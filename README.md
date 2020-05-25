@@ -1,5 +1,8 @@
 # oxid-esales/graphql-account
 
+[![Build Status](https://flat.badgen.net/travis/OXID-eSales/graphql-account-module/?icon=travis&label=build&cache=300&scale=1.1)](https://travis-ci.com/OXID-eSales/graphql-account-module)
+[![PHP Version](https://flat.badgen.net/packagist/php/OXID-eSales/graphql-account/?cache=300&scale=1.1)](https://github.com/oxid-esales/graphql-account-module)
+
 This module provides account related [GraphQL](https://www.graphql.org) queries and mutations for the [OXID eShop](https://www.oxid-esales.com/)
 ## Usage
 
