@@ -56,4 +56,15 @@ final class WishedPrice
             new WishedPriceFilterList()
         );
     }
+
+    /**
+     * @Mutation()
+     */
+    public function wishedPriceSet(WishedPriceDataType $wishedPrice): WishedPriceDataType
+    {
+        $this->wishedPriceService->save($wishedPrice);
+        $this->wishedPriceService->sendNotification($wishedPrice);
+
+        return $wishedPrice;
+    }
 }

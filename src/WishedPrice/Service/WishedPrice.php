@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceNotFound;
@@ -100,6 +101,29 @@ final class WishedPrice
             ),
             WishedPriceDataType::class
         );
+    }
+
+    public function save(WishedPriceDataType $wishedPrice): bool
+    {
+        $modelItem = $wishedPrice->getEshopModel();
+        return $this->repository->saveModel($modelItem);
+    }
+
+    public function sendNotification(WishedPriceDataType $wishedPrice): bool
+    {
+        /** @var Email $email */
+        $email = oxNew(Email::class);
+
+        $result = $email->sendPriceAlarmNotification([
+            'aid' => $wishedPrice->getProductId(),
+            'email' => $wishedPrice->getEmail()
+        ], $wishedPrice->getEshopModel());
+
+        if (!$result) {
+            throw new \Exception('Failed to send notification');
+        }
+
+        return true;
     }
 
     /**

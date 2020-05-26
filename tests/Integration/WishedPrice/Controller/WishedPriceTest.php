@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
 final class WishedPriceTest extends TokenTestCase
@@ -34,6 +35,8 @@ final class WishedPriceTest extends TokenTestCase
     private const WISHED_PRICE_WITH_NON_EXISTING_USER = '_test_wished_price_7_';
 
     private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
+
+    private const PRODUCT_ID = "058e613db53d782adfc9f2ccb43c45fe";
 
     public function testGetWishedPrice(): void
     {
@@ -305,5 +308,123 @@ final class WishedPriceTest extends TokenTestCase
             $count,
             $result['body']['data']['wishedPrices']
         );
+    }
+
+    public function testWishedPriceSetWithoutAuthorization()
+    {
+        $result = $this->query(
+            'mutation {
+                wishedPriceSet(wishedPrice: {
+                    productId: "' . self::PRODUCT_ID . '",
+                    currencyName: "EUR",
+                    price: 15.00
+                }) {
+                    id
+                    email
+                    notificationDate
+                    creationDate
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(403, $result);
+    }
+
+    /**
+     * @dataProvider wishedPriceSetWithMissingEntitiesProvider
+     *
+     * @param string $productId
+     * @param string $currency
+     * @param string $message
+     */
+    public function testWishedPriceSetWithMissingEntities(string $productId, string $currency, string $message)
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceSet(wishedPrice: { productId: "' . $productId . '", currencyName: "' .
+                        $currency . '", price: 15.00}) {
+                    id
+                    email
+                    notificationDate
+                    creationDate
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
+        $this->assertEquals($message, $result['body']['errors'][0]['message']);
+    }
+
+    public function wishedPriceSetWithMissingEntitiesProvider(): array
+    {
+        return [
+            [
+                'DOES-NOT-EXIST',
+                'EUR',
+                'Product was not found by id: DOES-NOT-EXIST'
+            ],
+            [
+                self::PRODUCT_ID,
+                'ABC',
+                'Currency "ABC" was not found'
+            ]
+        ];
+    }
+
+    public function testWishedPriceSet()
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceSet(wishedPrice: {
+                    productId: "' . self::PRODUCT_ID . '",
+                    currencyName: "EUR",
+                    price: 15.00
+                }) {
+                    id
+                    user {
+                        userName
+                    }
+                    email
+                    product {
+                        id
+                    }
+                    currency {
+                        name
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $wishedPrice = $result['body']['data']['wishedPriceSet'];
+        $wishedPriceId = $wishedPrice['id'];
+        unset($wishedPrice['id']);
+
+        $expectedWishedPrice = [
+            'user' => ['userName' => self::USERNAME],
+            'email' => self::USERNAME,
+            'product' => ['id' => self::PRODUCT_ID],
+            'currency' => ['name' => 'EUR']
+        ];
+
+        $this->assertEquals($expectedWishedPrice, $wishedPrice);
+
+        /** @var PriceAlarm $savedWishedPrice */
+        $savedWishedPrice = oxNew(PriceAlarm::class);
+        $savedWishedPrice->load($wishedPriceId);
+
+        $this->assertTrue($savedWishedPrice->isLoaded());
+
+        $user = $savedWishedPrice->getUser();
+
+        $this->assertEquals($expectedWishedPrice['user']['userName'], $user->getFieldData('oxusername'));
+        $this->assertEquals($expectedWishedPrice['email'], $user->getFieldData('oxusername'));
+        $this->assertEquals($expectedWishedPrice['product']['id'], $savedWishedPrice->getArticle()->getId());
+        $this->assertEquals($expectedWishedPrice['currency']['name'], $savedWishedPrice->getPriceAlarmCurrency()->name);
     }
 }
