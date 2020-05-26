@@ -24,6 +24,7 @@ final class WishedPriceTest extends TokenTestCase
     private const WISHED_PRICE_WITHOUT_USER = '_test_wished_price_without_user_';
     private const WISHED_PRICE_ASSIGNED_TO_OTHER_USER = '_test_wished_price_2_'; // Belongs to otheruser@oxid-esales.com
     private const WISHED_PRICE_WITH_NON_EXISTING_USER = '_test_wished_price_7_';
+    private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
 
     public function testGetWishedPrice()
     {
@@ -162,5 +163,81 @@ final class WishedPriceTest extends TokenTestCase
         );
 
         $this->assertResponseStatus(200, $result);
+    }
+
+    public function testDeleteWishedPriceWithoutToken()
+    {
+        $result = $this->query(
+            'mutation {
+                wishedPriceDelete(wishedPriceId: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(401, $result);
+    }
+
+    public function providerDeleteWishedPrice()
+    {
+        return [
+            'admin' => [
+                'username' => 'admin',
+                'password' => 'admin',
+                'expected' => 200
+            ],
+            'user'  => [
+                'username' => 'user@oxid-esales.com',
+                'password' => 'useruser',
+                'expected' => 200
+            ],
+            'otheruser'  => [
+                'username' => 'otheruser@oxid-esales.com',
+                'password' => 'useruser',
+                'expected' => 401
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider providerDeleteWishedPrice
+     */
+    public function testDeleteExistingWishedPriceWithToken(string $username, string $password, int $expected)
+    {
+        $this->prepareToken($username, $password);
+
+        //wished price in question belongs to user@oxid-esales.com.
+        //so admin and this user should be able to delete the wished price, otheruser not.
+        $result = $this->query(
+            'mutation {
+                wishedPriceDelete(wishedPriceId: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus($expected, $result);
+
+        if (200 == $expected) {
+            $this->assertEquals(self::WISHED_PRICE_TO_BE_DELETED, $result['body']['data']['wishedPriceDelete']['id']);
+        }
+    }
+
+    /**
+     * @dataProvider providerDeleteWishedPrice
+     */
+    public function testDeleteNonExistingWishedPrice(string $username, string $password)
+    {
+        $this->prepareToken($username, $password);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceDelete(wishedPriceId: "non_existing_wished_price") {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
     }
 }

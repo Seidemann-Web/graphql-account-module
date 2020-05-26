@@ -19,6 +19,7 @@ class WishedPriceMultiShopTest extends MultishopTestCase
 
     private const WISHED_PRICE_SHOP_1 = '_test_wished_price_1_';
     private const WISHED_PRICE_SHOP_2 = '_test_wished_price_8_';
+    private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
 
     public function dataProviderWishedPricePerShop()
     {
@@ -80,6 +81,24 @@ class WishedPriceMultiShopTest extends MultishopTestCase
         $result = $this->query(
             'query{
                 wishedPrice(id: "' . self::WISHED_PRICE_SHOP_1 . '") {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
+    }
+
+    public function testDeleteShop1WishedPriceFromShop2()
+    {
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceDelete(wishedPriceId: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
                     id
                 }
             }'

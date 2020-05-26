@@ -15,11 +15,30 @@ use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
+use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPriceService;
+use OxidEsales\GraphQL\Base\Service\Authentication;
+use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Controller\Base;
+use OxidEsales\GraphQL\Catalogue\Service\Repository;
 use TheCodingMachine\GraphQLite\Annotations\Query;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
 class WishedPrice extends Base
 {
+    /** @var WishedPriceService */
+    private $wishedPriceService = null;
+
+    public function __construct(
+        Repository $repository,
+        Authentication $authenticationService,
+        Authorization $authorizationService,
+        WishedPriceService $wishedPriceService
+    ) {
+        parent::__construct($repository, $authenticationService, $authorizationService);
+
+        $this->wishedPriceService = $wishedPriceService;
+    }
+
     /**
      * @Query()
      *
@@ -64,5 +83,15 @@ class WishedPrice extends Base
         }
 
         return $wishedPrice;
+    }
+
+    /**
+     * @Mutation()
+     *
+     * @return WishedPriceDataType
+     */
+    public function wishedPriceDelete(string $wishedPriceId): WishedPriceDataType
+    {
+        return $this->wishedPriceService->delete($wishedPriceId);
     }
 }
