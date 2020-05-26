@@ -3,3 +3,16 @@ services:
   _defaults:
     public: false
     autowire: true
+
+  OxidEsales\GraphQL\Account\WishedPrice\Controller\:
+      resource: 'src/WishedPrice/Controller/'
+      public: true
+
+  OxidEsales\GraphQL\Account\WishedPrice\DataTypeServices:
+      namespace: OxidEsales\GraphQL\Account\WishedPrice\DataType\
+      resource: 'src/WishedPrice/DataType/*Service.php'
+      public: true
+
+  OxidEsales\GraphQL\Account\Framework\NamespaceMapper:
+      class: OxidEsales\GraphQL\Account\Framework\NamespaceMapper
+      tags: ['graphql_namespace_mapper']
