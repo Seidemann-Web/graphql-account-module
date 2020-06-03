@@ -16,6 +16,7 @@ class NamespaceMapper implements NamespaceMapperInterface
     public function getControllerNamespaceMapping(): array
     {
         return [
+            '\\OxidEsales\\GraphQL\\Account\\Rating\\Controller' => __DIR__ . '/../Rating/Controller/',
             '\\OxidEsales\\GraphQL\\Account\\WishedPrice\\Controller' => __DIR__ . '/../WishedPrice/Controller/'
         ];
     }
@@ -23,6 +24,7 @@ class NamespaceMapper implements NamespaceMapperInterface
     public function getTypeNamespaceMapping(): array
     {
         return [
+            '\\OxidEsales\\GraphQL\\Account\\Rating\\DataType' => __DIR__ . '/../Rating/DataType/',
             '\\OxidEsales\\GraphQL\\Account\\WishedPrice\\DataType' => __DIR__ . '/../WishedPrice/DataType/',
         ];
     }

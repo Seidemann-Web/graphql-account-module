@@ -4,6 +4,18 @@ services:
     public: false
     autowire: true
 
+  OxidEsales\GraphQL\Account\Rating\Controller\:
+      resource: 'src/Rating/Controller/*'
+      public: true
+
+  OxidEsales\GraphQL\Account\Rating\DataType\:
+      resource: 'src/Rating/DataType/*'
+      public: true
+
+  OxidEsales\GraphQL\Account\Rating\Services\:
+      resource: 'src/Rating/Services/*'
+      public: true
+
   OxidEsales\GraphQL\Account\WishedPrice\Controller\:
       resource: 'src/WishedPrice/Controller/'
       public: true
