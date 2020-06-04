@@ -8,7 +8,11 @@ services:
       resource: 'src/WishedPrice/Controller/'
       public: true
 
-  OxidEsales\GraphQL\Account\WishedPrice\DataTypeServices:
+  OxidEsales\GraphQL\Account\WishedPrice\Services\:
+      namespace: OxidEsales\GraphQL\Account\WishedPrice\Service\
+      resource: 'src/WishedPrice/Service/*.php'
+
+  OxidEsales\GraphQL\Account\WishedPrice\DataTypeServices\:
       namespace: OxidEsales\GraphQL\Account\WishedPrice\DataType\
       resource: 'src/WishedPrice/DataType/*Service.php'
       public: true

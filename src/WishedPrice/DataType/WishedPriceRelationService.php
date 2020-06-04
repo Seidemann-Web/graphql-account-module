@@ -19,6 +19,7 @@ use OxidEsales\GraphQL\Catalogue\Service\Repository;
 use stdClass;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
+use OxidEsales\GraphQL\Catalogue\Service\Product as CatalogueProductService;
 
 /**
  * @ExtendType(class=WishedPrice::class)
@@ -28,10 +29,15 @@ class WishedPriceRelationService
     /** @var Repository */
     private $repository;
 
+    /** @var CatalogueProductService */
+    private $productService;
+
     public function __construct(
-        Repository $repository
+        Repository $repository,
+        CatalogueProductService $productService
     ) {
         $this->repository = $repository;
+        $this->productService = $productService;
     }
 
     /**
@@ -62,9 +68,8 @@ class WishedPriceRelationService
     public function getProduct(WishedPrice $wishedPrice): Product
     {
         /** @var Product $product */
-        $product = $this->repository->getById(
-            (string)$wishedPrice->getProductId(),
-            Product::class
+        $product = $this->productService->product(
+            (string)$wishedPrice->getProductId()
         );
 
         return $product;

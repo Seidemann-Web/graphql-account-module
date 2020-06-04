@@ -169,7 +169,7 @@ final class WishedPriceTest extends TokenTestCase
     {
         $result = $this->query(
             'mutation {
-                wishedPriceDelete(wishedPriceId: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
+                wishedPriceDelete(id: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
                     id
                 }
             }'
@@ -184,16 +184,19 @@ final class WishedPriceTest extends TokenTestCase
             'admin' => [
                 'username' => 'admin',
                 'password' => 'admin',
+                'oxid'     => self::WISHED_PRICE_TO_BE_DELETED . '1_',
                 'expected' => 200
             ],
             'user'  => [
                 'username' => 'user@oxid-esales.com',
                 'password' => 'useruser',
+                'oxid'     => self::WISHED_PRICE_TO_BE_DELETED . '2_',
                 'expected' => 200
             ],
             'otheruser'  => [
                 'username' => 'otheruser@oxid-esales.com',
                 'password' => 'useruser',
+                'oxid'     => self::WISHED_PRICE_TO_BE_DELETED . '3_',
                 'expected' => 401
             ]
         ];
@@ -202,7 +205,7 @@ final class WishedPriceTest extends TokenTestCase
     /**
      * @dataProvider providerDeleteWishedPrice
      */
-    public function testDeleteExistingWishedPriceWithToken(string $username, string $password, int $expected)
+    public function testDeleteWishedPriceWithToken(string $username, string $password, string $oxid, int $expected)
     {
         $this->prepareToken($username, $password);
 
@@ -210,7 +213,7 @@ final class WishedPriceTest extends TokenTestCase
         //so admin and this user should be able to delete the wished price, otheruser not.
         $result = $this->query(
             'mutation {
-                wishedPriceDelete(wishedPriceId: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
+                wishedPriceDelete(id: "' . $oxid . '") {
                     id
                 }
             }'
@@ -219,7 +222,7 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertResponseStatus($expected, $result);
 
         if (200 == $expected) {
-            $this->assertEquals(self::WISHED_PRICE_TO_BE_DELETED, $result['body']['data']['wishedPriceDelete']['id']);
+            $this->assertEquals($oxid, $result['body']['data']['wishedPriceDelete']['id']);
         }
     }
 
@@ -232,7 +235,7 @@ final class WishedPriceTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                wishedPriceDelete(wishedPriceId: "non_existing_wished_price") {
+                wishedPriceDelete(id: "non_existing_wished_price") {
                     id
                 }
             }'

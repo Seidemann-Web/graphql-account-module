@@ -98,7 +98,7 @@ class WishedPriceMultiShopTest extends MultishopTestCase
 
         $result = $this->query(
             'mutation {
-                wishedPriceDelete(wishedPriceId: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
+                wishedPriceDelete(id: "' . self::WISHED_PRICE_TO_BE_DELETED . '") {
                     id
                 }
             }'
