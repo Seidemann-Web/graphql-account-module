@@ -60,9 +60,83 @@ final class RatingTest extends TokenTestCase
 
         $ratingData = $result['body']['data']['ratingSet'];
 
-        $this->assertStringMatchesFormat("%s", $ratingData['id']);
+        $id = $ratingData['id'];
+        $this->assertStringMatchesFormat("%s", $id);
         $this->assertSame(self::PRODUCTID, $ratingData['product']['id']);
         $this->assertSame(5, $ratingData['rating']);
         $this->assertSame(self::USERID, $ratingData['user']['id']);
+
+        $result = $this->query(
+            'query {
+                rating(ratingInput: {
+                    rating: 5,
+                    productId: "' . self::PRODUCTID . '"
+                }){
+                    id
+                    product{
+                        id
+                    }
+                    rating
+                    user{
+                        id
+                    }
+                }
+            }'
+        );
+    }
+
+    public function testSetRatingOutOfBounds()
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                ratingSet(ratingInput: {
+                    rating: 6,
+                    productId: "' . self::PRODUCTID . '"
+                }){
+                    id
+                    product{
+                        id
+                    }
+                    rating
+                    user{
+                        id
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(400, $result);
+        $this->assertSame("Rating should be in 1 to 5 interval", $result['body']['errors'][0]['debugMessage']);
+    }
+
+    public function testSetRatingWrongProduct()
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                ratingSet(ratingInput: {
+                    rating: 5,
+                    productId: "some_not_existing_product"
+                }){
+                    id
+                    product{
+                        id
+                    }
+                    rating
+                    user{
+                        id
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
+        $this->assertSame(
+            "Product was not found by id: some_not_existing_product",
+            $result['body']['errors'][0]['message']
+        );
     }
 }
