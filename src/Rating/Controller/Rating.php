@@ -44,5 +44,4 @@ class Rating extends Base
 
         return $ratingInput;
     }
-
 }
