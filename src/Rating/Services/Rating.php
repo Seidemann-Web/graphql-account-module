@@ -14,6 +14,7 @@ use OxidEsales\GraphQL\Catalogue\Service\Repository;
 
 class Rating
 {
+    /** @var Repository */
     private $repository;
 
     public function __construct(Repository $repository)

@@ -20,7 +20,10 @@ use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 class RatingInput
 {
+    /** @var Authentication */
     private $authentication;
+
+    /** @var Repository */
     private $repository;
 
     public function __construct(
@@ -39,6 +42,7 @@ class RatingInput
         $this->assertRatingValue($rating);
         $this->assertProductIdValue($productId);
 
+        /** @var \OxidEsales\Eshop\Application\Model\Rating */
         $model = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
         $model->assign([
             'OXTYPE' => 'oxarticle',
@@ -50,14 +54,21 @@ class RatingInput
         return new Rating($model);
     }
 
-    private function assertRatingValue($rating)
+    /**
+     * @return true
+     */
+    private function assertRatingValue(int $rating): bool
     {
         if ($rating < 1 || $rating > 5) {
             throw new RatingOutOfBounds();
         }
+        return true;
     }
 
-    private function assertProductIdValue($productId)
+    /**
+     * @return true
+     */
+    private function assertProductIdValue(string $productId): bool
     {
         try {
             /** @var Product $product */
@@ -65,5 +76,6 @@ class RatingInput
         } catch (NotFound $e) {
             throw ProductNotFound::byId($productId);
         }
+        return true;
     }
 }
