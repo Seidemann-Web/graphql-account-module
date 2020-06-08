@@ -68,21 +68,14 @@ final class RatingTest extends TokenTestCase
 
         $result = $this->query(
             'query {
-                rating(ratingInput: {
-                    rating: 5,
-                    productId: "' . self::PRODUCTID . '"
-                }){
+                rating(id: "' . $id . '") {
                     id
-                    product{
-                        id
-                    }
                     rating
-                    user{
-                        id
-                    }
                 }
             }'
         );
+
+        $this->assertSame(5, $result['body']['data']['rating']['rating']);
     }
 
     public function testSetRatingOutOfBounds()
