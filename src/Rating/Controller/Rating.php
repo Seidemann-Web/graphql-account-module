@@ -10,28 +10,30 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Rating\Controller;
 
 use OxidEsales\GraphQL\Account\Rating\Services\Rating as RatingService;
-use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Base\Service\Authorization;
-use OxidEsales\GraphQL\Catalogue\Controller\Base;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
-use OxidEsales\GraphQL\Catalogue\DataType\Rating as RatingType;
+use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
+use TheCodingMachine\GraphQLite\Annotations\Query;
 
-class Rating extends Base
+final class Rating
 {
     /** @var RatingService */
-    private $ratingService;
+    private $ratingService = null;
 
     public function __construct(
-        Repository $repository,
-        Authentication $authenticationService,
-        Authorization $authorizationService,
         RatingService $ratingService
     ) {
-        parent::__construct($repository, $authenticationService, $authorizationService);
-
         $this->ratingService = $ratingService;
+    }
+
+    /**
+     * @Query()
+     *
+     * @return RatingType[]
+     */
+    public function ratings(): array
+    {
+        return $this->ratingService->reviews();
     }
 
     /**

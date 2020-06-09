@@ -132,4 +132,38 @@ final class RatingTest extends TokenTestCase
             $result['body']['errors'][0]['message']
         );
     }
+
+    /**
+     * @dataProvider ratingUserProvider
+     */
+    public function testRatingsForUser(array $user, int $status, array $result)
+    {
+        if ($user) {
+            $this->prepareToken($user['username'], $user['password']);
+        }
+
+        $result = $this->query('query {
+            ratings {
+                id
+            }
+        }');
+
+        $this->assertResponseStatus($status, $result);
+    }
+
+    public function ratingUserProvider()
+    {
+        return [
+            'user' => [
+                'username' => 'user@oxid-esales.com',
+                'password' => 'useruser',
+            ],
+            'expectedStatus' => 200,
+            'expectedResult' => [
+                [
+                    'id' => 'none'
+                ]
+            ]
+        ];
+    }
 }
