@@ -250,17 +250,19 @@ final class WishedPriceTest extends TokenTestCase
             'admin' => [
                 'username' => 'admin',
                 'password' => 'admin',
-                'expected' => 200
+                'expected' => 200,
+                'count'    => 0
             ],
             'user'  => [
                 'username' => 'user@oxid-esales.com',
                 'password' => 'useruser',
-                'expected' => 200
+                'expected' => 200,
+                'count'    => 9
             ],
             'otheruser'  => [
                 'username' => 'otheruser@oxid-esales.com',
                 'password' => 'useruser',
-                'expected' => 401
+                'expected' => 401,
             ]
         ];
     }
@@ -268,7 +270,7 @@ final class WishedPriceTest extends TokenTestCase
     /**
      * @dataProvider providerWishedPrices
      */
-    public function testWishedPrices(string $username, string $password, int $expectedResponse)
+    public function testWishedPrices(string $username, string $password, int $expectedResponse, $count)
     {
         $this->prepareToken($username, $password);
 
@@ -285,7 +287,10 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertResponseStatus($expectedResponse, $result);
 
         if (200 == $expectedResponse) {
-            $this->assertEquals(5, $result['body']['data']['wishedPrices']);
+            $this->assertCount(
+                $count,
+                $result['body']['data']['wishedPrices']
+            );
         }
     }
 }
