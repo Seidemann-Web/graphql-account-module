@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Email;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceNotFound;
+use OxidEsales\GraphQL\Account\WishedPrice\Exception\NotificationSendFailure;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
@@ -115,12 +116,12 @@ final class WishedPrice
         $email = oxNew(Email::class);
 
         $result = $email->sendPriceAlarmNotification([
-            'aid' => $wishedPrice->getProductId(),
+            'aid' => $wishedPrice->getProductId()->val(),
             'email' => $wishedPrice->getEmail()
         ], $wishedPrice->getEshopModel());
 
         if (!$result) {
-            throw new \Exception('Failed to send notification');
+            throw NotificationSendFailure::create();
         }
 
         return true;

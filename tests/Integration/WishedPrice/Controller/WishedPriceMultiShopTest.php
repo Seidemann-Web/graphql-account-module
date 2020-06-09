@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
@@ -23,6 +24,9 @@ final class WishedPriceMultiShopTest extends MultishopTestCase
     private const WISHED_PRICE_SHOP_2 = '_test_wished_price_8_';
 
     private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
+
+    private const PRODUCT_ID_SHOP_1 = '_test_product_1_';
+    private const PRODUCT_ID_SHOP_2 = '_test_product_5_';
 
     public function dataProviderWishedPricePerShop()
     {
@@ -108,5 +112,44 @@ final class WishedPriceMultiShopTest extends MultishopTestCase
         );
 
         $this->assertResponseStatus(404, $result);
+    }
+
+    /**
+     * @dataProvider wishedPriceSetPerShopDataProvider
+     */
+    public function testWishedPriceSetPerShop(int $shopId, string $productId)
+    {
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', (string)$shopId);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceSet(wishedPrice: {
+                    productId: "' . $productId . '",
+                    currencyName: "EUR",
+                    price: 15.00
+                }) {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $wishedPrice = oxNew(PriceAlarm::class);
+        $wishedPrice->load($result['body']['data']['wishedPriceSet']['id']);
+
+        $this->assertTrue($wishedPrice->isLoaded());
+        $this->assertEquals($shopId, $wishedPrice->getShopId());
+    }
+
+    public function wishedPriceSetPerShopDataProvider(): array
+    {
+        return [
+            [1, self::PRODUCT_ID_SHOP_1],
+            [2, self::PRODUCT_ID_SHOP_2]
+        ];
     }
 }
