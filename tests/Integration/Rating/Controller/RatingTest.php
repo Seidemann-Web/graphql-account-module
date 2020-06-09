@@ -136,7 +136,7 @@ final class RatingTest extends TokenTestCase
     /**
      * @dataProvider ratingUserProvider
      */
-    public function testRatingsForUser(array $user, int $status, array $result)
+    public function testRatingsForUser(array $user, int $status, $expectedRatings)
     {
         if ($user) {
             $this->prepareToken($user['username'], $user['password']);
@@ -149,19 +149,49 @@ final class RatingTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus($status, $result);
+
+        $this->assertEquals(
+            $expectedRatings,
+            $result['body']['data']['ratings']
+        );
     }
 
     public function ratingUserProvider()
     {
         return [
-            'user' => [
-                'username' => 'user@oxid-esales.com',
-                'password' => 'useruser',
-            ],
-            'expectedStatus' => 200,
-            'expectedResult' => [
-                [
-                    'id' => 'none'
+            [
+                'user' => [],
+                'expectedStatus' => 403,
+                'expectedResult' => null
+            ], [
+                'user' => [
+                    'username' => 'user@oxid-esales.com',
+                    'password' => 'useruser',
+                ],
+                'expectedStatus' => 200,
+                'expectedResult' => [
+                    [
+                        'id' => '13f810d1aa415400c8abdd37a5b2181a'
+                    ], [
+                        'id' => '944374b68a8b26d8d95a8b11ad574a75'
+                    ], [
+                        'id' => 'bcb64c798fd5ec58e5a6de30d52afee2'
+                    ], [
+                        'id' => 'c62d0873a0ed83aeed879c83aa863f23'
+                    ], [
+                        'id' => 'e7aa4c3a8508491a7e875f26b51fe4d0'
+                    ]
+                ]
+            ], [
+                'user' => [
+                    'username' => 'otheruser@oxid-esales.com',
+                    'password' => 'useruser',
+                ],
+                'expectedStatus' => 200,
+                'expectedResult' => [
+                    [
+                        'id' => '_test_user_rating'
+                    ]
                 ]
             ]
         ];

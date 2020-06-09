@@ -7,9 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Catalogue\DataType;
+namespace OxidEsales\GraphQL\Account\Rating\DataType;
 
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
+use OxidEsales\GraphQL\Catalogue\DataType\FilterList;
 
 class RatingFilterList extends FilterList
 {
