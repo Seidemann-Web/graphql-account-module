@@ -10,9 +10,12 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
+use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceRelationService;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceNotFound;
+use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
+use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
@@ -82,6 +85,23 @@ class WishedPriceService
         }
 
         return $wishedPrice;
+    }
+
+    /**
+     * @throws InvalidToken
+     * @return WishedPriceDataType[]
+     */
+    public function wishedPrices(): array
+    {
+        $userIdFilter = new StringFilter($this->authenticationService->getUserId());
+        $filter = new WishedPriceFilterList($userIdFilter);
+
+        $wishedPrices = $this->repository->getByFilter(
+            $filter,
+            WishedPriceDataType::class
+        );
+
+        return $wishedPrices;
     }
 
     /**

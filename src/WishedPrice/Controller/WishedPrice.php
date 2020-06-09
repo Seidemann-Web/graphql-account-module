@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\WishedPrice\Controller;
 
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPriceService;
+use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Service\Repository;
@@ -46,5 +47,16 @@ final class WishedPrice
     public function wishedPriceDelete(string $id): WishedPriceDataType
     {
         return $this->wishedPriceService->delete($id);
+    }
+
+    /**
+     * @Query()
+     *
+     * @throws InvalidToken
+     * @return WishedPriceDataType[]
+     */
+    public function wishedPrices(): array
+    {
+        return $this->wishedPriceService->wishedPrices();
     }
 }

@@ -243,4 +243,49 @@ final class WishedPriceTest extends TokenTestCase
 
         $this->assertResponseStatus(404, $result);
     }
+
+    public function providerWishedPrices()
+    {
+        return [
+            'admin' => [
+                'username' => 'admin',
+                'password' => 'admin',
+                'expected' => 200
+            ],
+            'user'  => [
+                'username' => 'user@oxid-esales.com',
+                'password' => 'useruser',
+                'expected' => 200
+            ],
+            'otheruser'  => [
+                'username' => 'otheruser@oxid-esales.com',
+                'password' => 'useruser',
+                'expected' => 401
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider providerWishedPrices
+     */
+    public function testWishedPrices(string $username, string $password, int $expectedResponse)
+    {
+        $this->prepareToken($username, $password);
+
+        //wished price in question belongs to user@oxid-esales.com.
+        //so admin and this user should be able to delete the wished price, otheruser not.
+        $result = $this->query(
+            'query {
+                wishedPrices {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus($expectedResponse, $result);
+
+        if (200 == $expectedResponse) {
+            $this->assertEquals(5, $result['body']['data']['wishedPrices']);
+        }
+    }
 }
