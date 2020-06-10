@@ -19,7 +19,7 @@ class WishedPriceFilterList extends FilterList
     /** @var ?StringFilter */
     private $userId = null;
 
-    public function __construct(?StringFilter $userId)
+    public function __construct(?StringFilter $userId = null)
     {
         $this->userId = $userId;
         parent::__construct();
@@ -31,6 +31,13 @@ class WishedPriceFilterList extends FilterList
     public static function createWishedPriceFilterList(?StringFilter $userId): self
     {
         return new self($userId);
+    }
+
+    public function withUserFilter(StringFilter $user): self
+    {
+        $filter = clone $this;
+        $filter->userId = $user;
+        return $filter;
     }
 
     /**

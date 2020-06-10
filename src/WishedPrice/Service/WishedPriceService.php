@@ -91,13 +91,14 @@ class WishedPriceService
      * @throws InvalidToken
      * @return WishedPriceDataType[]
      */
-    public function wishedPrices(): array
+    public function wishedPrices(WishedPriceFilterList $filter): array
     {
-        $userIdFilter = new StringFilter($this->authenticationService->getUserId());
-        $filter = new WishedPriceFilterList($userIdFilter);
-
         $wishedPrices = $this->repository->getByFilter(
-            $filter,
+            $filter->withUserFilter(
+                new StringFilter(
+                    $this->authenticationService->getUserId()
+                )
+            ),
             WishedPriceDataType::class
         );
 

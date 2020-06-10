@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\WishedPrice\Controller;
 
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPriceService;
+use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
@@ -57,6 +58,8 @@ final class WishedPrice
      */
     public function wishedPrices(): array
     {
-        return $this->wishedPriceService->wishedPrices();
+        return $this->wishedPriceService->wishedPrices(
+            new WishedPriceFilterList()
+        );
     }
 }
