@@ -21,7 +21,7 @@ use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Service\Repository;
 
-class WishedPriceService
+class WishedPrice
 {
     /** @var Repository */
     private $repository;
