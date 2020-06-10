@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Rating\DataType;
 
+use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\GraphQL\Account\Rating\Exception\RatingOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
@@ -41,13 +42,13 @@ class RatingInput
         $this->assertRatingValue($rating);
         $this->assertProductIdValue($productId);
 
-        /** @var \OxidEsales\Eshop\Application\Model\Rating */
-        $model = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
+        /** @var RatingEshopModel */
+        $model = oxNew(RatingEshopModel::class);
         $model->assign([
-            'OXTYPE' => 'oxarticle',
+            'OXTYPE'     => 'oxarticle',
             'OXOBJECTID' => $productId,
-            'OXRATING' => $rating,
-            'OXUSERID' => $this->authentication->getUserId()
+            'OXRATING'   => $rating,
+            'OXUSERID'   => $this->authentication->getUserId()
         ]);
 
         return new Rating($model);

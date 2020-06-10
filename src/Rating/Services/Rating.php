@@ -37,7 +37,6 @@ class Rating
      */
     public function reviews(?RatingFilterList $filterList = null): array
     {
-
         return $this->repository->getByFilter(
             $filterList ?? new RatingFilterList(
                 new StringFilter($this->authenticationService->getUserId())
