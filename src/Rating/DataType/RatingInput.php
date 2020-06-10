@@ -13,7 +13,6 @@ use OxidEsales\GraphQL\Account\Rating\Exception\RatingOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\DataType\Product;
-use OxidEsales\GraphQL\Catalogue\DataType\Rating;
 use OxidEsales\GraphQL\Catalogue\Exception\ProductNotFound;
 use OxidEsales\GraphQL\Catalogue\Service\Repository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
@@ -55,17 +54,19 @@ class RatingInput
     }
 
     /**
+     * @throws RatingOutOfBounds
      * @return true
      */
     private function assertRatingValue(int $rating): bool
     {
         if ($rating < 1 || $rating > 5) {
-            throw new RatingOutOfBounds();
+            throw RatingOutOfBounds::byWrongValue($rating);
         }
         return true;
     }
 
     /**
+     * @throws ProductNotFound
      * @return true
      */
     private function assertProductIdValue(string $productId): bool
