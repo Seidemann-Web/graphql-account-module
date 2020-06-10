@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Exception;
+namespace OxidEsales\GraphQL\Account\Rating\Exception;
 
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 

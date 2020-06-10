@@ -30,11 +30,21 @@ final class Rating
     /**
      * @Query()
      *
+     * @return RatingType
+     */
+    public function rating(string $id): RatingType
+    {
+        return $this->ratingService->rating($id);
+    }
+
+    /**
+     * @Query()
+     *
      * @return RatingType[]
      */
     public function ratings(): array
     {
-        return $this->ratingService->reviews(
+        return $this->ratingService->ratings(
             new RatingFilterList()
         );
     }

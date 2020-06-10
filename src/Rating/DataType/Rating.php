@@ -65,4 +65,9 @@ final class Rating implements DataType
             (string)$this->rating->getFieldData('oxtimestamp')
         );
     }
+
+    public function getUserId(): string
+    {
+        return (string) $this->rating->getFieldData('oxuserid');
+    }
 }

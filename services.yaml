@@ -32,3 +32,7 @@ services:
   OxidEsales\GraphQL\Account\Framework\NamespaceMapper:
       class: OxidEsales\GraphQL\Account\Framework\NamespaceMapper
       tags: ['graphql_namespace_mapper']
+
+  OxidEsales\GraphQL\Account\Service\PermissionProvider:
+      class: OxidEsales\GraphQL\Account\Service\PermissionProvider
+      tags: ['graphql_permission_provider']
