@@ -35,11 +35,13 @@ class Rating
     /**
      * @return RatingType[]
      */
-    public function reviews(?RatingFilterList $filterList = null): array
+    public function reviews(RatingFilterList $filterList): array
     {
         return $this->repository->getByFilter(
-            $filterList ?? new RatingFilterList(
-                new StringFilter($this->authenticationService->getUserId())
+            $filterList->withUserFilter(
+                new StringFilter(
+                    $this->authenticationService->getUserId()
+                )
             ),
             RatingType::class
         );

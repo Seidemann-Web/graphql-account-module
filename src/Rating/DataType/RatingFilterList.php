@@ -25,6 +25,13 @@ class RatingFilterList extends FilterList
         parent::__construct();
     }
 
+    public function withUserFilter(StringFilter $user): self
+    {
+        $filter = clone $this;
+        $filter->userId = $user;
+        return $filter;
+    }
+
     /**
      * @return array{
      *  oxuserId: null|StringFilter

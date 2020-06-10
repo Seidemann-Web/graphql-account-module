@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Rating\Controller;
 
 use OxidEsales\GraphQL\Account\Rating\Services\Rating as RatingService;
+use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
@@ -33,17 +34,19 @@ final class Rating
      */
     public function ratings(): array
     {
-        return $this->ratingService->reviews();
+        return $this->ratingService->reviews(
+            new RatingFilterList()
+        );
     }
 
     /**
      * @Mutation()
      * @Logged()
      */
-    public function ratingSet(RatingType $ratingInput): RatingType
+    public function ratingSet(RatingType $rating): RatingType
     {
-        $this->ratingService->save($ratingInput);
+        $this->ratingService->save($rating);
 
-        return $ratingInput;
+        return $rating;
     }
 }
