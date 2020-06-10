@@ -12,7 +12,7 @@ namespace OxidEsales\GraphQL\Account\Rating\DataType;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Catalogue\DataType\FilterList;
 
-class RatingFilterList extends FilterList
+final class RatingFilterList extends FilterList
 {
     /** @var null|StringFilter */
     protected $userId;
@@ -34,13 +34,13 @@ class RatingFilterList extends FilterList
 
     /**
      * @return array{
-     *  oxuserId: null|StringFilter
+     *  oxuserid: null|StringFilter
      * }
      */
     public function getFilters(): array
     {
         return [
-            'oxuserId' => $this->userId
+            'oxuserid' => $this->userId
         ];
     }
 }

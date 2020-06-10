@@ -15,13 +15,12 @@ use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Service\Repository;
 
-class Rating
+final class Rating
 {
     /** @var Repository */
     private $repository;
-    /**
-     * @var Authentication
-     */
+
+    /** @var Authentication */
     private $authenticationService;
 
     public function __construct(

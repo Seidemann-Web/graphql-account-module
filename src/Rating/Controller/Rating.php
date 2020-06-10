@@ -19,7 +19,7 @@ use TheCodingMachine\GraphQLite\Annotations\Query;
 final class Rating
 {
     /** @var RatingService */
-    private $ratingService = null;
+    private $ratingService;
 
     public function __construct(
         RatingService $ratingService

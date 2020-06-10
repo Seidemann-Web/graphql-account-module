@@ -18,7 +18,7 @@ use OxidEsales\GraphQL\Catalogue\Exception\ProductNotFound;
 use OxidEsales\GraphQL\Catalogue\Service\Repository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
-class RatingInput
+final class RatingInput
 {
     /** @var Authentication */
     private $authentication;
