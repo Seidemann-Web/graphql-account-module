@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Rating\DataType;
+namespace OxidEsales\GraphQL\Account\Rating\Service;
 
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Catalogue\Exception\ProductNotFound;
@@ -15,6 +15,7 @@ use OxidEsales\GraphQL\Catalogue\DataType\Product;
 use OxidEsales\GraphQL\Catalogue\Service\Product as ProductService;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
+use OxidEsales\GraphQL\Account\Rating\DataType\Rating;
 
 /**
  * @ExtendType(class=Rating::class)
