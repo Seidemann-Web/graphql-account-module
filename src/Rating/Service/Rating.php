@@ -42,11 +42,38 @@ final class Rating
     }
 
     /**
+     * @throws InvalidLogin
      * @throws RatingNotFound
      */
     public function rating(string $id): RatingType
     {
-        return $this->getRating($id);
+        /** Only logged in users can query ratings */
+        if (!$this->authenticationService->isLogged()) {
+            throw new InvalidLogin('Unauthenticated');
+        }
+
+        try {
+            /** @var RatingType $rating */
+            $rating = $this->repository->getById(
+                $id,
+                RatingType::class,
+                false
+            );
+        } catch (NotFound $e) {
+            throw RatingNotFound::byId($id);
+        }
+
+        /** If the logged in user is authorized return the rating */
+        if ($this->authorizationService->isAllowed('VIEW_RATINGS')) {
+            return $rating;
+        }
+
+        /** A user can query only its own rating */
+        if (!$this->isSameUser($rating)) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        return $rating;
     }
 
     /**
@@ -78,7 +105,7 @@ final class Rating
      */
     public function delete(string $id): RatingDataType
     {
-        $rating = $this->getRating($id);
+        $rating = $this->rating($id);
 
         //we got this far, we have a user
         //user can delete only its own rating, admin can delete any rating
@@ -97,40 +124,5 @@ final class Rating
     private function isSameUser(RatingType $rating): bool
     {
         return ((string)$rating->getUserId() === (string)$this->authenticationService->getUserId());
-    }
-
-    /**
-     * @throws InvalidLogin
-     * @throws RatingNotFound
-     */
-    private function getRating(string $id): RatingType
-    {
-        /** Only logged in users can query ratings */
-        if (!$this->authenticationService->isLogged()) {
-            throw new InvalidLogin('Unauthenticated');
-        }
-
-        try {
-            /** @var RatingType $rating */
-            $rating = $this->repository->getById(
-                $id,
-                RatingType::class,
-                false
-            );
-        } catch (NotFound $e) {
-            throw RatingNotFound::byId($id);
-        }
-
-        /** If the logged in user is authorized return the rating */
-        if ($this->authorizationService->isAllowed('VIEW_RATINGS')) {
-            return $rating;
-        }
-
-        /** A user can query only its own rating */
-        if (!$this->isSameUser($rating)) {
-            throw new InvalidLogin('Unauthorized');
-        }
-
-        return $rating;
     }
 }
