@@ -12,7 +12,7 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
-class WishedPriceMultiShopTest extends MultishopTestCase
+final class WishedPriceMultiShopTest extends MultishopTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
     private const PASSWORD = 'useruser';
