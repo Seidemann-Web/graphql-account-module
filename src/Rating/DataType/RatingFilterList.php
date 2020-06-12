@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Rating\DataType;
 
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
-use OxidEsales\GraphQL\Catalogue\DataType\FilterList;
+use OxidEsales\GraphQL\Catalogue\Shared\DataType\FilterList;
 
 final class RatingFilterList extends FilterList
 {
@@ -27,20 +27,21 @@ final class RatingFilterList extends FilterList
 
     public function withUserFilter(StringFilter $user): self
     {
-        $filter = clone $this;
+        $filter         = clone $this;
         $filter->userId = $user;
+
         return $filter;
     }
 
     /**
      * @return array{
-     *  oxuserid: null|StringFilter
-     * }
+     *                oxuserid: null|StringFilter
+     *                }
      */
     public function getFilters(): array
     {
         return [
-            'oxuserid' => $this->userId
+            'oxuserid' => $this->userId,
         ];
     }
 }

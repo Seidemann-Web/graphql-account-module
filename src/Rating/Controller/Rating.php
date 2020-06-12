@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Rating\Controller;
 
-use OxidEsales\GraphQL\Account\Rating\Service\Rating as RatingService;
+use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
+use OxidEsales\GraphQL\Account\Rating\Service\Rating as RatingService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
-use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class Rating
@@ -29,8 +29,6 @@ final class Rating
 
     /**
      * @Query()
-     *
-     * @return RatingType
      */
     public function rating(string $id): RatingType
     {

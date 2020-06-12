@@ -14,14 +14,19 @@ use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 final class RatingTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
+
     private const USERID = 'e7af1c3b786fd02906ccd75698f4e6b9';
+
     private const PRODUCTID = '058c7b525aad619d8b343c0ffada0247';
 
     /**
      * @dataProvider ratingUserProvider
+     *
+     * @param mixed $expectedRatings
      */
-    public function testRatingsForUser(array $user, int $status, $expectedRatings)
+    public function testRatingsForUser(array $user, int $status, $expectedRatings): void
     {
         if ($user) {
             $this->prepareToken($user['username'], $user['password']);
@@ -45,9 +50,9 @@ final class RatingTest extends TokenTestCase
     {
         return [
             [
-                'user' => [],
+                'user'           => [],
                 'expectedStatus' => 403,
-                'expectedResult' => null
+                'expectedResult' => null,
             ], [
                 'user' => [
                     'username' => 'user@oxid-esales.com',
@@ -56,17 +61,17 @@ final class RatingTest extends TokenTestCase
                 'expectedStatus' => 200,
                 'expectedResult' => [
                     [
-                        'id' => '13f810d1aa415400c8abdd37a5b2181a'
+                        'id' => '13f810d1aa415400c8abdd37a5b2181a',
                     ], [
-                        'id' => '944374b68a8b26d8d95a8b11ad574a75'
+                        'id' => '944374b68a8b26d8d95a8b11ad574a75',
                     ], [
-                        'id' => 'bcb64c798fd5ec58e5a6de30d52afee2'
+                        'id' => 'bcb64c798fd5ec58e5a6de30d52afee2',
                     ], [
-                        'id' => 'c62d0873a0ed83aeed879c83aa863f23'
+                        'id' => 'c62d0873a0ed83aeed879c83aa863f23',
                     ], [
-                        'id' => 'e7aa4c3a8508491a7e875f26b51fe4d0'
-                    ]
-                ]
+                        'id' => 'e7aa4c3a8508491a7e875f26b51fe4d0',
+                    ],
+                ],
             ], [
                 'user' => [
                     'username' => 'otheruser@oxid-esales.com',
@@ -75,14 +80,14 @@ final class RatingTest extends TokenTestCase
                 'expectedStatus' => 200,
                 'expectedResult' => [
                     [
-                        'id' => '_test_user_rating'
-                    ]
-                ]
-            ]
+                        'id' => '_test_user_rating',
+                    ],
+                ],
+            ],
         ];
     }
 
-    public function testSetRatingWithoutToken()
+    public function testSetRatingWithoutToken(): void
     {
         $result = $this->query(
             'mutation {
@@ -98,7 +103,7 @@ final class RatingTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
     }
 
-    public function testSetRating()
+    public function testSetRating(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -122,7 +127,7 @@ final class RatingTest extends TokenTestCase
         $ratingData = $result['body']['data']['ratingSet'];
 
         $id = $ratingData['id'];
-        $this->assertStringMatchesFormat("%s", $id);
+        $this->assertStringMatchesFormat('%s', $id);
         $this->assertSame(self::PRODUCTID, $ratingData['product']['id']);
         $this->assertSame(5, $ratingData['rating']);
 
@@ -138,7 +143,7 @@ final class RatingTest extends TokenTestCase
         $this->assertSame(5, $result['body']['data']['rating']['rating']);
     }
 
-    public function testSetRatingOutOfBounds()
+    public function testSetRatingOutOfBounds(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -158,10 +163,10 @@ final class RatingTest extends TokenTestCase
         );
 
         $this->assertResponseStatus(400, $result);
-        $this->assertSame("Rating must be between 1 and 5, was 6", $result['body']['errors'][0]['debugMessage']);
+        $this->assertSame('Rating must be between 1 and 5, was 6', $result['body']['errors'][0]['debugMessage']);
     }
 
-    public function testSetRatingWrongProduct()
+    public function testSetRatingWrongProduct(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -182,7 +187,7 @@ final class RatingTest extends TokenTestCase
 
         $this->assertResponseStatus(404, $result);
         $this->assertSame(
-            "Product was not found by id: some_not_existing_product",
+            'Product was not found by id: some_not_existing_product',
             $result['body']['errors'][0]['message']
         );
     }

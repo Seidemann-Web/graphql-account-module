@@ -12,13 +12,16 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
-class WishedPriceMultiShopTest extends MultishopTestCase
+final class WishedPriceMultiShopTest extends MultishopTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
 
     private const WISHED_PRICE_SHOP_1 = '_test_wished_price_1_';
+
     private const WISHED_PRICE_SHOP_2 = '_test_wished_price_8_';
+
     private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
 
     public function dataProviderWishedPricePerShop()
@@ -32,7 +35,7 @@ class WishedPriceMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderWishedPricePerShop
      */
-    public function testUserWishedPricePerShop(string $shopId, string $wishedPriceId)
+    public function testUserWishedPricePerShop(string $shopId, string $wishedPriceId): void
     {
         EshopRegistry::getConfig()->setShopId($shopId);
         $this->setGETRequestParameter('shp', $shopId);
@@ -53,7 +56,7 @@ class WishedPriceMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderWishedPricePerShop
      */
-    public function testAdminWishedPricePerShop(string $shopId, string $wishedPriceId)
+    public function testAdminWishedPricePerShop(string $shopId, string $wishedPriceId): void
     {
         EshopRegistry::getConfig()->setShopId($shopId);
         $this->setGETRequestParameter('shp', $shopId);
@@ -71,7 +74,7 @@ class WishedPriceMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus(200, $result);
     }
 
-    public function testGetUserWishedPriceFromShop1ToShop2()
+    public function testGetUserWishedPriceFromShop1ToShop2(): void
     {
         EshopRegistry::getConfig()->setShopId(2);
         $this->setGETRequestParameter('shp', '2');
@@ -89,7 +92,7 @@ class WishedPriceMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus(404, $result);
     }
 
-    public function testDeleteShop1WishedPriceFromShop2()
+    public function testDeleteShop1WishedPriceFromShop2(): void
     {
         EshopRegistry::getConfig()->setShopId(2);
         $this->setGETRequestParameter('shp', '2');

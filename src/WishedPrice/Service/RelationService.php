@@ -7,24 +7,25 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\WishedPrice\DataType;
+namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
 use OxidEsales\Eshop\Core\Price as EshopPriceModel;
+use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
-use OxidEsales\GraphQL\Catalogue\DataType\Currency;
-use OxidEsales\GraphQL\Catalogue\DataType\Price;
-use OxidEsales\GraphQL\Catalogue\DataType\Product;
-use OxidEsales\GraphQL\Catalogue\DataType\User;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
+use OxidEsales\GraphQL\Catalogue\Currency\DataType\Currency;
+use OxidEsales\GraphQL\Catalogue\Product\DataType\Price;
+use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
+use OxidEsales\GraphQL\Catalogue\Product\Service\Product as CatalogueProductService;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
+use OxidEsales\GraphQL\Catalogue\User\DataType\User;
 use stdClass;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
-use OxidEsales\GraphQL\Catalogue\Service\Product as CatalogueProductService;
 
 /**
  * @ExtendType(class=WishedPrice::class)
  */
-class WishedPriceRelationService
+final class RelationService
 {
     /** @var Repository */
     private $repository;
@@ -36,7 +37,7 @@ class WishedPriceRelationService
         Repository $repository,
         CatalogueProductService $productService
     ) {
-        $this->repository = $repository;
+        $this->repository     = $repository;
         $this->productService = $productService;
     }
 
@@ -48,7 +49,7 @@ class WishedPriceRelationService
         $user = null;
 
         try {
-            if ($userId = (string)$wishedPrice->getUserId()) {
+            if ($userId = (string) $wishedPrice->getUserId()) {
                 $user = $this->repository->getById(
                     $userId,
                     User::class,
@@ -67,12 +68,9 @@ class WishedPriceRelationService
      */
     public function getProduct(WishedPrice $wishedPrice): Product
     {
-        /** @var Product $product */
-        $product = $this->productService->product(
-            (string)$wishedPrice->getProductId()
+        return $this->productService->product(
+            (string) $wishedPrice->getProductId()
         );
-
-        return $product;
     }
 
     /**
@@ -82,7 +80,7 @@ class WishedPriceRelationService
     {
         /** @var EshopPriceModel $price */
         $price = oxNew(EshopPriceModel::class);
-        $price->setPrice((double)$wishedPrice->getEshopModel()->getFieldData('oxprice'));
+        $price->setPrice((float) $wishedPrice->getEshopModel()->getFieldData('oxprice'));
 
         return new Price($price);
     }

@@ -13,9 +13,9 @@ use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\GraphQL\Account\Rating\Exception\RatingOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Catalogue\DataType\Product;
-use OxidEsales\GraphQL\Catalogue\Exception\ProductNotFound;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
+use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
+use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class RatingInput
@@ -31,7 +31,7 @@ final class RatingInput
         Repository $repository
     ) {
         $this->authentication = $authentication;
-        $this->repository = $repository;
+        $this->repository     = $repository;
     }
 
     /**
@@ -48,7 +48,7 @@ final class RatingInput
             'OXTYPE'     => 'oxarticle',
             'OXOBJECTID' => $productId,
             'OXRATING'   => $rating,
-            'OXUSERID'   => $this->authentication->getUserId()
+            'OXUSERID'   => $this->authentication->getUserId(),
         ]);
 
         return new Rating($model);
@@ -56,6 +56,7 @@ final class RatingInput
 
     /**
      * @throws RatingOutOfBounds
+     *
      * @return true
      */
     private function assertRatingValue(int $rating): bool
@@ -63,11 +64,13 @@ final class RatingInput
         if ($rating < 1 || $rating > 5) {
             throw RatingOutOfBounds::byWrongValue($rating);
         }
+
         return true;
     }
 
     /**
      * @throws ProductNotFound
+     *
      * @return true
      */
     private function assertProductIdValue(string $productId): bool
@@ -78,6 +81,7 @@ final class RatingInput
         } catch (NotFound $e) {
             throw ProductNotFound::byId($productId);
         }
+
         return true;
     }
 }

@@ -12,7 +12,7 @@ namespace OxidEsales\GraphQL\Account\WishedPrice\DataType;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\PriceAlarm as WishedPriceModel;
-use OxidEsales\GraphQL\Catalogue\DataType\DataType;
+use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 use TheCodingMachine\GraphQLite\Types\ID;
@@ -20,7 +20,7 @@ use TheCodingMachine\GraphQLite\Types\ID;
 /**
  * @Type()
  */
-class WishedPrice implements DataType
+final class WishedPrice implements DataType
 {
     /** @var WishedPriceModel */
     private $wishedPrice;
@@ -37,14 +37,6 @@ class WishedPrice implements DataType
     }
 
     /**
-     * @return class-string
-     */
-    public static function getModelClass(): string
-    {
-        return WishedPriceModel::class;
-    }
-
-    /**
      * @Field()
      */
     public function getId(): ID
@@ -57,14 +49,14 @@ class WishedPrice implements DataType
     public function getUserId(): ID
     {
         return new ID(
-            (string)$this->wishedPrice->getFieldData('oxuserid')
+            (string) $this->wishedPrice->getFieldData('oxuserid')
         );
     }
 
     public function getProductId(): ID
     {
         return new ID(
-            (string)$this->wishedPrice->getFieldData('oxartid')
+            (string) $this->wishedPrice->getFieldData('oxartid')
         );
     }
 
@@ -84,7 +76,8 @@ class WishedPrice implements DataType
      */
     public function getNotificationDate(): ?DateTimeInterface
     {
-        $notificationDate = (string)$this->wishedPrice->getFieldData('oxsended');
+        $notificationDate = (string) $this->wishedPrice->getFieldData('oxsended');
+
         if ($notificationDate === '0000-00-00 00:00:00') {
             return null;
         }
@@ -97,6 +90,14 @@ class WishedPrice implements DataType
      */
     public function getCreationDate(): DateTimeInterface
     {
-        return new DateTimeImmutable((string)$this->wishedPrice->getFieldData('oxinsert'));
+        return new DateTimeImmutable((string) $this->wishedPrice->getFieldData('oxinsert'));
+    }
+
+    /**
+     * @return class-string
+     */
+    public static function getModelClass(): string
+    {
+        return WishedPriceModel::class;
     }
 }

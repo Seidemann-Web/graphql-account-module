@@ -4,35 +4,15 @@ services:
     public: false
     autowire: true
 
-  OxidEsales\GraphQL\Account\Rating\Controller\:
-      resource: 'src/Rating/Controller/*'
-      public: true
+  OxidEsales\GraphQL\Account\:
+    resource: 'src/*'
+    exclude: 'src/**/DataType'
+    public: true
 
-  OxidEsales\GraphQL\Account\Rating\DataType\:
-      resource: 'src/Rating/DataType/*'
-      public: true
-
-  OxidEsales\GraphQL\Account\Rating\Service\:
-      resource: 'src/Rating/Service/*'
-      public: true
-
-  OxidEsales\GraphQL\Account\WishedPrice\Controller\:
-      resource: 'src/WishedPrice/Controller/'
-      public: true
-
-  OxidEsales\GraphQL\Account\WishedPrice\Services\:
-      namespace: OxidEsales\GraphQL\Account\WishedPrice\Service\
-      resource: 'src/WishedPrice/Service/*.php'
-
-  OxidEsales\GraphQL\Account\WishedPrice\DataTypeServices\:
-      namespace: OxidEsales\GraphQL\Account\WishedPrice\DataType\
-      resource: 'src/WishedPrice/DataType/*Service.php'
-      public: true
-
-  OxidEsales\GraphQL\Account\Framework\NamespaceMapper:
-      class: OxidEsales\GraphQL\Account\Framework\NamespaceMapper
+  OxidEsales\GraphQL\Account\Shared\Service\NamespaceMapper:
+      class: OxidEsales\GraphQL\Account\Shared\Service\NamespaceMapper
       tags: ['graphql_namespace_mapper']
 
-  OxidEsales\GraphQL\Account\Service\PermissionProvider:
-      class: OxidEsales\GraphQL\Account\Service\PermissionProvider
+  OxidEsales\GraphQL\Account\Shared\Service\PermissionProvider:
+      class: OxidEsales\GraphQL\Account\Shared\Service\PermissionProvider
       tags: ['graphql_permission_provider']

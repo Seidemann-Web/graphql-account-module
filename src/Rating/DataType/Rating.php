@@ -12,7 +12,7 @@ namespace OxidEsales\GraphQL\Account\Rating\DataType;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
-use OxidEsales\GraphQL\Catalogue\DataType\DataType;
+use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 use TheCodingMachine\GraphQLite\Types\ID;
@@ -28,11 +28,6 @@ final class Rating implements DataType
     public function __construct(EshopRatingModel $rating)
     {
         $this->rating = $rating;
-    }
-
-    public static function getModelClass(): string
-    {
-        return EshopRatingModel::class;
     }
 
     public function getEshopModel(): EshopRatingModel
@@ -62,12 +57,17 @@ final class Rating implements DataType
     public function getTimestamp(): DateTimeInterface
     {
         return new DateTimeImmutable(
-            (string)$this->rating->getFieldData('oxtimestamp')
+            (string) $this->rating->getFieldData('oxtimestamp')
         );
     }
 
     public function getUserId(): string
     {
         return (string) $this->rating->getFieldData('oxuserid');
+    }
+
+    public static function getModelClass(): string
+    {
+        return EshopRatingModel::class;
     }
 }
