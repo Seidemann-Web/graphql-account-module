@@ -12,8 +12,8 @@ services:
       resource: 'src/Rating/DataType/*'
       public: true
 
-  OxidEsales\GraphQL\Account\Rating\Services\:
-      resource: 'src/Rating/Services/*'
+  OxidEsales\GraphQL\Account\Rating\Service\:
+      resource: 'src/Rating/Service/*'
       public: true
 
   OxidEsales\GraphQL\Account\WishedPrice\Controller\:

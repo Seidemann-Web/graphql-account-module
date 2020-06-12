@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Rating\Services;
+namespace OxidEsales\GraphQL\Account\Rating\Service;
 
 use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;

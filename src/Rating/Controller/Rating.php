@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Rating\Controller;
 
-use OxidEsales\GraphQL\Account\Rating\Services\Rating as RatingService;
+use OxidEsales\GraphQL\Account\Rating\Service\Rating as RatingService;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
