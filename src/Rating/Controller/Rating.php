@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Rating\Controller;
 
+use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use OxidEsales\GraphQL\Account\Rating\Service\Rating as RatingService;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
-use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class Rating
@@ -58,5 +58,15 @@ final class Rating
         $this->ratingService->save($rating);
 
         return $rating;
+    }
+
+    /**
+     * @Mutation()
+     *
+     * @return RatingType
+     */
+    public function ratingDelete(string $id): RatingType
+    {
+        return $this->ratingService->delete($id);
     }
 }

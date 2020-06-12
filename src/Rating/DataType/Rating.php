@@ -66,8 +66,10 @@ final class Rating implements DataType
         );
     }
 
-    public function getUserId(): string
+    public function getUserId(): ID
     {
-        return (string) $this->rating->getFieldData('oxuserid');
+        return new ID(
+            (string)$this->rating->getFieldData('oxuserid')
+        );
     }
 }

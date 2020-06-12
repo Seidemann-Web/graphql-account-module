@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Rating\Service;
 
+use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingDataType;
 use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
 use OxidEsales\GraphQL\Account\Rating\Exception\RatingNotFound;
@@ -45,31 +46,7 @@ final class Rating
      */
     public function rating(string $id): RatingType
     {
-        /** Only logged in users can query ratings */
-        if (!$this->authenticationService->isLogged()) {
-            throw new InvalidLogin('Unauthenticated');
-        }
-
-        try {
-            /** @var RatingType $rating */
-            $rating = $this->repository->getById(
-                $id,
-                RatingType::class
-            );
-        } catch (NotFound $e) {
-            throw RatingNotFound::byId($id);
-        }
-
-        /** If the logged in user is authorized return the rating */
-        if ($this->authorizationService->isAllowed('VIEW_RATINGS')) {
-            return $rating;
-        }
-
-        /** A user can query only its own rating */
-        if (!$this->isSameUser($rating)) {
-            throw new InvalidLogin('Unauthorized');
-        }
-        return $rating;
+        return $this->getRating($id);
     }
 
     /**
@@ -93,8 +70,67 @@ final class Rating
         return $this->repository->saveModel($modelItem);
     }
 
+    /**
+     * @param  string $id
+     * @return RatingDataType
+     * @throws InvalidLogin
+     * @throws RatingNotFound
+     */
+    public function delete(string $id): RatingDataType
+    {
+        $rating = $this->getRating($id);
+
+        //we got this far, we have a user
+        //user can delete only its own rating, admin can delete any rating
+        if (
+            $this->authorizationService->isAllowed('DELETE_RATING')
+            || $this->isSameUser($rating)
+        ) {
+            $this->repository->delete($id, RatingDataType::class);
+        } else {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        return $rating;
+    }
+
     private function isSameUser(RatingType $rating): bool
     {
-        return ($rating->getUserId() == $this->authenticationService->getUserId());
+        return ((string)$rating->getUserId() === (string)$this->authenticationService->getUserId());
+    }
+
+    /**
+     * @throws InvalidLogin
+     * @throws RatingNotFound
+     */
+    private function getRating(string $id): RatingType
+    {
+        /** Only logged in users can query ratings */
+        if (!$this->authenticationService->isLogged()) {
+            throw new InvalidLogin('Unauthenticated');
+        }
+
+        try {
+            /** @var RatingType $rating */
+            $rating = $this->repository->getById(
+                $id,
+                RatingType::class,
+                false
+            );
+        } catch (NotFound $e) {
+            throw RatingNotFound::byId($id);
+        }
+
+        /** If the logged in user is authorized return the rating */
+        if ($this->authorizationService->isAllowed('VIEW_RATINGS')) {
+            return $rating;
+        }
+
+        /** A user can query only its own rating */
+        if (!$this->isSameUser($rating)) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        return $rating;
     }
 }
