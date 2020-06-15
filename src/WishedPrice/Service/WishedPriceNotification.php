@@ -20,13 +20,16 @@ class WishedPriceNotification
         /** @var Email $email */
         $email = oxNew(Email::class);
 
-        $result = $email->sendPriceAlarmNotification([
-            'aid'   => $wishedPrice->getProductId()->val(),
-            'email' => $wishedPrice->getEmail()
-        ], $wishedPrice->getEshopModel());
+        $result = $email->sendPriceAlarmNotification(
+            [
+                'aid'   => $wishedPrice->getProductId()->val(),
+                'email' => $wishedPrice->getEmail()
+            ],
+            $wishedPrice->getEshopModel()
+        );
 
         if (!$result) {
-            throw NotificationSendFailure::create();
+            throw NotificationSendFailure::create($email->ErrorInfo);
         }
 
         return true;

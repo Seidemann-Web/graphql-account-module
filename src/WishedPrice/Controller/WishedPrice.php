@@ -14,8 +14,9 @@ use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPrice as WishedPriceSer
 use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPriceNotification as WishedPriceNotificationService;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
-use TheCodingMachine\GraphQLite\Annotations\Mutation;
+use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Query;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
 final class WishedPrice
 {
@@ -65,6 +66,7 @@ final class WishedPrice
 
     /**
      * @Mutation()
+     * @Logged()
      */
     public function wishedPriceSet(WishedPriceDataType $wishedPrice): WishedPriceDataType
     {

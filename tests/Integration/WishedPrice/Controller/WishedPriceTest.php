@@ -327,7 +327,7 @@ final class WishedPriceTest extends TokenTestCase
             }'
         );
 
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(400, $result);
     }
 
     /**
@@ -335,16 +335,23 @@ final class WishedPriceTest extends TokenTestCase
      *
      * @param string $productId
      * @param string $currency
+     * @param string $price
      * @param string $message
      */
-    public function testWishedPriceSetWithMissingEntities(string $productId, string $currency, string $message)
-    {
+    public function testWishedPriceSetWithMissingEntities(
+        string $productId,
+        string $currency,
+        string $price,
+        string $message,
+        int $expected,
+        string $location
+    ) {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query(
             'mutation {
                 wishedPriceSet(wishedPrice: { productId: "' . $productId . '", currencyName: "' .
-                        $currency . '", price: 15.00}) {
+                        $currency . '", price: ' . $price . '}) {
                     id
                     email
                     notificationDate
@@ -353,27 +360,52 @@ final class WishedPriceTest extends TokenTestCase
             }'
         );
 
-        $this->assertResponseStatus(404, $result);
-        $this->assertEquals($message, $result['body']['errors'][0]['message']);
+        $this->assertResponseStatus($expected, $result);
+        $this->assertEquals($message, $result['body']['errors'][0][$location]);
     }
 
     public function wishedPriceSetWithMissingEntitiesProvider(): array
     {
         return [
-            'not_existing_product' => [
-                    'DOES-NOT-EXIST',
-                    'EUR',
-                    'Product was not found by id: DOES-NOT-EXIST'
-                ],
-            'not_existing_currency' => [
-                    self::PRODUCT_ID,
-                    'ABC',
-                    'Currency "ABC" was not found'
-                ],
-            'wished_price_disabled' => [
-                 self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT,
+            'not_existing_product'  => [
+                'DOES-NOT-EXIST',
                 'EUR',
-                'Product was not found by id: ' . self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT
+                '15.0',
+                'Product was not found by id: DOES-NOT-EXIST',
+                404,
+                'message'
+            ],
+            'not_existing_currency' => [
+                self::PRODUCT_ID,
+                'ABC',
+                '15.0',
+                'Currency "ABC" was not found',
+                404,
+                'message'
+            ],
+            'wished_price_disabled' => [
+                self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT,
+                'EUR',
+                '15.0',
+                'Product was not found by id: ' . self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT,
+                404,
+                'message'
+            ],
+            'invalid_price'         => [
+                self::PRODUCT_ID,
+                'EUR',
+                'this_is_not_a_vald_price',
+                'Field "wishedPriceSet" argument "wishedPrice" requires type Float!, found this_is_not_a_vald_price.',
+                400,
+                'message'
+            ],
+            'negative_price'        => [
+                self::PRODUCT_ID,
+                'EUR',
+                -123,
+                'Wished price must be positive float, was -123',
+                400,
+                'debugMessage'
             ],
         ];
     }

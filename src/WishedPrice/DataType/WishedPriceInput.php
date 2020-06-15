@@ -13,10 +13,11 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Catalogue\DataType\Product as ProductDataType;
-use OxidEsales\GraphQL\Catalogue\Exception\ProductNotFound;
-use OxidEsales\GraphQL\Catalogue\Service\CurrencyRepository;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
+use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceOutOfBounds;
+use OxidEsales\GraphQL\Catalogue\Product\DataType\Product as ProductDataType;
+use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
+use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 use TheCodingMachine\GraphQLite\Types\ID;
 
@@ -47,6 +48,7 @@ class WishedPriceInput
     public function fromUserInput(ID $productId, string $currencyName, float $price): WishedPrice
     {
         $this->assertProductWishedPriceIsPossible($productId);
+        $this->assertPriceValue($price);
 
         $currency = $this->currencyRepository->getByName($currencyName);
 
@@ -84,6 +86,18 @@ class WishedPriceInput
             throw ProductNotFound::byId($id);
         }
 
+        return true;
+    }
+
+    /**
+     * @throws WishedPriceOutOfBounds
+     * @return true
+     */
+    private function assertPriceValue(float $price): bool
+    {
+        if (0 > $price) {
+            throw WishedPriceOutOfBounds::byWrongValue((string) $price);
+        }
         return true;
     }
 }
