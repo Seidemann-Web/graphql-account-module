@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\WishedPrice\DataType;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
@@ -68,7 +67,7 @@ class WishedPriceInput
                 'OXUSERID'   => $this->authentication->getUserId(),
                 'OXEMAIL'    => $this->authentication->getUserName(),
                 'OXARTID'    => $product->getId()->val(),
-                'OXPRICE'    => Registry::getUtils()->fRound((string) $price, $currency->getEshopModel()),
+                'OXPRICE'    => round($price, $currency->getPrecision()),
                 'OXCURRENCY' => $currency->getName()
             ]
         );
