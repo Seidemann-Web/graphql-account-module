@@ -360,16 +360,21 @@ final class WishedPriceTest extends TokenTestCase
     public function wishedPriceSetWithMissingEntitiesProvider(): array
     {
         return [
-            [
-                'DOES-NOT-EXIST',
+            'not_existing_product' => [
+                    'DOES-NOT-EXIST',
+                    'EUR',
+                    'Product was not found by id: DOES-NOT-EXIST'
+                ],
+            'not_existing_currency' => [
+                    self::PRODUCT_ID,
+                    'ABC',
+                    'Currency "ABC" was not found'
+                ],
+            'wished_price_disabled' => [
+                 self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT,
                 'EUR',
-                'Product was not found by id: DOES-NOT-EXIST'
+                'Product was not found by id: ' . self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT
             ],
-            [
-                self::PRODUCT_ID,
-                'ABC',
-                'Currency "ABC" was not found'
-            ]
         ];
     }
 
