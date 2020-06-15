@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\WishedPrice\Controller;
 
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
-use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPrice as WishedPriceService;
+use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPriceNotification as WishedPriceNotificationService;
+use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
@@ -21,10 +22,15 @@ final class WishedPrice
     /** @var WishedPriceService */
     private $wishedPriceService;
 
+    /** @var WishedPriceNotificationService */
+    private $wishedPriceNotificationService;
+
     public function __construct(
-        WishedPriceService $wishedPriceService
+        WishedPriceService $wishedPriceService,
+        WishedPriceNotificationService $wishedPriceNotificationService
     ) {
         $this->wishedPriceService = $wishedPriceService;
+        $this->wishedPriceNotificationService = $wishedPriceNotificationService;
     }
 
     /**
@@ -63,7 +69,7 @@ final class WishedPrice
     public function wishedPriceSet(WishedPriceDataType $wishedPrice): WishedPriceDataType
     {
         $this->wishedPriceService->save($wishedPrice);
-        $this->wishedPriceService->sendNotification($wishedPrice);
+        $this->wishedPriceNotificationService->sendNotification($wishedPrice);
 
         return $wishedPrice;
     }

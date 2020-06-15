@@ -110,23 +110,6 @@ final class WishedPrice
         return $this->repository->saveModel($modelItem);
     }
 
-    public function sendNotification(WishedPriceDataType $wishedPrice): bool
-    {
-        /** @var Email $email */
-        $email = oxNew(Email::class);
-
-        $result = $email->sendPriceAlarmNotification([
-            'aid' => $wishedPrice->getProductId()->val(),
-            'email' => $wishedPrice->getEmail()
-        ], $wishedPrice->getEshopModel());
-
-        if (!$result) {
-            throw NotificationSendFailure::create();
-        }
-
-        return true;
-    }
-
     /**
      * @throws WishedPriceNotFound
      * @throws InvalidLogin
