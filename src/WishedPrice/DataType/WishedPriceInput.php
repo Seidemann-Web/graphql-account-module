@@ -47,10 +47,6 @@ class WishedPriceInput
      */
     public function fromUserInput(ID $productId, string $currencyName, float $price): WishedPrice
     {
-        /** @var User $user */
-        $user = oxNew(User::class);
-        $user->load($this->authentication->getUserId());
-
         try {
             /** @var ProductDataType $product */
             $product = $this->repository->getById((string)$productId->val(), ProductDataType::class);
@@ -67,13 +63,15 @@ class WishedPriceInput
 
         /** @var PriceAlarm $model */
         $model = oxNew(PriceAlarm::class);
-        $model->assign([
-            'OXUSERID' => $user->getId(),
-            'OXEMAIL' => $user->getFieldData('oxusername'),
-            'OXARTID' => $product->getId()->val(),
-            'OXPRICE' => Registry::getUtils()->fRound((string) $price, $currency->getEshopModel()),
-            'OXCURRENCY' => $currency->getName()
-        ]);
+        $model->assign(
+            [
+                'OXUSERID'   => $this->authentication->getUserId(),
+                'OXEMAIL'    => $this->authentication->getUserName(),
+                'OXARTID'    => $product->getId()->val(),
+                'OXPRICE'    => Registry::getUtils()->fRound((string) $price, $currency->getEshopModel()),
+                'OXCURRENCY' => $currency->getName()
+            ]
+        );
 
         return new WishedPrice($model);
     }
