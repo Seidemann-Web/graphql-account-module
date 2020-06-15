@@ -9,20 +9,39 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\DataType;
 
-use OxidEsales\GraphQL\Base\DataType\BoolFilter;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
-use OxidEsales\GraphQL\Catalogue\DataType\FilterList;
+use OxidEsales\GraphQL\Catalogue\Shared\DataType\FilterList;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
-class WishedPriceFilterList extends FilterList
+final class WishedPriceFilterList extends FilterList
 {
     /** @var ?StringFilter */
-    private $userId = null;
+    private $userId;
 
     public function __construct(?StringFilter $userId = null)
     {
         $this->userId = $userId;
         parent::__construct();
+    }
+
+    public function withUserFilter(StringFilter $user): self
+    {
+        $filter         = clone $this;
+        $filter->userId = $user;
+
+        return $filter;
+    }
+
+    /**
+     * @return array{
+     *                oxuserId: ?StringFilter
+     *                }
+     */
+    public function getFilters(): array
+    {
+        return [
+            'oxuserId' => $this->userId,
+        ];
     }
 
     /**
@@ -31,24 +50,5 @@ class WishedPriceFilterList extends FilterList
     public static function createWishedPriceFilterList(?StringFilter $userId): self
     {
         return new self($userId);
-    }
-
-    public function withUserFilter(StringFilter $user): self
-    {
-        $filter = clone $this;
-        $filter->userId = $user;
-        return $filter;
-    }
-
-    /**
-     * @return array{
-     *  oxuserId: ?StringFilter
-     * }
-     */
-    public function getFilters(): array
-    {
-        return [
-            'oxuserId' => $this->userId
-        ];
     }
 }

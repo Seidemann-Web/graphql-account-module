@@ -10,19 +10,16 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\WishedPrice\Controller;
 
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
-use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPrice as WishedPriceService;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
+use OxidEsales\GraphQL\Account\WishedPrice\Service\WishedPrice as WishedPriceService;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
-use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Base\Service\Authorization;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
-use TheCodingMachine\GraphQLite\Annotations\Query;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
+use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class WishedPrice
 {
     /** @var WishedPriceService */
-    private $wishedPriceService = null;
+    private $wishedPriceService;
 
     public function __construct(
         WishedPriceService $wishedPriceService
@@ -32,8 +29,6 @@ final class WishedPrice
 
     /**
      * @Query()
-     *
-     * @return WishedPriceDataType
      */
     public function wishedPrice(string $id): WishedPriceDataType
     {
@@ -42,8 +37,6 @@ final class WishedPrice
 
     /**
      * @Mutation()
-     *
-     * @return WishedPriceDataType
      */
     public function wishedPriceDelete(string $id): WishedPriceDataType
     {
@@ -54,6 +47,7 @@ final class WishedPrice
      * @Query()
      *
      * @throws InvalidToken
+     *
      * @return WishedPriceDataType[]
      */
     public function wishedPrices(): array

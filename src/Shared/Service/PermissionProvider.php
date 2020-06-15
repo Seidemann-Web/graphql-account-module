@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Service;
+namespace OxidEsales\GraphQL\Account\Shared\Service;
 
 use OxidEsales\GraphQL\Base\Framework\PermissionProviderInterface;
 
-class PermissionProvider implements PermissionProviderInterface
+final class PermissionProvider implements PermissionProviderInterface
 {
     public function getPermissions(): array
     {
@@ -27,7 +27,6 @@ class PermissionProvider implements PermissionProviderInterface
                 'DELETE_WISHED_PRICE',
                 'VIEW_RATINGS',
                 'DELETE_RATING'
-            ]
         ];
     }
 }

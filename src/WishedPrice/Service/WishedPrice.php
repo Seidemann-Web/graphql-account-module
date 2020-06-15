@@ -11,7 +11,6 @@ namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
-use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceRelationService;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceNotFound;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -19,9 +18,9 @@ use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
-class WishedPrice
+final class WishedPrice
 {
     /** @var Repository */
     private $repository;
@@ -32,24 +31,22 @@ class WishedPrice
     /** @var Authorization */
     private $authorizationService;
 
-    /** @var WishedPriceRelationService */
+    /** @var RelationService */
     private $wishedPriceRelationService;
 
     public function __construct(
         Repository $repository,
         Authentication $authenticationService,
         Authorization $authorizationService,
-        WishedPriceRelationService $wishedPriceRelationService
+        RelationService $wishedPriceRelationService
     ) {
-        $this->repository = $repository;
-        $this->authenticationService = $authenticationService;
-        $this->authorizationService = $authorizationService;
+        $this->repository                 = $repository;
+        $this->authenticationService      = $authenticationService;
+        $this->authorizationService       = $authorizationService;
         $this->wishedPriceRelationService = $wishedPriceRelationService;
     }
 
     /**
-     * @param  string $id
-     * @return WishedPriceDataType
      * @throws InvalidLogin
      * @throws WishedPriceNotFound
      */
@@ -80,6 +77,7 @@ class WishedPrice
 
         /** Check disable wished price flag */
         $product = $this->wishedPriceRelationService->getProduct($wishedPrice);
+
         if (!$product->wishedPriceEnabled() && !$this->authorizationService->isAllowed('VIEW_WISHED_PRICES')) {
             throw WishedPriceNotFound::byId($id);
         }
@@ -89,11 +87,12 @@ class WishedPrice
 
     /**
      * @throws InvalidToken
+     *
      * @return WishedPriceDataType[]
      */
     public function wishedPrices(WishedPriceFilterList $filter): array
     {
-        $wishedPrices = $this->repository->getByFilter(
+        return $this->repository->getByFilter(
             $filter->withUserFilter(
                 new StringFilter(
                     $this->authenticationService->getUserId()
@@ -101,8 +100,6 @@ class WishedPrice
             ),
             WishedPriceDataType::class
         );
-
-        return $wishedPrices;
     }
 
     /**
@@ -136,11 +133,13 @@ class WishedPrice
         if (!$this->isSameUser($wishedPrice)) {
             throw new InvalidLogin('Unauthorized');
         }
+
         return $wishedPrice;
     }
 
     private function isSameUser(WishedPriceDataType $wishedPrice): bool
     {
         return ((string)$wishedPrice->getUserId() === (string)$this->authenticationService->getUserId());
+
     }
 }

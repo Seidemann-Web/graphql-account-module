@@ -13,12 +13,12 @@ use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingDataType;
 use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
 use OxidEsales\GraphQL\Account\Rating\Exception\RatingNotFound;
+use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
-use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
-use OxidEsales\GraphQL\Catalogue\Service\Repository;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class Rating
 {
@@ -36,9 +36,9 @@ final class Rating
         Authentication $authenticationService,
         Authorization $authorizationService
     ) {
-        $this->repository = $repository;
+        $this->repository            = $repository;
         $this->authenticationService = $authenticationService;
-        $this->authorizationService = $authorizationService;
+        $this->authorizationService  = $authorizationService;
     }
 
     /**
@@ -94,6 +94,7 @@ final class Rating
     public function save(RatingType $rating): bool
     {
         $modelItem = $rating->getEshopModel();
+
         return $this->repository->saveModel($modelItem);
     }
 

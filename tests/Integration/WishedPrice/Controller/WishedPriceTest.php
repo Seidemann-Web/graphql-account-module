@@ -14,19 +14,28 @@ use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 final class WishedPriceTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
 
     private const WISHED_PRICE = '_test_wished_price_1_'; // Belongs to user@oxid-esales.com
+
     private const WISHED_PRICE_2 = '_test_wished_price_6_'; // Belongs to user@oxid-esales.com
+
     private const WISHED_PRICE_WITH_INACTIVE_PRODUCT = '_test_wished_price_4_';
+
     private const WISHED_PRICE_WITH_NON_EXISTING_PRODUCT = '_test_wished_price_5_';
+
     private const WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT = '_test_wished_price_3_';
+
     private const WISHED_PRICE_WITHOUT_USER = '_test_wished_price_without_user_';
+
     private const WISHED_PRICE_ASSIGNED_TO_OTHER_USER = '_test_wished_price_2_'; // Belongs to otheruser@oxid-esales.com
+
     private const WISHED_PRICE_WITH_NON_EXISTING_USER = '_test_wished_price_7_';
+
     private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
 
-    public function testGetWishedPrice()
+    public function testGetWishedPrice(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -72,11 +81,11 @@ final class WishedPriceTest extends TokenTestCase
             'email',
             'notificationDate',
             'creationDate',
-            'user'
+            'user',
         ]));
     }
 
-    public function testGetWishedPriceNotificationDate()
+    public function testGetWishedPriceNotificationDate(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -93,7 +102,7 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertNotNull($wishedPrice['notificationDate']);
     }
 
-    public function testGetWishedPriceWithoutToken()
+    public function testGetWishedPriceWithoutToken(): void
     {
         $result = $this->query(
             'query{
@@ -121,7 +130,7 @@ final class WishedPriceTest extends TokenTestCase
     /**
      * @dataProvider dataProviderWishedPrices404and401
      */
-    public function testWishedPricesWithResponse404and401(string $id, int $status)
+    public function testWishedPricesWithResponse404and401(string $id, int $status): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -150,7 +159,7 @@ final class WishedPriceTest extends TokenTestCase
     /**
      * @dataProvider dataProviderWishedPricesWithAuthorization
      */
-    public function testWishedPricesWithAuthorization(string $id)
+    public function testWishedPricesWithAuthorization(string $id): void
     {
         $this->prepareToken();
 
@@ -165,7 +174,7 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertResponseStatus(200, $result);
     }
 
-    public function testDeleteWishedPriceWithoutToken()
+    public function testDeleteWishedPriceWithoutToken(): void
     {
         $result = $this->query(
             'mutation {
@@ -185,27 +194,27 @@ final class WishedPriceTest extends TokenTestCase
                 'username' => 'admin',
                 'password' => 'admin',
                 'oxid'     => self::WISHED_PRICE_TO_BE_DELETED . '1_',
-                'expected' => 200
+                'expected' => 200,
             ],
             'user'  => [
                 'username' => 'user@oxid-esales.com',
                 'password' => 'useruser',
                 'oxid'     => self::WISHED_PRICE_TO_BE_DELETED . '2_',
-                'expected' => 200
+                'expected' => 200,
             ],
             'otheruser'  => [
                 'username' => 'otheruser@oxid-esales.com',
                 'password' => 'useruser',
                 'oxid'     => self::WISHED_PRICE_TO_BE_DELETED . '3_',
-                'expected' => 401
-            ]
+                'expected' => 401,
+            ],
         ];
     }
 
     /**
      * @dataProvider providerDeleteWishedPrice
      */
-    public function testDeleteWishedPriceWithToken(string $username, string $password, string $oxid, int $expected)
+    public function testDeleteWishedPriceWithToken(string $username, string $password, string $oxid, int $expected): void
     {
         $this->prepareToken($username, $password);
 
@@ -229,7 +238,7 @@ final class WishedPriceTest extends TokenTestCase
     /**
      * @dataProvider providerDeleteWishedPrice
      */
-    public function testDeleteNonExistingWishedPrice(string $username, string $password)
+    public function testDeleteNonExistingWishedPrice(string $username, string $password): void
     {
         $this->prepareToken($username, $password);
 
@@ -244,7 +253,7 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertResponseStatus(404, $result);
     }
 
-    public function testWishedPrices401WithoutToken()
+    public function testWishedPrices401WithoutToken(): void
     {
         $result = $this->query(
             'query {
@@ -275,8 +284,10 @@ final class WishedPriceTest extends TokenTestCase
 
     /**
      * @dataProvider providerWishedPrices
+     *
+     * @param mixed $count
      */
-    public function testWishedPrices(string $username, string $password, $count)
+    public function testWishedPrices(string $username, string $password, $count): void
     {
         $this->prepareToken($username, $password);
 
