@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
@@ -25,8 +26,23 @@ final class WishedPriceMultiShopTest extends MultishopTestCase
 
     private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
 
-    private const PRODUCT_ID_SHOP_1 = '_test_product_1_';
-    private const PRODUCT_ID_SHOP_2 = '_test_product_5_';
+    private const PRODUCT_ID_SHOP_1 = '_test_product_wp1_';
+
+    private const PRODUCT_ID_SHOP_2 = '_test_product_wp2_';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $shop = oxNew(Shop::class);
+        $shop->load(2);
+        $shop->assign(
+            [
+                'oxorderemail' => 'reply@myoxideshop.com',
+            ]
+        );
+        $shop->save();
+    }
 
     public function dataProviderWishedPricePerShop()
     {
@@ -117,10 +133,10 @@ final class WishedPriceMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider wishedPriceSetPerShopDataProvider
      */
-    public function testWishedPriceSetPerShop(int $shopId, string $productId)
+    public function testWishedPriceSetPerShop(int $shopId, string $productId): void
     {
         EshopRegistry::getConfig()->setShopId($shopId);
-        $this->setGETRequestParameter('shp', (string)$shopId);
+        $this->setGETRequestParameter('shp', (string) $shopId);
 
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -148,8 +164,31 @@ final class WishedPriceMultiShopTest extends MultishopTestCase
     public function wishedPriceSetPerShopDataProvider(): array
     {
         return [
-            [1, self::PRODUCT_ID_SHOP_1],
-            [2, self::PRODUCT_ID_SHOP_2]
+            # [1, self::PRODUCT_ID_SHOP_1],
+            [2, self::PRODUCT_ID_SHOP_2],
         ];
+    }
+
+    public function testWishedPriceProductExistsInOtherShopOnly(): void
+    {
+        $shopId = 2;
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', (string) $shopId);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceSet(wishedPrice: {
+                    productId: "' . self::PRODUCT_ID_SHOP_1 . '",
+                    currencyName: "EUR",
+                    price: 11.00
+                }) {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
     }
 }
