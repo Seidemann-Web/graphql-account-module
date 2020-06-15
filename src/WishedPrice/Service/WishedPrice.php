@@ -139,7 +139,6 @@ final class WishedPrice
 
     private function isSameUser(WishedPriceDataType $wishedPrice): bool
     {
-        return ((string)$wishedPrice->getUserId() === (string)$this->authenticationService->getUserId());
-
+        return (string) $wishedPrice->getUserId() === (string) $this->authenticationService->getUserId();
     }
 }

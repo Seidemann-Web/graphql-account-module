@@ -20,14 +20,14 @@ final class PermissionProvider implements PermissionProviderInterface
                 'VIEW_WISHED_PRICES',
                 'DELETE_WISHED_PRICE',
                 'VIEW_RATINGS',
-                'DELETE_RATING'
+                'DELETE_RATING',
             ],
             'malladmin' => [
                 'VIEW_WISHED_PRICES',
                 'DELETE_WISHED_PRICE',
                 'VIEW_RATINGS',
-                'DELETE_RATING'
-            ]
+                'DELETE_RATING',
+            ],
         ];
     }
 }

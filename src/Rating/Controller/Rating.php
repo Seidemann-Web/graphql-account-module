@@ -61,7 +61,8 @@ final class Rating
     /**
      * @Mutation()
      *
-     * @return RatingType
+     * @throws \OxidEsales\GraphQL\Base\Exception\InvalidLogin
+     * @throws \OxidEsales\GraphQL\Account\Rating\Exception\RatingNotFound
      */
     public function ratingDelete(string $id): RatingType
     {

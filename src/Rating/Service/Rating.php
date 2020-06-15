@@ -99,8 +99,6 @@ final class Rating
     }
 
     /**
-     * @param  string $id
-     * @return RatingDataType
      * @throws InvalidLogin
      * @throws RatingNotFound
      */
@@ -124,6 +122,6 @@ final class Rating
 
     private function isSameUser(RatingType $rating): bool
     {
-        return ((string)$rating->getUserId() === (string)$this->authenticationService->getUserId());
+        return (string) $rating->getUserId() === (string) $this->authenticationService->getUserId();
     }
 }

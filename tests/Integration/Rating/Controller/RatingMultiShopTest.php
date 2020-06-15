@@ -15,10 +15,13 @@ use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 final class RatingMultiShopTest extends MultishopTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
 
     private const RATING_SHOP_1 = 'test_rating_1_';
+
     private const RATING_SHOP_2 = 'test_rating_8_';
+
     private const RATING_TO_BE_DELETED = 'test_rating_delete_';
 
     public function dataProviderRatingPerShop()
@@ -32,7 +35,7 @@ final class RatingMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderRatingPerShop
      */
-    public function testUserRatingPerShop(string $shopId, string $ratingId)
+    public function testUserRatingPerShop(string $shopId, string $ratingId): void
     {
         EshopRegistry::getConfig()->setShopId($shopId);
         $this->setGETRequestParameter('shp', $shopId);
@@ -53,7 +56,7 @@ final class RatingMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderRatingPerShop
      */
-    public function testAdminRatingPerShop(string $shopId, string $ratingId)
+    public function testAdminRatingPerShop(string $shopId, string $ratingId): void
     {
         EshopRegistry::getConfig()->setShopId($shopId);
         $this->setGETRequestParameter('shp', $shopId);
@@ -71,7 +74,7 @@ final class RatingMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus(200, $result);
     }
 
-    public function testGetUserRatingFromShop1ToShop2()
+    public function testGetUserRatingFromShop1ToShop2(): void
     {
         EshopRegistry::getConfig()->setShopId(2);
         $this->setGETRequestParameter('shp', '2');
@@ -89,7 +92,7 @@ final class RatingMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus(404, $result);
     }
 
-    public function testDeleteShop1RatingFromShop2()
+    public function testDeleteShop1RatingFromShop2(): void
     {
         EshopRegistry::getConfig()->setShopId(2);
         $this->setGETRequestParameter('shp', '2');

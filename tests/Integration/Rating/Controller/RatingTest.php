@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 
-use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
+use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
 final class RatingTest extends TokenTestCase
 {
@@ -21,6 +21,7 @@ final class RatingTest extends TokenTestCase
     private const USERID = 'e7af1c3b786fd02906ccd75698f4e6b9';
 
     private const PRODUCTID = '058c7b525aad619d8b343c0ffada0247';
+
     private const RATING_DELETE = '_test_rating_delete_';
 
     /**
@@ -73,24 +74,24 @@ final class RatingTest extends TokenTestCase
                 'expectedStatus' => 200,
                 'expectedResult' => [
                     [
-                        'id' => '13f810d1aa415400c8abdd37a5b2181a'
+                        'id' => '13f810d1aa415400c8abdd37a5b2181a',
                     ],
                     [
-                        'id' => '944374b68a8b26d8d95a8b11ad574a75'
+                        'id' => '944374b68a8b26d8d95a8b11ad574a75',
                     ],
                     [
-                        'id' => 'bcb64c798fd5ec58e5a6de30d52afee2'
+                        'id' => 'bcb64c798fd5ec58e5a6de30d52afee2',
                     ],
                     [
-                        'id' => 'c62d0873a0ed83aeed879c83aa863f23'
+                        'id' => 'c62d0873a0ed83aeed879c83aa863f23',
                     ],
                     [
-                        'id' => 'e7aa4c3a8508491a7e875f26b51fe4d0'
+                        'id' => 'e7aa4c3a8508491a7e875f26b51fe4d0',
                     ],
                     [
                         'id' => 'test_rating_1_',
-                    ]
-                ]
+                    ],
+                ],
             ], [
                 'user' => [
                     'username' => 'otheruser@oxid-esales.com',
@@ -99,7 +100,7 @@ final class RatingTest extends TokenTestCase
                 'expectedStatus' => 200,
                 'expectedResult' => [
                     [
-                        'id' => 'test_user_rating'
+                        'id' => 'test_user_rating',
                     ],
                 ],
             ],
@@ -217,25 +218,25 @@ final class RatingTest extends TokenTestCase
             'admin' => [
                 'username' => 'admin',
                 'password' => 'admin',
-                'expected' => 200
+                'expected' => 200,
             ],
             'user'  => [
                 'username' => 'user@oxid-esales.com',
                 'password' => 'useruser',
-                'expected' => 200
+                'expected' => 200,
             ],
             'otheruser'  => [
                 'username' => 'otheruser@oxid-esales.com',
                 'password' => 'useruser',
-                'expected' => 401
-            ]
+                'expected' => 401,
+            ],
         ];
     }
 
     /**
      * @dataProvider providerDeleteRating
      */
-    public function testDeleteRating(string $username, string $password, int $expected)
+    public function testDeleteRating(string $username, string $password, int $expected): void
     {
         $rating = oxNew(EshopRatingModel::class);
         $rating->assign(
@@ -245,7 +246,7 @@ final class RatingTest extends TokenTestCase
                 'oxuserid'   => self::USERID,
                 'oxtype'     => 'oxarticle',
                 'oxobjectid' => 'b56597806428de2f58b1c6c7d3e0e093',
-                'oxrating'   => 3
+                'oxrating'   => 3,
             ]
         );
         $rating->save();
