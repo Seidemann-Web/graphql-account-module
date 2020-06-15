@@ -46,17 +46,7 @@ class WishedPriceInput
      */
     public function fromUserInput(ID $productId, string $currencyName, float $price): WishedPrice
     {
-        try {
-            /** @var ProductDataType $product */
-            $product = $this->repository->getById((string)$productId->val(), ProductDataType::class);
-        } catch (NotFound $e) {
-            throw ProductNotFound::byId($productId->val());
-        }
-
-        // Throw 404 if product has wished prices disabled
-        if (!$product->getEshopModel()->isPriceAlarm()) {
-            throw ProductNotFound::byId((string) $product->getId()->val());
-        }
+        $this->assertProductWishedPriceIsPossible($productId);
 
         $currency = $this->currencyRepository->getByName($currencyName);
 
@@ -66,12 +56,34 @@ class WishedPriceInput
             [
                 'OXUSERID'   => $this->authentication->getUserId(),
                 'OXEMAIL'    => $this->authentication->getUserName(),
-                'OXARTID'    => $product->getId()->val(),
+                'OXARTID'    => (string)$productId->val(),
                 'OXPRICE'    => round($price, $currency->getPrecision()),
                 'OXCURRENCY' => $currency->getName()
             ]
         );
 
         return new WishedPrice($model);
+    }
+
+    /**
+     * @throws ProductNotFound
+     * @return true
+     */
+    private function assertProductWishedPriceIsPossible(ID $productId): bool
+    {
+        $id = (string)$productId->val();
+        try {
+            /** @var ProductDataType $product */
+            $product = $this->repository->getById($id, ProductDataType::class);
+        } catch (NotFound $e) {
+            throw ProductNotFound::byId($id);
+        }
+
+        // Throw 404 if product has wished prices disabled
+        if (!$product->getEshopModel()->isPriceAlarm()) {
+            throw ProductNotFound::byId($id);
+        }
+
+        return true;
     }
 }
