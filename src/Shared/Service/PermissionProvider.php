@@ -27,6 +27,7 @@ final class PermissionProvider implements PermissionProviderInterface
                 'DELETE_WISHED_PRICE',
                 'VIEW_RATINGS',
                 'DELETE_RATING'
+            ]
         ];
     }
 }
