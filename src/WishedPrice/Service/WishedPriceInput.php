@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
-use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceOutOfBounds;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice;
+use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;

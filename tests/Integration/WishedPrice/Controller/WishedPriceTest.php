@@ -11,8 +11,8 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\Eshop\Application\Model\Shop;
-use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
 final class WishedPriceTest extends TokenTestCase
