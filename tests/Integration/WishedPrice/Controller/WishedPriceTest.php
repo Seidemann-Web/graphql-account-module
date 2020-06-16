@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishedPrice\Controller;
 
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Core\Registry as EshopRegistry;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
 final class WishedPriceTest extends TokenTestCase
@@ -36,7 +39,14 @@ final class WishedPriceTest extends TokenTestCase
 
     private const WISHED_PRICE_TO_BE_DELETED = '_test_wished_price_delete_';
 
-    private const PRODUCT_ID = "058e613db53d782adfc9f2ccb43c45fe";
+    private const PRODUCT_ID = '058e613db53d782adfc9f2ccb43c45fe';
+
+    protected function tearDown(): void
+    {
+        $this->setShopOrderMail();
+
+        parent::tearDown();
+    }
 
     public function testGetWishedPrice(): void
     {
@@ -310,7 +320,7 @@ final class WishedPriceTest extends TokenTestCase
         );
     }
 
-    public function testWishedPriceSetWithoutAuthorization()
+    public function testWishedPriceSetWithoutAuthorization(): void
     {
         $result = $this->query(
             'mutation {
@@ -332,11 +342,6 @@ final class WishedPriceTest extends TokenTestCase
 
     /**
      * @dataProvider wishedPriceSetWithMissingEntitiesProvider
-     *
-     * @param string $productId
-     * @param string $currency
-     * @param string $price
-     * @param string $message
      */
     public function testWishedPriceSetWithMissingEntities(
         string $productId,
@@ -345,7 +350,7 @@ final class WishedPriceTest extends TokenTestCase
         string $message,
         int $expected,
         string $location
-    ) {
+    ): void {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query(
@@ -373,7 +378,7 @@ final class WishedPriceTest extends TokenTestCase
                 '15.0',
                 'Product was not found by id: DOES-NOT-EXIST',
                 404,
-                'message'
+                'message',
             ],
             'not_existing_currency' => [
                 self::PRODUCT_ID,
@@ -381,7 +386,7 @@ final class WishedPriceTest extends TokenTestCase
                 '15.0',
                 'Currency "ABC" was not found',
                 404,
-                'message'
+                'message',
             ],
             'wished_price_disabled' => [
                 self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT,
@@ -389,7 +394,7 @@ final class WishedPriceTest extends TokenTestCase
                 '15.0',
                 'Product was not found by id: ' . self::WISHED_PRICE_WITH_DISABLED_WISHED_PRICE_FOR_PRODUCT,
                 404,
-                'message'
+                'message',
             ],
             'invalid_price'         => [
                 self::PRODUCT_ID,
@@ -397,7 +402,7 @@ final class WishedPriceTest extends TokenTestCase
                 'this_is_not_a_vald_price',
                 'Field "wishedPriceSet" argument "wishedPrice" requires type Float!, found this_is_not_a_vald_price.',
                 400,
-                'message'
+                'message',
             ],
             'negative_price'        => [
                 self::PRODUCT_ID,
@@ -405,12 +410,12 @@ final class WishedPriceTest extends TokenTestCase
                 -123,
                 'Wished price must be positive float, was -123',
                 400,
-                'debugMessage'
+                'debugMessage',
             ],
         ];
     }
 
-    public function testWishedPriceSet()
+    public function testWishedPriceSet(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -438,15 +443,15 @@ final class WishedPriceTest extends TokenTestCase
 
         $this->assertResponseStatus(200, $result);
 
-        $wishedPrice = $result['body']['data']['wishedPriceSet'];
+        $wishedPrice   = $result['body']['data']['wishedPriceSet'];
         $wishedPriceId = $wishedPrice['id'];
         unset($wishedPrice['id']);
 
         $expectedWishedPrice = [
-            'user' => ['userName' => self::USERNAME],
-            'email' => self::USERNAME,
-            'product' => ['id' => self::PRODUCT_ID],
-            'currency' => ['name' => 'EUR']
+            'user'     => ['userName' => self::USERNAME],
+            'email'    => self::USERNAME,
+            'product'  => ['id' => self::PRODUCT_ID],
+            'currency' => ['name' => 'EUR'],
         ];
 
         $this->assertEquals($expectedWishedPrice, $wishedPrice);
@@ -463,5 +468,43 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertEquals($expectedWishedPrice['email'], $user->getFieldData('oxusername'));
         $this->assertEquals($expectedWishedPrice['product']['id'], $savedWishedPrice->getArticle()->getId());
         $this->assertEquals($expectedWishedPrice['currency']['name'], $savedWishedPrice->getPriceAlarmCurrency()->name);
+    }
+
+    public function testWishedPriceSetFailsToSendNotification(): void
+    {
+        $this->setShopOrderMail('');
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                wishedPriceSet(wishedPrice: {
+                    productId: "' . self::PRODUCT_ID . '",
+                    currencyName: "EUR",
+                    price: 15.00
+                }) {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(500, $result);
+        $this->assertContains(
+            'Failed to send notification: Invalid address:  (to):',
+            $result['body']['errors']['0']['message']
+        );
+    }
+
+    private function setShopOrderMail(string $value = 'reply@myoxideshop.com'): void
+    {
+        EshopRegistry::set(Config::class, null);
+
+        $shop = oxNew(Shop::class);
+        $shop->load(1);
+        $shop->assign(
+            [
+                'oxorderemail' => $value,
+            ]
+        );
+        $shop->save();
     }
 }
