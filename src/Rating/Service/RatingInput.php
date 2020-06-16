@@ -7,9 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Rating\DataType;
+namespace OxidEsales\GraphQL\Account\Rating\Service;
 
 use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
+use OxidEsales\GraphQL\Account\Rating\DataType\Rating;
 use OxidEsales\GraphQL\Account\Rating\Exception\RatingOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
