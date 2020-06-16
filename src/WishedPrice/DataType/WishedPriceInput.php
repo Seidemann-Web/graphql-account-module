@@ -9,19 +9,18 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\DataType;
 
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceOutOfBounds;
+use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product as ProductDataType;
 use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
-use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 use TheCodingMachine\GraphQLite\Types\ID;
 
-class WishedPriceInput
+final class WishedPriceInput
 {
     /** @var Authentication */
     private $authentication;
@@ -37,8 +36,8 @@ class WishedPriceInput
         Repository $repository,
         CurrencyRepository $currencyRepository
     ) {
-        $this->authentication = $authentication;
-        $this->repository = $repository;
+        $this->authentication     = $authentication;
+        $this->repository         = $repository;
         $this->currencyRepository = $currencyRepository;
     }
 
@@ -58,9 +57,9 @@ class WishedPriceInput
             [
                 'OXUSERID'   => $this->authentication->getUserId(),
                 'OXEMAIL'    => $this->authentication->getUserName(),
-                'OXARTID'    => (string)$productId->val(),
+                'OXARTID'    => (string) $productId->val(),
                 'OXPRICE'    => round($price, $currency->getPrecision()),
-                'OXCURRENCY' => $currency->getName()
+                'OXCURRENCY' => $currency->getName(),
             ]
         );
 
@@ -69,11 +68,13 @@ class WishedPriceInput
 
     /**
      * @throws ProductNotFound
+     *
      * @return true
      */
     private function assertProductWishedPriceIsPossible(ID $productId): bool
     {
-        $id = (string)$productId->val();
+        $id = (string) $productId->val();
+
         try {
             /** @var ProductDataType $product */
             $product = $this->repository->getById($id, ProductDataType::class);
@@ -91,6 +92,7 @@ class WishedPriceInput
 
     /**
      * @throws WishedPriceOutOfBounds
+     *
      * @return true
      */
     private function assertPriceValue(float $price): bool
@@ -98,6 +100,7 @@ class WishedPriceInput
         if (0 > $price) {
             throw WishedPriceOutOfBounds::byWrongValue((string) $price);
         }
+
         return true;
     }
 }

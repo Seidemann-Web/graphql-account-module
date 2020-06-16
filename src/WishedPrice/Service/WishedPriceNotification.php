@@ -13,7 +13,7 @@ use OxidEsales\Eshop\Core\Email;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\NotificationSendFailure;
 
-class WishedPriceNotification
+final class WishedPriceNotification
 {
     public function sendNotification(WishedPriceDataType $wishedPrice): bool
     {
@@ -23,7 +23,7 @@ class WishedPriceNotification
         $result = $email->sendPriceAlarmNotification(
             [
                 'aid'   => $wishedPrice->getProductId()->val(),
-                'email' => $wishedPrice->getEmail()
+                'email' => $wishedPrice->getEmail(),
             ],
             $wishedPrice->getEshopModel()
         );

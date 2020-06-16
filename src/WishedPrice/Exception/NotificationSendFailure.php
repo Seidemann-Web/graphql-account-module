@@ -16,11 +16,6 @@ use OxidEsales\GraphQL\Base\Exception\HttpErrorInterface;
 
 final class NotificationSendFailure extends Exception implements ClientAware, HttpErrorInterface
 {
-    public static function create(string $message): self
-    {
-        return new self(sprintf("Failed to send notification: %s", $message));
-    }
-
     public function isClientSafe(): bool
     {
         return true;
@@ -34,5 +29,10 @@ final class NotificationSendFailure extends Exception implements ClientAware, Ht
     public function getHttpStatus(): int
     {
         return 500;
+    }
+
+    public static function create(string $message): self
+    {
+        return new self(sprintf('Failed to send notification: %s', $message));
     }
 }

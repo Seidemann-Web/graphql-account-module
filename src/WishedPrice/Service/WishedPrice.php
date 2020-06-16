@@ -9,11 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
-use OxidEsales\Eshop\Core\Email;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice as WishedPriceDataType;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPriceFilterList;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceNotFound;
-use OxidEsales\GraphQL\Account\WishedPrice\Exception\NotificationSendFailure;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
@@ -107,6 +105,7 @@ final class WishedPrice
     public function save(WishedPriceDataType $wishedPrice): bool
     {
         $modelItem = $wishedPrice->getEshopModel();
+
         return $this->repository->saveModel($modelItem);
     }
 
