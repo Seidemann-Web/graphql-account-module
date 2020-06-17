@@ -102,7 +102,7 @@ final class Rating
      * @throws InvalidLogin
      * @throws RatingNotFound
      */
-    public function delete(string $id): RatingDataType
+    public function delete(string $id): bool
     {
         $rating = $this->rating($id);
 
@@ -112,12 +112,12 @@ final class Rating
             $this->authorizationService->isAllowed('DELETE_RATING')
             || $this->isSameUser($rating)
         ) {
-            $this->repository->delete($id, RatingDataType::class);
+            $deleted = $this->repository->delete($id, RatingDataType::class);
         } else {
             throw new InvalidLogin('Unauthorized');
         }
 
-        return $rating;
+        return $deleted;
     }
 
     private function isSameUser(RatingType $rating): bool

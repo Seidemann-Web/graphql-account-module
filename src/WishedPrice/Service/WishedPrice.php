@@ -50,7 +50,7 @@ final class WishedPrice
      * @throws InvalidLogin
      * @throws WishedPriceNotFound
      */
-    public function delete(string $id): WishedPriceDataType
+    public function delete(string $id): bool
     {
         $wishedPrice = $this->getWishedPrice($id);
 
@@ -60,12 +60,12 @@ final class WishedPrice
             $this->authorizationService->isAllowed('DELETE_WISHED_PRICE')
              || $this->isSameUser($wishedPrice)
         ) {
-            $this->repository->delete($id, WishedPriceDataType::class);
+            $deleted = $this->repository->delete($id, WishedPriceDataType::class);
         } else {
             throw new InvalidLogin('Unauthorized');
         }
 
-        return $wishedPrice;
+        return $deleted;
     }
 
     /**

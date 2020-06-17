@@ -38,7 +38,7 @@ final class WishedPrice
     /**
      * @Mutation()
      */
-    public function wishedPriceDelete(string $id): WishedPriceDataType
+    public function wishedPriceDelete(string $id): bool
     {
         return $this->wishedPriceService->delete($id);
     }

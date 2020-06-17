@@ -64,7 +64,7 @@ final class Rating
      * @throws \OxidEsales\GraphQL\Base\Exception\InvalidLogin
      * @throws \OxidEsales\GraphQL\Account\Rating\Exception\RatingNotFound
      */
-    public function ratingDelete(string $id): RatingType
+    public function ratingDelete(string $id): bool
     {
         return $this->ratingService->delete($id);
     }
