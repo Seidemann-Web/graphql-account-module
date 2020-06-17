@@ -43,14 +43,6 @@ final class WishedPrice
     }
 
     /**
-     * @Mutation()
-     */
-    public function wishedPriceDelete(string $id): WishedPriceDataType
-    {
-        return $this->wishedPriceService->delete($id);
-    }
-
-    /**
      * @Query()
      *
      * @throws InvalidToken
@@ -74,5 +66,16 @@ final class WishedPrice
         $this->wishedPriceNotificationService->sendNotification($wishedPrice);
 
         return $wishedPrice;
+    }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     *
+     * @return true
+     */
+    public function wishedPriceDelete(string $id): bool
+    {
+        return $this->wishedPriceService->delete($id);
     }
 }

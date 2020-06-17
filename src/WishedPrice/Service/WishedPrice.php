@@ -49,8 +49,10 @@ final class WishedPrice
     /**
      * @throws InvalidLogin
      * @throws WishedPriceNotFound
+     *
+     * @return true
      */
-    public function delete(string $id): WishedPriceDataType
+    public function delete(string $id): bool
     {
         $wishedPrice = $this->getWishedPrice($id);
 
@@ -58,14 +60,12 @@ final class WishedPrice
         //user can delete only its own wished price, admin can delete any wished price
         if (
             $this->authorizationService->isAllowed('DELETE_WISHED_PRICE')
-             || $this->isSameUser($wishedPrice)
+            || $this->isSameUser($wishedPrice)
         ) {
-            $this->repository->delete($id, WishedPriceDataType::class);
-        } else {
-            throw new InvalidLogin('Unauthorized');
+            return $this->repository->delete($id, WishedPriceDataType::class);
         }
 
-        return $wishedPrice;
+        throw new InvalidLogin('Unauthorized');
     }
 
     /**
