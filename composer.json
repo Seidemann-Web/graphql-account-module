@@ -18,7 +18,7 @@
     "require": {
         "php": "^7.1",
         "oxid-esales/graphql-base": "dev-master",
-        "oxid-esales/graphql-catalogue": "dev-master-wished_price_set-OXDEV-3505"
+        "oxid-esales/graphql-catalogue": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5.20|^8.5|^9",
