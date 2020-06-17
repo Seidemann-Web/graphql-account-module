@@ -34,13 +34,13 @@ final class WishedPriceFilterList extends FilterList
 
     /**
      * @return array{
-     *                oxuserId: ?StringFilter
+     *                oxuserid: ?StringFilter
      *                }
      */
     public function getFilters(): array
     {
         return [
-            'oxuserId' => $this->userId,
+            'oxuserid' => $this->userId,
         ];
     }
 

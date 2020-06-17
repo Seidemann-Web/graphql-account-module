@@ -11,13 +11,14 @@ namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
 use OxidEsales\Eshop\Core\Price as EshopPriceModel;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice;
-use OxidEsales\GraphQL\Base\Exception\NotFound;
+use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Catalogue\Currency\DataType\Currency;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Price;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
 use OxidEsales\GraphQL\Catalogue\Product\Service\Product as CatalogueProductService;
-use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 use OxidEsales\GraphQL\Catalogue\User\DataType\User;
+use OxidEsales\GraphQL\Catalogue\User\Exception\UserNotFound;
+use OxidEsales\GraphQL\Catalogue\User\Service\User as UserService;
 use stdClass;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
@@ -27,17 +28,17 @@ use TheCodingMachine\GraphQLite\Annotations\Field;
  */
 final class RelationService
 {
-    /** @var Repository */
-    private $repository;
+    /** @var UserService */
+    private $userService;
 
     /** @var CatalogueProductService */
     private $productService;
 
     public function __construct(
-        Repository $repository,
+        UserService $userService,
         CatalogueProductService $productService
     ) {
-        $this->repository     = $repository;
+        $this->userService    = $userService;
         $this->productService = $productService;
     }
 
@@ -46,21 +47,12 @@ final class RelationService
      */
     public function getUser(WishedPrice $wishedPrice): ?User
     {
-        $user = null;
-
         try {
-            if ($userId = (string) $wishedPrice->getUserId()) {
-                $user = $this->repository->getById(
-                    $userId,
-                    User::class,
-                    false
-                );
-            }
-        } catch (NotFound $e) {
-            return null;
+            return $this->userService->user((string) $wishedPrice->getUserId());
+        } catch (UserNotFound | InvalidLogin $e) {
         }
 
-        return $user;
+        return null;
     }
 
     /**

@@ -14,8 +14,8 @@ use function sprintf;
 
 final class WishedPriceOutOfBounds extends OutOfBoundsException
 {
-    public static function byWrongValue(string $value): self
+    public static function byValue(float $value): self
     {
-        return new self(sprintf('Wished price must be positive float, was %s', $value));
+        return new self(sprintf('Wished price must be positive, was: %d', $value));
     }
 }

@@ -408,7 +408,7 @@ final class WishedPriceTest extends TokenTestCase
                 self::PRODUCT_ID,
                 'EUR',
                 -123,
-                'Wished price must be positive float, was -123',
+                'Wished price must be positive, was: -123',
                 400,
                 'debugMessage',
             ],

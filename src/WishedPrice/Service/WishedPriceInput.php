@@ -98,8 +98,8 @@ final class WishedPriceInput
      */
     private function assertPriceValue(float $price): bool
     {
-        if (0 > $price) {
-            throw WishedPriceOutOfBounds::byWrongValue((string) $price);
+        if ($price <= 0) {
+            throw WishedPriceOutOfBounds::byValue($price);
         }
 
         return true;
