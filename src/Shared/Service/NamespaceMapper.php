@@ -18,6 +18,7 @@ final class NamespaceMapper implements NamespaceMapperInterface
         return [
             '\\OxidEsales\\GraphQL\\Account\\Rating\\Controller'      => __DIR__ . '/../../Rating/Controller/',
             '\\OxidEsales\\GraphQL\\Account\\WishedPrice\\Controller' => __DIR__ . '/../../WishedPrice/Controller/',
+            '\\OxidEsales\\GraphQL\\Account\\Password\\Controller'    => __DIR__ . '/../../Password/Controller/',
         ];
     }
 
