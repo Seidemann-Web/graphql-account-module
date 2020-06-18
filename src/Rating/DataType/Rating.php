@@ -68,6 +68,13 @@ final class Rating implements DataType
         );
     }
 
+    public function getObjectId(): ID
+    {
+        return new ID(
+            (string) $this->rating->getFieldData('oxobjectid')
+        );
+    }
+
     public static function getModelClass(): string
     {
         return EshopRatingModel::class;

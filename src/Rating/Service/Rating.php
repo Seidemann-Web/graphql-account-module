@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Rating\Service;
 
 use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingDataType;
-use OxidEsales\GraphQL\Account\Rating\DataType\Rating as RatingType;
 use OxidEsales\GraphQL\Account\Rating\DataType\RatingFilterList;
+use OxidEsales\GraphQL\Account\Rating\Exception\RatingExists;
 use OxidEsales\GraphQL\Account\Rating\Exception\RatingNotFound;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -45,7 +45,7 @@ final class Rating
      * @throws InvalidLogin
      * @throws RatingNotFound
      */
-    public function rating(string $id): RatingType
+    public function rating(string $id): RatingDataType
     {
         /** Only logged in users can query ratings */
         if (!$this->authenticationService->isLogged()) {
@@ -53,10 +53,10 @@ final class Rating
         }
 
         try {
-            /** @var RatingType $rating */
+            /** @var RatingDataType $rating */
             $rating = $this->repository->getById(
                 $id,
-                RatingType::class,
+                RatingDataType::class,
                 false
             );
         } catch (NotFound $e) {
@@ -77,7 +77,7 @@ final class Rating
     }
 
     /**
-     * @return RatingType[]
+     * @return RatingDataType[]
      */
     public function ratings(RatingFilterList $filterList): array
     {
@@ -87,12 +87,16 @@ final class Rating
                     $this->authenticationService->getUserId()
                 )
             ),
-            RatingType::class
+            RatingDataType::class
         );
     }
 
-    public function save(RatingType $rating): bool
+    public function save(RatingDataType $rating): bool
     {
+        if ($this->productRatingExists($rating)) {
+            throw RatingExists::byId((string) $rating->getObjectId()->val());
+        }
+
         $modelItem = $rating->getEshopModel();
 
         return $this->repository->saveModel($modelItem);
@@ -120,8 +124,19 @@ final class Rating
         return $deleted;
     }
 
-    private function isSameUser(RatingType $rating): bool
+    private function isSameUser(RatingDataType $rating): bool
     {
         return (string) $rating->getUserId() === (string) $this->authenticationService->getUserId();
+    }
+
+    private function productRatingExists(RatingDataType $rating): bool
+    {
+        $filterList = new RatingFilterList(
+            new StringFilter((string) $rating->getUserId()->val()),
+            new StringFilter((string) $rating->getObjectId()->val())
+        );
+        $ratings = $this->ratings($filterList);
+
+        return !empty($ratings);
     }
 }

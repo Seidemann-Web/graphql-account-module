@@ -17,10 +17,15 @@ final class RatingFilterList extends FilterList
     /** @var null|StringFilter */
     protected $userId;
 
+    /** @var null|StringFilter */
+    protected $productId;
+
     public function __construct(
-        ?StringFilter $userId = null
+        ?StringFilter $userId = null,
+        ?StringFilter $productId = null
     ) {
-        $this->userId = $userId;
+        $this->userId    = $userId;
+        $this->productId = $productId;
 
         parent::__construct();
     }
@@ -41,7 +46,8 @@ final class RatingFilterList extends FilterList
     public function getFilters(): array
     {
         return [
-            'oxuserid' => $this->userId,
+            'oxuserid'   => $this->userId,
+            'oxobjectid' => $this->productId,
         ];
     }
 }

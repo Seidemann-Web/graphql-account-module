@@ -24,6 +24,10 @@ final class RatingTest extends TokenTestCase
 
     private const RATING_DELETE = '_test_rating_delete_';
 
+    private const SET_RATING_PRODUCTID = '_test_product_for_rating_5_';
+
+    private const SET_ONLY_ONE_RATING_PRODUCTID = '_test_product_for_rating_6_';
+
     /**
      * Tear down.
      */
@@ -131,7 +135,7 @@ final class RatingTest extends TokenTestCase
             'mutation {
                 ratingSet(rating: {
                     rating: 5,
-                    productId: "' . self::PRODUCTID . '"
+                    productId: "' . self::SET_RATING_PRODUCTID . '"
                 }){
                     id
                     product{
@@ -148,7 +152,7 @@ final class RatingTest extends TokenTestCase
 
         $id = $ratingData['id'];
         $this->assertStringMatchesFormat('%s', $id);
-        $this->assertSame(self::PRODUCTID, $ratingData['product']['id']);
+        $this->assertSame(self::SET_RATING_PRODUCTID, $ratingData['product']['id']);
         $this->assertSame(5, $ratingData['rating']);
 
         $result = $this->query(
@@ -210,6 +214,53 @@ final class RatingTest extends TokenTestCase
             'Product was not found by id: some_not_existing_product',
             $result['body']['errors'][0]['message']
         );
+    }
+
+    public function testSetRatingOnlyOnePerProduct(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $query =  'mutation {
+                ratingSet(rating: {
+                    rating: 5,
+                    productId: "' . self::SET_ONLY_ONE_RATING_PRODUCTID . '"
+                }){
+                    id
+                    product{
+                        id
+                    }
+                    rating
+                }
+            }';
+
+        $result = $this->query(sprintf($query, 5));
+
+        $this->assertResponseStatus(200, $result);
+        $ratingId = $result['body']['data']['ratingSet']['id'];
+
+        //try to rate again
+        $result = $this->query(sprintf($query, 4));
+        $this->assertResponseStatus(404, $result);
+        $this->assertSame(
+            "You already rated product '_test_product_for_rating_6_', please delete existing rating first.",
+            $result['body']['errors'][0]['message']
+        );
+
+        //delete
+        $result = $this->query(
+            'mutation {
+                ratingDelete(id: "' . $ratingId . '")
+            }'
+        );
+        $this->assertResponseStatus(200, $result);
+
+        //rate again
+        $result = $this->query(sprintf($query, 4));
+        $this->assertResponseStatus(200, $result);
+        $newRatingId = $result['body']['data']['ratingSet']['id'];
+
+        $this->assertNotEmpty($newRatingId);
+        $this->assertNotEquals($ratingId, $newRatingId);
     }
 
     public function providerDeleteRating()
