@@ -255,9 +255,7 @@ final class RatingTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                ratingDelete(id: "' . self::RATING_DELETE . '"){
-                    id
-                }
+                ratingDelete(id: "' . self::RATING_DELETE . '")
             }'
         );
 

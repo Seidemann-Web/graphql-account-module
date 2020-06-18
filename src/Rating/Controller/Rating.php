@@ -62,7 +62,7 @@ final class Rating
      * @Mutation()
      * @Logged()
      */
-    public function ratingDelete(string $id): RatingType
+    public function ratingDelete(string $id): bool
     {
         return $this->ratingService->delete($id);
     }

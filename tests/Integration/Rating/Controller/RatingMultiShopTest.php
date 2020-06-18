@@ -101,9 +101,7 @@ final class RatingMultiShopTest extends MultishopTestCase
 
         $result = $this->query(
             'mutation {
-                ratingDelete(id: "' . self::RATING_TO_BE_DELETED . '") {
-                    id
-                }
+                ratingDelete(id: "' . self::RATING_TO_BE_DELETED . '")
             }'
         );
 
