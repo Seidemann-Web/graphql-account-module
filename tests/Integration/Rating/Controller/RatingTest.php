@@ -28,6 +28,8 @@ final class RatingTest extends TokenTestCase
 
     private const SET_ONLY_ONE_RATING_PRODUCTID = '_test_product_for_rating_6_';
 
+    private const PRODUCT_RELATION = '05833e961f65616e55a2208c2ed7c6b8';
+
     /**
      * Tear down.
      */
@@ -222,7 +224,7 @@ final class RatingTest extends TokenTestCase
 
         $query =  'mutation {
                 ratingSet(rating: {
-                    rating: 5,
+                    rating: %d,
                     productId: "' . self::SET_ONLY_ONE_RATING_PRODUCTID . '"
                 }){
                     id
@@ -261,6 +263,57 @@ final class RatingTest extends TokenTestCase
 
         $this->assertNotEmpty($newRatingId);
         $this->assertNotEquals($ratingId, $newRatingId);
+    }
+
+    public function testRelationBetweenRatingAndProductRating(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $query =  'mutation {
+                ratingSet(rating: {
+                    rating: %d,
+                    productId: "' . self::PRODUCT_RELATION . '"
+                }){
+                    id
+                    product {
+                        id
+                        rating {
+                            rating
+                            count
+                        }
+                    }
+                    rating
+                }
+            }';
+
+        $ratingValue = 5;
+        $result      = $this->query(sprintf($query, $ratingValue));
+
+        $this->assertResponseStatus(200, $result);
+        $rating        = $result['body']['data']['ratingSet']['rating'];
+        $productRating = $result['body']['data']['ratingSet']['product']['rating'];
+        $this->assertEquals($ratingValue, $productRating['rating']);
+        $this->assertSame($ratingValue, $rating);
+        $this->assertSame(1, $productRating['count']);
+
+//        //delete
+//        $ratingId = $result['body']['data']['ratingSet']['id'];
+//        $result = $this->query(
+//            'mutation {
+//                ratingDelete(id: "' . $ratingId . '")
+//            }'
+//        );
+//        $this->assertResponseStatus(200, $result);
+//
+//        //rate again
+//        $newRatingValue = 4;
+//        $result = $this->query(sprintf($query, $newRatingValue));
+//        $this->assertResponseStatus(200, $result);
+//        $newRating = $result['body']['data']['ratingSet']['rating'];
+//        $newProductRating = $result['body']['data']['ratingSet']['product']['rating'];
+//        $this->assertSame($newRatingValue, $newProductRating['rating']);
+//        $this->assertSame($newRatingValue, $newRating);
+//        $this->assertSame(1, $newProductRating['count']);
     }
 
     public function providerDeleteRating()

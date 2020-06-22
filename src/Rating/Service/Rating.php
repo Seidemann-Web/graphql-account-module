@@ -31,14 +31,19 @@ final class Rating
     /** @var Authorization */
     private $authorizationService;
 
+    /** @var RelationService */
+    private $ratingRelationService;
+
     public function __construct(
         Repository $repository,
         Authentication $authenticationService,
-        Authorization $authorizationService
+        Authorization $authorizationService,
+        RelationService $ratingRelationService
     ) {
         $this->repository            = $repository;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
+        $this->ratingRelationService = $ratingRelationService;
     }
 
     /**
@@ -99,7 +104,14 @@ final class Rating
 
         $modelItem = $rating->getEshopModel();
 
-        return $this->repository->saveModel($modelItem);
+        $response = $this->repository->saveModel($modelItem);
+
+        // When new rating is added, product's average rating should be recalculated
+        if ($product = $this->ratingRelationService->product($rating)) {
+            $product->getEshopModel()->addToRatingAverage($rating->getRating());
+        }
+
+        return $response;
     }
 
     /**
