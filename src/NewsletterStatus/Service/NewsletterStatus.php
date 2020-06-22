@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class NewsletterStatus
 {
@@ -40,5 +40,14 @@ final class NewsletterStatus
         return $this->repository->getByUserId(
             $this->authenticationService->getUserId()
         );
+    }
+
+    public function optIn(NewsletterStatusType $newsletterStatus): bool
+    {
+        $modelItem = $newsletterStatus->getEshopModel();
+        $modelItem->updateSubscription($modelItem->getUser());
+        $modelItem->setOptInStatus(1);
+
+        return $this->repository->saveModel($modelItem);
     }
 }

@@ -46,6 +46,11 @@ final class NewsletterStatus implements DataType
         $this->newsletterSubscriptionStatus = $newsletterSubscriptionStatus;
     }
 
+    public function getEshopModel(): EshopNewsletterSubscriptionStatusModel
+    {
+        return $this->newsletterSubscriptionStatus;
+    }
+
     /**
      * @Field()
      */
