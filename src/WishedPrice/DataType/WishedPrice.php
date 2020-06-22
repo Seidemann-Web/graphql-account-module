@@ -46,7 +46,7 @@ final class WishedPrice implements DataType
         );
     }
 
-    public function getUserId(): ID
+    public function getInquirerId(): ID
     {
         return new ID(
             (string) $this->wishedPrice->getFieldData('oxuserid')

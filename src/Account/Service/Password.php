@@ -7,48 +7,48 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Password\Service;
+namespace OxidEsales\GraphQL\Account\Account\Service;
 
-use OxidEsales\GraphQL\Account\Password\Exception\PasswordMismatch;
+use OxidEsales\GraphQL\Account\Account\Exception\PasswordMismatch;
+use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
-use OxidEsales\GraphQL\Catalogue\User\Service\User as UserService;
 
 final class Password
 {
     /** @var Repository */
     private $repository;
 
-    /** @var UserService */
-    private $userService;
+    /** @var CustomerService */
+    private $customerService;
 
     /** @var Authentication */
     private $authenticationService;
 
     public function __construct(
         Repository $repository,
-        UserService $userService,
+        CustomerService $customerService,
         Authentication $authenticationService
     ) {
-        $this->repository             = $repository;
-        $this->userService            = $userService;
-        $this->authenticationService  = $authenticationService;
+        $this->repository                 = $repository;
+        $this->customerService            = $customerService;
+        $this->authenticationService      = $authenticationService;
     }
 
     public function change(string $old, string $new): bool
     {
-        $userModel = $this->userService
-                          ->user(
+        $customerModel = $this->customerService
+                          ->customer(
                               $this->authenticationService->getUserId()
                           )
                           ->getEshopModel();
 
-        if (!$userModel->isSamePassword($old)) {
+        if (!$customerModel->isSamePassword($old)) {
             throw PasswordMismatch::byOldPassword();
         }
 
-        $userModel->setPassword($new);
+        $customerModel->setPassword($new);
 
-        return $this->repository->saveModel($userModel);
+        return $this->repository->saveModel($customerModel);
     }
 }

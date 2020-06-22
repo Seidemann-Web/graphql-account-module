@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Tests\Integration\Password\Controller;
+namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
 use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 

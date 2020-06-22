@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Password\Controller;
+namespace OxidEsales\GraphQL\Account\Account\Controller;
 
-use OxidEsales\GraphQL\Account\Password\Service\Password as PasswordService;
+use OxidEsales\GraphQL\Account\Account\Service\Password as PasswordService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 

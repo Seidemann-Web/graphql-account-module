@@ -19,6 +19,8 @@ final class WishedPriceTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
+    private const FIRSTNAME = 'Marc';
+
     private const PASSWORD = 'useruser';
 
     private const WISHED_PRICE = '_test_wished_price_1_'; // Belongs to user@oxid-esales.com
@@ -68,8 +70,8 @@ final class WishedPriceTest extends TokenTestCase
                     email
                     notificationDate
                     creationDate
-                    user {
-                        userName
+                    inquirer {
+                        firstName
                     }
                 }
             }'
@@ -83,7 +85,7 @@ final class WishedPriceTest extends TokenTestCase
         $this->assertEquals($wishedPrice['currency']['name'], 'EUR');
         $this->assertEquals($wishedPrice['id'], self::WISHED_PRICE);
         $this->assertEquals($wishedPrice['email'], self::USERNAME);
-        $this->assertEquals($wishedPrice['user']['userName'], self::USERNAME);
+        $this->assertEquals($wishedPrice['inquirer']['firstName'], self::FIRSTNAME);
         $this->assertNull($wishedPrice['notificationDate']);
 
         $this->assertEmpty(array_diff(array_keys($wishedPrice), [
@@ -94,7 +96,7 @@ final class WishedPriceTest extends TokenTestCase
             'email',
             'notificationDate',
             'creationDate',
-            'user',
+            'inquirer',
         ]));
     }
 
@@ -421,8 +423,8 @@ final class WishedPriceTest extends TokenTestCase
                     price: 15.00
                 }) {
                     id
-                    user {
-                        userName
+                    inquirer {
+                        firstName
                     }
                     email
                     product {
@@ -442,7 +444,7 @@ final class WishedPriceTest extends TokenTestCase
         unset($wishedPrice['id']);
 
         $expectedWishedPrice = [
-            'user'     => ['userName' => self::USERNAME],
+            'inquirer' => ['firstName' => self::FIRSTNAME],
             'email'    => self::USERNAME,
             'product'  => ['id' => self::PRODUCT_ID],
             'currency' => ['name' => 'EUR'],
@@ -458,7 +460,7 @@ final class WishedPriceTest extends TokenTestCase
 
         $user = $savedWishedPrice->getUser();
 
-        $this->assertEquals($expectedWishedPrice['user']['userName'], $user->getFieldData('oxusername'));
+        $this->assertEquals($expectedWishedPrice['inquirer']['firstName'], $user->getFieldData('oxfname'));
         $this->assertEquals($expectedWishedPrice['email'], $user->getFieldData('oxusername'));
         $this->assertEquals($expectedWishedPrice['product']['id'], $savedWishedPrice->getArticle()->getId());
         $this->assertEquals($expectedWishedPrice['currency']['name'], $savedWishedPrice->getPriceAlarmCurrency()->name);

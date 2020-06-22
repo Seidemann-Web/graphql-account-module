@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Password\Exception;
+namespace OxidEsales\GraphQL\Account\Account\Exception;
 
 use Exception;
 use GraphQL\Error\ClientAware;
