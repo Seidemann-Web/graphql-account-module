@@ -64,4 +64,12 @@ final class NewsletterStatus
 
         return $this->repository->saveModel($modelItem);
     }
+
+    public function save(NewsletterStatus $newsletterStatus): bool
+    {
+        $modelItem = $newsletterStatus->getEshopModel();
+        $modelItem->updateSubscription($modelItem->getUser());
+
+        return $this->repository->saveModel($modelItem);
+    }
 }

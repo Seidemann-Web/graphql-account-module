@@ -33,4 +33,14 @@ final class NewsletterStatus
 
         return $newsletterStatus;
     }
+
+    /**
+     * @Mutation()
+     */
+    public function newsletterUnsubscribe(NewsletterStatusType $newsletterStatus): NewsletterStatus
+    {
+        $this->newsletterService->save($newsletterStatus);
+
+        return $newsletterStatus;
+    }
 }
