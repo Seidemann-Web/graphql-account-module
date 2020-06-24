@@ -22,11 +22,19 @@ use TheCodingMachine\GraphQLite\Types\ID;
  */
 final class NewsletterSubscriptionStatus implements DataType
 {
+    private const STATUS_0 = 'UNSUBSCRIBED';
+
+    private const STATUS_1 = 'SUBSCRIBED';
+
+    private const STATUS_2 = 'SUBSCRIBED_MISSING_DBOPTIN';
+
+    private const DEFAULT_STATUS = 0;
+
     /** @var array */
     private $statusMapping = [
-        0 => 'unsubscribed',
-        1 => 'subscribed',
-        2 => 'missing double optin',
+        0 => self::STATUS_0,
+        1 => self::STATUS_1,
+        2 => self::STATUS_2
     ];
 
     /** @var EshopNewsletterSubscriptionStatusModel */
@@ -77,8 +85,8 @@ final class NewsletterSubscriptionStatus implements DataType
     {
         $status = $this->newsletterSubscriptionStatus->getOptInStatus();
 
-        if ($status < 0 || $status > 2) {
-            $status = 0;
+        if (!array_key_exists($status, $this->statusMapping)) {
+            $status = self::DEFAULT_STATUS;
         }
 
         return $this->statusMapping[$status];
