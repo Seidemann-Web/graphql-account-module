@@ -13,6 +13,7 @@ use OxidEsales\GraphQL\Account\Review\Exception\ReviewNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
+use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use OxidEsales\GraphQL\Catalogue\Review\Service\Review as ReviewService;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
@@ -60,7 +61,7 @@ final class Review
             throw new InvalidLogin('Unauthorized');
         }
 
-        return $this->repository->delete($review);
+        return $this->repository->delete($review->getEshopModel());
     }
 
     /**
