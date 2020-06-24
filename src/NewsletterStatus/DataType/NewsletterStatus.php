@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Newsletter\DataType;
+namespace OxidEsales\GraphQL\Account\NewsletterStatus\DataType;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -20,7 +20,7 @@ use TheCodingMachine\GraphQLite\Types\ID;
 /**
  * @Type()
  */
-final class NewsletterSubscriptionStatus implements DataType
+final class NewsletterStatus implements DataType
 {
     private const STATUS_0 = 'UNSUBSCRIBED';
 
@@ -34,7 +34,7 @@ final class NewsletterSubscriptionStatus implements DataType
     private $statusMapping = [
         0 => self::STATUS_0,
         1 => self::STATUS_1,
-        2 => self::STATUS_2
+        2 => self::STATUS_2,
     ];
 
     /** @var EshopNewsletterSubscriptionStatusModel */
@@ -123,7 +123,7 @@ final class NewsletterSubscriptionStatus implements DataType
     /**
      * @Field()
      */
-    public function created(): DateTimeInterface
+    public function updated(): DateTimeInterface
     {
         return new DateTimeImmutable(
             (string) $this->newsletterSubscriptionStatus->getFieldData('oxtimestamp')
