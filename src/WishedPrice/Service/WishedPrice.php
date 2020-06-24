@@ -62,7 +62,7 @@ final class WishedPrice
             $this->authorizationService->isAllowed('DELETE_WISHED_PRICE')
             || $this->isSameUser($wishedPrice)
         ) {
-            return $this->repository->delete($id, WishedPriceDataType::class);
+            return $this->repository->delete($wishedPrice->getEshopModel());
         }
 
         throw new InvalidLogin('Unauthorized');

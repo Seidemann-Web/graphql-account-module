@@ -128,7 +128,7 @@ final class Rating
             $this->authorizationService->isAllowed('DELETE_RATING')
             || $this->isSameUser($rating)
         ) {
-            $deleted = $this->repository->delete($id, RatingDataType::class);
+            $deleted = $this->repository->delete($rating->getEshopModel());
         } else {
             throw new InvalidLogin('Unauthorized');
         }
