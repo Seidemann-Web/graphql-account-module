@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Review\Controller;
 
 use OxidEsales\Eshop\Application\Model\Review as EshopReviewModel;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
 final class ReviewTest extends TokenTestCase
@@ -34,12 +35,16 @@ final class ReviewTest extends TokenTestCase
 
     private const REVIEW_TEXT = 'Some text, containing a review for this product.';
 
-    /**
-     * Tear down.
-     */
+    protected function setUp(): void
+    {
+        Registry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', true);
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         $this->cleanUpTable('oxreviews', 'oxid');
+        Registry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', false);
 
         parent::tearDown();
     }
@@ -305,5 +310,36 @@ final class ReviewTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(404, $result);
+    }
+
+    public function testDeleteFailsIfManageFlagSetToFalse(): void
+    {
+        Registry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', false);
+        $review = oxNew(EshopReviewModel::class);
+        $review->assign([
+            'oxid'       => self::REVIEW_TO_DELETE,
+            'oxshopid'   => '1',
+            'oxuserid'   => self::USERID,
+            'oxtype'     => 'oxarticle',
+            'oxobjectid' => self::PRODUCT_ID,
+            'oxtext'     => self::REVIEW_TEXT,
+            'oxlang'     => '1',
+            'oxrating'   => 4,
+        ]);
+
+        $review->save();
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('mutation {
+            reviewDelete(id: "' . self::REVIEW_TO_DELETE . '")
+        }');
+
+        Registry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', true);
+
+        $this->assertResponseStatus(
+            401,
+            $result
+        );
     }
 }

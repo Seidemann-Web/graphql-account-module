@@ -14,6 +14,7 @@ use OxidEsales\GraphQL\Account\Review\Exception\ReviewNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
+use OxidEsales\GraphQL\Base\Service\Legacy;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use OxidEsales\GraphQL\Catalogue\Review\Service\Review as ReviewService;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
@@ -32,16 +33,21 @@ final class Review
     /** @var Authorization */
     private $authorizationService;
 
+    /** @var Legacy */
+    private $legacyService;
+
     public function __construct(
         Repository $repository,
         ReviewService $reviewService,
         Authentication $authenticationService,
-        Authorization $authorizationService
+        Authorization $authorizationService,
+        Legacy $legacyService
     ) {
         $this->repository            = $repository;
         $this->reviewService         = $reviewService;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
+        $this->legacyService         = $legacyService;
     }
 
     /**
@@ -52,6 +58,9 @@ final class Review
      */
     public function delete(string $id): bool
     {
+        if (!((bool) $this->legacyService->getConfigParam('blAllowUsersToManageTheirReviews'))) {
+            throw new InvalidLogin('Unauthorized');
+        }
         $review = $this->reviewService->review($id);
 
         //user can delete only its own review, admin can delete any review
