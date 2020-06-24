@@ -80,8 +80,9 @@ final class Review
      */
     public function reviews(ReviewFilterList $filter): array
     {
+        // `oxactive` field is not used, therefore with no active filter
         return $this->repository->getByFilter(
-            $filter,
+            $filter->withActiveFilter(null),
             ReviewDataType::class
         );
     }
