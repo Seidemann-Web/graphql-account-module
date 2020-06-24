@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Service;
 
+use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
 use OxidEsales\GraphQL\Account\Review\Exception\ReviewNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
@@ -71,6 +72,17 @@ final class Review
     {
         return $this->repository->saveModel(
             $review->getEshopModel()
+        );
+    }
+
+    /**
+     * @return ReviewDataType[]
+     */
+    public function reviews(ReviewFilterList $filter): array
+    {
+        return $this->repository->getByFilter(
+            $filter,
+            ReviewDataType::class
         );
     }
 }
