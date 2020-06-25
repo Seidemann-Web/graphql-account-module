@@ -115,8 +115,14 @@ final class NewsletterStatus implements DataType
      */
     public function unsubscribed(): ?DateTimeInterface
     {
+        $dateTime = (string) $this->newsletterSubscriptionStatus->getFieldData('oxunsubscribed');
+
+        if ($dateTime === '0000-00-00 00:00:00') {
+            return null;
+        }
+
         return new DateTimeImmutable(
-            (string) $this->newsletterSubscriptionStatus->getFieldData('oxunsubscribed')
+            $dateTime
         );
     }
 

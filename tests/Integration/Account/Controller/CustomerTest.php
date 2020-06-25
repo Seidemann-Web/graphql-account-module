@@ -125,7 +125,7 @@ final class CustomerTest extends TokenTestCase
             'status'           => 'SUBSCRIBED',
             'failedEmailCount' => 0,
             'subscribed'       => '2020-04-01T11:11:11+02:00',
-            'unsubscribed'     => '-0001-11-30T00:00:00+01:00',
+            'unsubscribed'     => null,
         ];
 
         $this->assertContains('T', $result['body']['data']['me']['newsletterStatus']['updated']);
