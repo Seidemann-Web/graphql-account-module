@@ -55,6 +55,7 @@ final class CustomerMultiShopTest extends MultishopTestCase
      */
     public function testUserCustomerPerShopForMallUser(string $shopId, string $expected): void
     {
+        $this->ensureShop((int) $shopId);
         EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
 
         EshopRegistry::getConfig()->setShopId($shopId);
