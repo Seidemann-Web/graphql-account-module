@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Tests\Integration\NewsletterStatus\Controller;
+namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
-final class NewsletterStatusTest extends TokenTestCase
+final class CustomerTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
@@ -34,31 +34,38 @@ final class NewsletterStatusTest extends TokenTestCase
         parent::tearDown();
     }
 
-    public function testStatusForNotLoggedInUser(): void
+    public function testMeForNotLoggedInUser(): void
     {
         $result = $this->query('query {
-            newsletterStatus {
-                status
+            me {
+               id
+               firstName
             }
         }');
 
-        $this->assertResponseStatus(401, $result);
+        $this->assertResponseStatus(400, $result);
     }
 
-    public function testStatusNoEntryInDatabase(): void
+    public function testMeNewsletterStatusNoEntryInDatabase(): void
     {
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
         $result = $this->query('query {
-            newsletterStatus {
-                status
+            me {
+                id
+                firstName
+                newsletterStatus {
+                    status
+                }
             }
         }');
 
-        $this->assertResponseStatus(404, $result);
+        $this->assertResponseStatus(200, $result);
+        $this->assertSame('Marc', $result['body']['data']['me']['firstName']);
+        $this->assertNull($result['body']['data']['me']['newsletterStatus']);
     }
 
-    public function testStatusInvalidEntryInDatabase(): void
+    public function testMeNewsletterStatusInvalidEntryInDatabase(): void
     {
         $subscription = oxNew(EshopNewsSubscribed::class);
         $subscription->setId('_othertestuser');
@@ -73,30 +80,38 @@ final class NewsletterStatusTest extends TokenTestCase
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
         $result = $this->query('query {
-            newsletterStatus {
-                status
+            me {
+                id
+                firstName
+                newsletterStatus {
+                    status
+                }
             }
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertSame('UNSUBSCRIBED', $result['body']['data']['newsletterStatus']['status']);
+        $this->assertSame('UNSUBSCRIBED', $result['body']['data']['me']['newsletterStatus']['status']);
     }
 
-    public function testNewsletterStatusForUser(): void
+    public function testMeAndNewsletterStatusForUser(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query('query {
-            newsletterStatus {
-                salutation
-                firstname
-                lastname
-                email
-                status
-                failedEmailCount
-                subscribed
-                unsubscribed
-                updated
+            me {
+                id
+                firstName
+                newsletterStatus {
+                    salutation
+                    firstname
+                    lastname
+                    email
+                    status
+                    failedEmailCount
+                    subscribed
+                    unsubscribed
+                    updated
+                }
             }
         }');
 
@@ -113,12 +128,12 @@ final class NewsletterStatusTest extends TokenTestCase
             'unsubscribed'     => '-0001-11-30T00:00:00+01:00',
         ];
 
-        $this->assertContains('T', $result['body']['data']['newsletterStatus']['updated']);
-        unset($result['body']['data']['newsletterStatus']['updated']);
+        $this->assertContains('T', $result['body']['data']['me']['newsletterStatus']['updated']);
+        unset($result['body']['data']['me']['newsletterStatus']['updated']);
 
         $this->assertEquals(
             $expected,
-            $result['body']['data']['newsletterStatus']
+            $result['body']['data']['me']['newsletterStatus']
         );
     }
 }

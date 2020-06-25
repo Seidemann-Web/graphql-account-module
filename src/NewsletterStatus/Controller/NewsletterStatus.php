@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Controller;
 
-use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
-use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class NewsletterStatus
 {
@@ -22,13 +20,5 @@ final class NewsletterStatus
         NewsletterStatusService $newsletterStatusService
     ) {
         $this->newsletterStatusService = $newsletterStatusService;
-    }
-
-    /**
-     * @Query()
-     */
-    public function newsletterStatus(): NewsletterStatusType
-    {
-        return $this->newsletterStatusService->newsletterStatus();
     }
 }

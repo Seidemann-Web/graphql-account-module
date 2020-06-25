@@ -7,13 +7,13 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Tests\Integration\NewsletterStatus\Controller;
+namespace OxidEsales\GraphQL\Account\Tests\Integration\Customer\Controller;
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
-final class NewsletterStatusMultiShopTest extends MultishopTestCase
+final class CustomerMultiShopTest extends MultishopTestCase
 {
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
@@ -36,7 +36,7 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
         parent::tearDown();
     }
 
-    public function dataProviderNewsletterStatusPerShop()
+    public function dataProviderCustomerPerShop()
     {
         return [
             'shop_1' => [
@@ -51,9 +51,9 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
     }
 
     /**
-     * @dataProvider dataProviderNewsletterStatusPerShop
+     * @dataProvider dataProviderCustomerPerShop
      */
-    public function testUserNewsletterStatusPerShopForMallUser(string $shopId, string $expected): void
+    public function testUserCustomerPerShopForMallUser(string $shopId, string $expected): void
     {
         EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
 
@@ -63,13 +63,15 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
         $result = $this->query('query {
-            newsletterStatus {
-                status
+            me {
+                newsletterStatus {
+                    status
+                }
             }
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertSame($expected, $result['body']['data']['newsletterStatus']['status']);
+        $this->assertSame($expected, $result['body']['data']['me']['newsletterStatus']['status']);
     }
 
     private function prepareTestdata(int $shopid, int $status): void
