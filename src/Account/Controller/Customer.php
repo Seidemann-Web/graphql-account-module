@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Controller;
 
-use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerType;
+use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
@@ -35,7 +35,7 @@ final class Customer
      * @Query()
      * @Logged()
      */
-    public function me(): CustomerType
+    public function me(): CustomerDataType
     {
         return $this->customerService->customer(
             $this->authenticationService->getUserId()

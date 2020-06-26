@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Review\Controller;
 
 use OxidEsales\GraphQL\Account\Review\Service\Review as ReviewService;
-use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewType;
+use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
@@ -29,7 +29,7 @@ final class Review
      * @Mutation()
      * @Logged()
      */
-    public function reviewSet(ReviewType $review): ReviewType
+    public function reviewSet(ReviewDataType $review): ReviewDataType
     {
         $this->reviewService->save($review);
 
