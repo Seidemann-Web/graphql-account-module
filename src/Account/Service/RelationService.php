@@ -12,6 +12,9 @@ namespace OxidEsales\GraphQL\Account\Account\Service;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer;
 use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
 use OxidEsales\GraphQL\Account\Review\Service\Review as ReviewService;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
@@ -26,10 +29,15 @@ final class RelationService
     /** @var ReviewService */
     private $reviewService;
 
+    /** @var NewsletterStatusService */
+    private $newsletterStatusService;
+
     public function __construct(
-        ReviewService $reviewService
+        ReviewService $reviewService,
+        NewsletterStatusService $newsletterStatusService
     ) {
         $this->reviewService = $reviewService;
+        $this->newsletterStatusService = $newsletterStatusService;
     }
 
     /**
@@ -48,5 +56,18 @@ final class RelationService
                 )
             )
         );
+    }
+
+    /**
+     * @Field()
+     */
+    public function getNewsletterStatus(): ?NewsletterStatusType
+    {
+        try {
+            return $this->newsletterStatusService->newsletterStatus();
+        } catch (NewsletterStatusNotFound $e) {
+        }
+
+        return null;
     }
 }

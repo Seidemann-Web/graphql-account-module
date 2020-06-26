@@ -14,6 +14,7 @@ use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
+use OxidEsales\GraphQL\Base\Service\Legacy;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class Customer
@@ -24,12 +25,17 @@ final class Customer
     /** @var Authentication */
     private $authenticationService;
 
+    /** @var Legacy */
+    private $legacyService;
+
     public function __construct(
         Repository $repository,
-        Authentication $authenticationService
+        Authentication $authenticationService,
+        Legacy $legacyService
     ) {
         $this->repository            = $repository;
         $this->authenticationService = $authenticationService;
+        $this->legacyService         = $legacyService;
     }
 
     /**
@@ -42,12 +48,14 @@ final class Customer
             throw new InvalidLogin('Unauthorized');
         }
 
+        $ignoreSubshop = (bool) $this->legacyService->getConfigParam('blMallUsers');
+
         try {
             /** @var CustomerDataType $customer */
             $customer = $this->repository->getById(
                 $id,
                 CustomerDataType::class,
-                false
+                $ignoreSubshop
             );
         } catch (NotFound $e) {
             throw CustomerNotFound::byId($id);
