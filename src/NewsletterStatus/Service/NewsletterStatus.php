@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
@@ -26,14 +27,19 @@ final class NewsletterStatus
     /** @var Authentication */
     private $authenticationService;
 
+    /** @var SubscriberService */
+    private $subscriberService;
+
     public function __construct(
         NewsletterStatusRepository $newsletterStatusRepository,
         Authentication $authenticationService,
-        Repository $repository
+        Repository $repository,
+        SubscriberService $subscriberService
     ) {
-        $this->newsletterStatusRepository =  $newsletterStatusRepository;
+        $this->newsletterStatusRepository = $newsletterStatusRepository;
         $this->authenticationService      = $authenticationService;
         $this->repository                 = $repository;
+        $this->subscriberService          = $subscriberService;
     }
 
     public function newsletterStatus(): NewsletterStatusType
@@ -50,8 +56,10 @@ final class NewsletterStatus
 
     public function optIn(NewsletterStatusType $newsletterStatus): bool
     {
+        $subscriber = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
+
         $modelItem = $newsletterStatus->getEshopModel();
-        $modelItem->updateSubscription($modelItem->getUser());
+        $modelItem->updateSubscription($subscriber->getEshopModel());
         $modelItem->setOptInStatus(1);
 
         return $this->repository->saveModel($modelItem);

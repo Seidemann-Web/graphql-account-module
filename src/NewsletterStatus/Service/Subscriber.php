@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\Subscriber as SubscriberDataType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
+use OxidEsales\GraphQL\Base\Service\Legacy;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class Subscriber
@@ -19,10 +20,15 @@ final class Subscriber
     /** @var Repository */
     private $repository;
 
+    /** @var Legacy */
+    private $legacyService;
+
     public function __construct(
-        Repository $repository
+        Repository $repository,
+        Legacy $legacyService
     ) {
-        $this->repository = $repository;
+        $this->repository    = $repository;
+        $this->legacyService = $legacyService;
     }
 
     /**
@@ -30,9 +36,11 @@ final class Subscriber
      */
     public function subscriber(string $id): SubscriberDataType
     {
+        $ignoreSubshop = (bool) $this->legacyService->getConfigParam('blMallUsers');
+
         try {
             /** @var SubscriberDataType $Subscriber */
-            $Subscriber = $this->repository->getById($id, SubscriberDataType::class);
+            $Subscriber = $this->repository->getById($id, SubscriberDataType::class, $ignoreSubshop);
         } catch (NotFound $e) {
             throw SubscriberNotFound::byId($id);
         }
