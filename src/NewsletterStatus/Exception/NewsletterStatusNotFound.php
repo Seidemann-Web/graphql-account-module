@@ -19,4 +19,9 @@ final class NewsletterStatusNotFound extends NotFound
     {
         return new self(sprintf('Newsletter subscription status was not found for userid: %s', $userId));
     }
+
+    public static function byEmail(string $email): self
+    {
+        return new self(sprintf('Newsletter subscription status was not found for: %s', $email));
+    }
 }

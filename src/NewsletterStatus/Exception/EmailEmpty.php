@@ -14,7 +14,7 @@ use Throwable;
 
 final class EmailEmpty extends Exception
 {
-    public function __construct($message = 'Email empty', $code = 0, ?Throwable $previous = null)
+    public function __construct(string $message = 'Email empty', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

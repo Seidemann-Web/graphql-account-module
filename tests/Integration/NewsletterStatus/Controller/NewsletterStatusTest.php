@@ -9,16 +9,90 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\NewsletterStatus\Controller;
 
+use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\GraphQL\Base\Tests\Integration\TestCase;
 
 final class NewsletterStatusTest extends TestCase
 {
-    public function testNewsletterOptInWorks(): void
+    private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
+
+    private const OTHER_USER_OXID = '245ad3b5380202966df6ff128e9eecaq';
+
+    private const OTHER_USER_OXPASSALT = 'b186f117054b700a89de929ce90c6aef';
+
+    /**
+     * Tear down.
+     */
+    protected function tearDown(): void
+    {
+        $this->cleanUpTable('oxnewssubscribed', 'oxid');
+
+        parent::tearDown();
+    }
+
+    public function testNewsletterOptInNoDatabaseEntry(): void
     {
         $result = $this->query('mutation{
           newsletterOptIn(newsletterStatus: {
-            email:"user@oxid-esales.com",
-            confirmCode:"6e700a086090bf0ae085951b0f3150b6"
+            email:"' . self::OTHER_USERNAME . '",
+            confirmCode:"' . md5(self::OTHER_USERNAME . self::OTHER_USER_OXPASSALT) . '"
+          }){
+            email
+            status
+          }
+        }');
+
+        $this->assertResponseStatus(404, $result);
+        $this->assertEquals(
+            'Newsletter subscription status was not found for: ' . self::OTHER_USERNAME,
+            $result['body']['errors'][0]['message']
+        );
+    }
+
+    public function testNewsletterOptInWrongConfirmationCode(): void
+    {
+        $this->prepareTestData();
+
+        $result = $this->query('mutation{
+          newsletterOptIn(newsletterStatus: {
+            email:"' . self::OTHER_USERNAME . '",
+            confirmCode:"incorrect"
+          }){
+            email
+            status
+          }
+        }');
+
+        $this->assertResponseStatus(400, $result);
+        $this->assertEquals('Wrong email confirmation code', $result['body']['errors'][0]['debugMessage']);
+    }
+
+    public function testNewsletterOptInEmptyEmail(): void
+    {
+        $this->prepareTestData();
+
+        $result = $this->query('mutation{
+          newsletterOptIn(newsletterStatus: {
+            email:"",
+            confirmCode:""
+          }){
+            email
+            status
+          }
+        }');
+
+        $this->assertResponseStatus(400, $result);
+        $this->assertEquals('Email empty', $result['body']['errors'][0]['debugMessage']);
+    }
+
+    public function testNewsletterOptInWorks(): void
+    {
+        $this->prepareTestData();
+
+        $result = $this->query('mutation{
+          newsletterOptIn(newsletterStatus: {
+            email:"' . self::OTHER_USERNAME . '",
+            confirmCode:"' . md5(self::OTHER_USERNAME . self::OTHER_USER_OXPASSALT) . '"
           }){
             salutation
             firstname
@@ -36,5 +110,21 @@ final class NewsletterStatusTest extends TestCase
 
         $data = $result['body']['data']['newsletterOptIn'];
         $this->assertEquals('SUBSCRIBED', $data['status']);
+    }
+
+    private function prepareTestData(): void
+    {
+        $subscription = oxNew(EshopNewsSubscribed::class);
+        $subscription->setId('_othertestuser');
+        $subscription->assign(
+            [
+                'oxuserid'  => self::OTHER_USER_OXID,
+                'oxdboptin' => 2,
+                'oxemail'   => self::OTHER_USERNAME,
+                'oxfname'   => 'Marc',
+                'oxlname'   => 'Muster',
+            ]
+        );
+        $subscription->save();
     }
 }

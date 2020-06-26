@@ -15,8 +15,8 @@ use Throwable;
 final class EmailConfirmationCode extends Exception
 {
     public function __construct(
-        $message = 'Wrong email confirmation code',
-        $code = 0,
+        string $message = 'Wrong email confirmation code',
+        int $code = 0,
         ?Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);

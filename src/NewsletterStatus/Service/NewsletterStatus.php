@@ -10,12 +10,16 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class NewsletterStatus
 {
+    /** @var NewsletterStatusRepository */
+    private $newsletterStatusRepository;
+
     /** @var Repository */
     private $repository;
 
@@ -23,11 +27,13 @@ final class NewsletterStatus
     private $authenticationService;
 
     public function __construct(
-        Repository $repository,
-        Authentication $authenticationService
+        NewsletterStatusRepository $newsletterStatusRepository,
+        Authentication $authenticationService,
+        Repository $repository
     ) {
-        $this->repository            = $repository;
-        $this->authenticationService = $authenticationService;
+        $this->newsletterStatusRepository =  $newsletterStatusRepository;
+        $this->authenticationService      = $authenticationService;
+        $this->repository                 = $repository;
     }
 
     public function newsletterStatus(): NewsletterStatusType
@@ -37,7 +43,7 @@ final class NewsletterStatus
             throw new InvalidLogin('Unauthenticated');
         }
 
-        return $this->repository->getByUserId(
+        return $this->newsletterStatusRepository->getByUserId(
             $this->authenticationService->getUserId()
         );
     }

@@ -9,29 +9,25 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
-use OxidEsales\Eshop\Application\Model\NewsSubscribed;
-use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\Subscriber as SubscriberType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailConfirmationCode;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class NewsletterOptInInput
 {
-    /** @var QueryBuilderFactory */
-    private $queryBuilderFactory;
-
-    /** @var int */
-    private $shopid;
+    /** @var SubscriberService */
+    private $subscriberService;
 
     public function __construct(
-        QueryBuilderFactory $queryBuilderFactory,
-        ContextInterface $context
+        SubscriberService $subscriberService
     ) {
-        $this->queryBuilderFactory = $queryBuilderFactory;
-        $this->shopid              = $context->getCurrentShopId();
+        $this->subscriberService   = $subscriberService;
     }
 
     /**
@@ -40,18 +36,25 @@ final class NewsletterOptInInput
     public function fromUserInput(string $email, string $confirmCode): NewsletterStatusType
     {
         $this->assertEmailNotEmpty($email);
-        $user = $this->getUserByEmailConfirmCode($email, $confirmCode);
 
-        /** @var NewsSubscribed $newsletterModelItem */
-        $newsletterModelItem = oxNew(NewsletterStatusType::getModelClass());
+        /** @var EshopNewsletterSubscriptionStatusModel $newsletterStatusModel */
+        $newsletterStatusModel = oxNew(NewsletterStatusType::getModelClass());
 
-        $newsletterModelItem->loadFromUserId($user->getId());
-        $newsletterModelItem->setUser($user);
-        $newsletterModelItem->assign([
-            'OXUSERID' => $user->getId(),
-        ]);
+        if (!$newsletterStatusModel->loadFromEmail($email)) {
+            throw NewsletterStatusNotFound::byEmail($email);
+        }
+        $newsletterStatus = new NewsletterStatusType($newsletterStatusModel);
 
-        return new NewsletterStatusType($newsletterModelItem);
+        try {
+            /** @var SubscriberType $subscriber */
+            $subscriber = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
+        } catch (SubscriberNotFound $exception) {
+            throw NewsletterStatusNotFound::byEmail($email);
+        }
+
+        $this->verifyConfirmCode($subscriber, $confirmCode);
+
+        return $newsletterStatus;
     }
 
     private function assertEmailNotEmpty(string $email): bool
@@ -63,28 +66,13 @@ final class NewsletterOptInInput
         return true;
     }
 
-    private function getUserByEmailConfirmCode(string $email, string $confirmCode): User
+    /**
+     * @throws EmailConfirmationCode
+     */
+    private function verifyConfirmCode(SubscriberType $subcriber, string $confirmCode): void
     {
-        $qb     = $this->queryBuilderFactory->create();
-        $result = $qb->select('OXID')
-            ->from('oxuser')
-            ->andWhere('OXUSERNAME = :oxusername')
-            ->andWhere('OXSHOPID = :shopid')
-            ->andWhere(':confirmCode = md5(concat(OXUSERNAME, OXPASSSALT))')
-            ->setParameter('shopid', $this->shopid)
-            ->setParameter('oxusername', $email)
-            ->setParameter('confirmCode', $confirmCode)
-            ->execute();
-
-        $oxid = $result->fetchColumn();
-
-        if (!$oxid) {
+        if ($subcriber->getConfirmationCode() !== $confirmCode) {
             throw new EmailConfirmationCode();
         }
-
-        $user = oxNew(User::class);
-        $user->load($oxid);
-
-        return $user;
     }
 }
