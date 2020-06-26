@@ -59,7 +59,7 @@ final class Review
     public function delete(string $id): bool
     {
         if (!((bool) $this->legacyService->getConfigParam('blAllowUsersToManageTheirReviews'))) {
-            throw new InvalidLogin('Unauthorized');
+            throw new InvalidLogin('Unauthorized - users are not allowed to manage their reviews');
         }
         $review = $this->reviewService->review($id);
 
