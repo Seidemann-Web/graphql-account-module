@@ -25,21 +25,19 @@ class GraphQLCest
         $I->seeResponseIsJson();
     }
 
+    /**
+     * should be refactored to graphql base module
+     */
     private function fetchToken(AcceptanceTester $I): string
     {
         static $token = null;
         if ($token) {
             return $token;
         }
-        $I->haveHTTPHeader('Content-Type', 'application/json');
-        $I->sendPOST('/widget.php?cl=graphql', [
-            'query' => 'query {token(username:"admin", password:"admin")}',
-        ]);
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK);
-        $I->seeResponseIsJson();
-        $I->seeResponseContains('token');
-
-        return $token = json_decode($I->grabResponse())->data->token;
+        $token = json_decode(
+            file_get_contents('http://oxideshop.local/widget.php?cl=graphql&query=query{token(username:"admin",password:"admin")}')
+        )->data->token;
+        return $token;
     }
 
     public function testChangePasswordWithWrongOldPasswordFails(AcceptanceTester $I): void
