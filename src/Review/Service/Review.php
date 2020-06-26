@@ -71,7 +71,9 @@ final class Review
             throw new InvalidLogin('Unauthorized');
         }
 
-        return $this->repository->delete($review->getEshopModel());
+        return $this->repository->delete(
+            $review->getEshopModel()
+        );
     }
 
     /**
