@@ -112,6 +112,57 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
         }
     }
 
+    /**
+     * @dataProvider dataProviderNewsletterStatusPerShop
+     */
+    public function testNewsletterUnsubscribePerShop(string $shopId): void
+    {
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $this->prepareTestdata((int) $shopId);
+        $this->assignUserToShop((int) $shopId);
+
+        $result = $this->query('mutation{
+          newsletterUnsubscribe(newsletterStatus: {
+            email:"' . self::OTHER_USERNAME . '"
+          }){
+            email
+          }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertSame(self::OTHER_USERNAME, $result['body']['data']['newsletterUnsubscribe']['email']);
+    }
+
+    /**
+     * @dataProvider dataProviderNewsletterStatusMallUser
+     */
+    public function testNewsletterUbsubcribeForMallUserFromOtherSubshop(bool $flag, int $expected, bool $verify): void
+    {
+        EshopRegistry::getConfig()->setConfigParam('blMallUsers', $flag);
+
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+
+        $this->prepareTestdata(2);
+        $this->assignUserToShop(1);
+
+        $result = $this->query('mutation{
+          newsletterUnsubscribe(newsletterStatus: {
+            email:"' . self::OTHER_USERNAME . '"
+          }){
+            email
+          }
+        }');
+
+        $this->assertResponseStatus($expected, $result);
+
+        if ($verify) {
+            $this->assertSame(self::OTHER_USERNAME, $result['body']['data']['newsletterUnsubscribe']['email']);
+        }
+    }
+
     private function prepareTestdata(int $shopid): void
     {
         $subscription = oxNew(EshopNewsSubscribed::class);

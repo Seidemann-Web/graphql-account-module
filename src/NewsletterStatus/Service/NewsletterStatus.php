@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -24,11 +25,11 @@ final class NewsletterStatus
     /** @var Repository */
     private $repository;
 
-    /** @var Authentication */
-    private $authenticationService;
-
     /** @var SubscriberService */
     private $subscriberService;
+
+    /** @var Authentication */
+    private $authenticationService;
 
     public function __construct(
         NewsletterStatusRepository $newsletterStatusRepository,
@@ -65,11 +66,11 @@ final class NewsletterStatus
         return $this->repository->saveModel($modelItem);
     }
 
-    public function save(NewsletterStatus $newsletterStatus): bool
+    public function unsubscribe(NewsletterStatusUnsubscribeType $newsletterStatus): NewsletterStatusUnsubscribeType
     {
-        $modelItem = $newsletterStatus->getEshopModel();
-        $modelItem->updateSubscription($modelItem->getUser());
+        $subscriber = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
+        $subscriber->getEshopModel()->setNewsSubscription(false, false);
 
-        return $this->repository->saveModel($modelItem);
+        return $newsletterStatus;
     }
 }

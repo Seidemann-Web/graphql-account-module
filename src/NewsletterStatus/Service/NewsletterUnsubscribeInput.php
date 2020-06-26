@@ -9,70 +9,37 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
-use OxidEsales\Eshop\Application\Model\NewsSubscribed;
-use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory;
-use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus;
+use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class NewsletterUnsubscribeInput
 {
-    /** @var QueryBuilderFactory */
-    private $queryBuilderFactory;
-
-    public function __construct(
-        QueryBuilderFactory $queryBuilderFactory
-    ) {
-        $this->queryBuilderFactory = $queryBuilderFactory;
-    }
-
     /**
      * @Factory
      */
-    public function fromUserInput(string $email): NewsletterStatus
+    public function fromUserInput(string $email): NewsletterStatusUnsubscribeType
     {
         $this->assertEmailNotEmpty($email);
 
-        /** @var NewsSubscribed $newsletterModelItem */
-        $newsletterModelItem = oxNew(NewsletterStatus::getModelClass());
-        $newsletterModelItem->loadFromEmail($email);
+        /** @var EshopNewsletterSubscriptionStatusModel $newsletterStatusModel */
+        $newsletterStatusModel = oxNew(NewsletterStatusUnsubscribeType::getModelClass());
 
-        /** @var User $user */
-        $user = $this->getSubscribedUserByEmail($email);
-        $user->removeFromGroup('oxidnewsletter');
+        if (!$newsletterStatusModel->loadFromEmail($email)) {
+            throw NewsletterStatusNotFound::byEmail($email);
+        }
 
-        $newsletterModelItem->setOptInStatus(0);
-
-        return new NewsletterStatus($newsletterModelItem);
+        return new NewsletterStatusUnsubscribeType($newsletterStatusModel);
     }
 
     private function assertEmailNotEmpty(string $email): bool
     {
         if (!strlen($email)) {
-            throw new \Exception("Email empty");
+            throw new EmailEmpty();
         }
 
         return true;
-    }
-
-    private function getSubscribedUserByEmail(string $email): User
-    {
-        $qb = $this->queryBuilderFactory->create();
-        $result = $qb->select("OXUSERID")
-            ->from("oxnewssubscribed")
-            ->where("OXEMAIL = :oxemail")
-            ->setParameter("oxemail", $email)
-            ->execute();
-
-        $oxid = $result->fetchColumn();
-
-        if (!$oxid) {
-            throw new \Exception("Cannot find any subscribed user with this email");
-        }
-
-        $user = oxNew(User::class);
-        $user->load($oxid);
-
-        return $user;
     }
 }
