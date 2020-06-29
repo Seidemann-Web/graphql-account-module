@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishList\Controller;
 
+use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
 use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
+use TheCodingMachine\GraphQLite\Annotations\Logged;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
 final class WishList
 {
@@ -20,5 +23,14 @@ final class WishList
         WishListService $wishListService
     ) {
         $this->wishListService = $wishListService;
+    }
+
+    /**
+     * @Mutation
+     * @Logged
+     */
+    public function wishListAddProduct(string $productId): WishListDataType
+    {
+        return $this->wishListService->addProduct($productId);
     }
 }
