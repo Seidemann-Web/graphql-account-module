@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\Review\Controller;
 
 use OxidEsales\Eshop\Application\Model\Review as EshopReviewModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
+use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class ReviewTest extends TokenTestCase
 {

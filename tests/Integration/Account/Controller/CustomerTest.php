@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
-use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
+use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class CustomerTest extends TokenTestCase
 {

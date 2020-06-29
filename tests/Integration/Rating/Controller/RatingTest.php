@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Rating\Controller;
 
 use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
-use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
+use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class RatingTest extends TokenTestCase
 {
