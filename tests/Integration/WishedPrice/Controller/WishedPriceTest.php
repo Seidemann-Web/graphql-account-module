@@ -458,10 +458,6 @@ final class WishedPriceTest extends TokenTestCase
 
         $this->assertTrue($savedWishedPrice->isLoaded());
 
-        $user = $savedWishedPrice->getUser();
-
-        $this->assertEquals($expectedWishedPrice['inquirer']['firstName'], $user->getFieldData('oxfname'));
-        $this->assertEquals($expectedWishedPrice['email'], $user->getFieldData('oxusername'));
         $this->assertEquals($expectedWishedPrice['product']['id'], $savedWishedPrice->getArticle()->getId());
         $this->assertEquals($expectedWishedPrice['currency']['name'], $savedWishedPrice->getPriceAlarmCurrency()->name);
     }
