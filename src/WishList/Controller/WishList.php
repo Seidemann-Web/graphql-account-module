@@ -13,6 +13,7 @@ use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
 use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
+use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 
 final class WishList
 {

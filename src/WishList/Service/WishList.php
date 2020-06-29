@@ -18,6 +18,7 @@ use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Legacy;
 use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
 use OxidEsales\GraphQL\Catalogue\Product\Service\Product as CatalogueProductService;
+use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class WishList
