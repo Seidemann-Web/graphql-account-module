@@ -17,7 +17,7 @@ final class PasswordTest extends TokenTestCase
     {
         $result = $this->query('
             mutation {
-                userPaswordChange(old: "foobar", new: "foobaz")
+                userPasswordChange(old: "foobar", new: "foobaz")
             }
         ');
         $this->assertResponseStatus(400, $result);
@@ -29,7 +29,7 @@ final class PasswordTest extends TokenTestCase
 
         $result = $this->query('
             mutation {
-                userPaswordChange(old: "foobar", new: "foobaz")
+                userPasswordChange(old: "foobar", new: "foobaz")
             }
         ');
         $this->assertResponseStatus(403, $result);
@@ -41,7 +41,7 @@ final class PasswordTest extends TokenTestCase
 
         $result = $this->query('
             mutation {
-                userPaswordChange(old: "admin", new: "foobar")
+                userPasswordChange(old: "admin", new: "foobar")
             }
         ');
 
@@ -49,7 +49,7 @@ final class PasswordTest extends TokenTestCase
 
         $result = $this->query('
             mutation {
-                userPaswordChange(old: "foobar", new: "admin")
+                userPasswordChange(old: "foobar", new: "admin")
             }
         ');
 

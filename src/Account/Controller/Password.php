@@ -16,20 +16,20 @@ use TheCodingMachine\GraphQLite\Annotations\Mutation;
 final class Password
 {
     /** @var PasswordService */
-    private $paswordService;
+    private $passwordService;
 
     public function __construct(
-        PasswordService $paswordService
+        PasswordService $passwordService
     ) {
-        $this->paswordService = $paswordService;
+        $this->passwordService = $passwordService;
     }
 
     /**
      * @Mutation()
      * @Logged()
      */
-    public function userPaswordChange(string $old, string $new): bool
+    public function userPasswordChange(string $old, string $new): bool
     {
-        return $this->paswordService->change($old, $new);
+        return $this->passwordService->change($old, $new);
     }
 }
