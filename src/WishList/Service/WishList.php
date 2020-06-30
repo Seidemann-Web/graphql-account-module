@@ -56,7 +56,7 @@ final class WishList
 
     public function addProduct(string $productId): WishListDataType
     {
-        $this->assertProductIdValue($productId);
+        $this->assertProductId($productId);
         /** @var CustomerDataType $customer */
         $customer = $this->customerService->customer($this->authenticationService->getUserId());
 
@@ -73,7 +73,7 @@ final class WishList
      *
      * @return true
      */
-    private function assertProductIdValue(string $productId): bool
+    private function assertProductId(string $productId): bool
     {
         try {
             $this->productService->product($productId);
