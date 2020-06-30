@@ -39,10 +39,8 @@ final class NewsletterStatus
      * @Mutation()
      */
     public function newsletterUnsubscribe(
-        NewsletterStatusUnsubscribeType $newsletterStatus
-    ): NewsletterStatusUnsubscribeType {
-        $this->newsletterStatusService->unsubscribe($newsletterStatus);
-
-        return $newsletterStatus;
+        ?NewsletterStatusUnsubscribeType $newsletterStatus
+    ): bool {
+        return $this->newsletterStatusService->unsubscribe($newsletterStatus);
     }
 }

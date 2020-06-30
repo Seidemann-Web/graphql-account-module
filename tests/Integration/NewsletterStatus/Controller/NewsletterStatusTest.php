@@ -11,10 +11,14 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\NewsletterStatus\Controll
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\Eshop\Application\Model\user as EshopUser;
-use OxidEsales\GraphQL\Base\Tests\Integration\TestCase;
+use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
 
-final class NewsletterStatusTest extends TestCase
+final class NewsletterStatusTest extends TokenTestCase
 {
+    private const USERNAME = 'user@oxid-esales.com';
+
+    private const PASSWORD = 'useruser';
+
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
     private const OTHER_USER_OXID = '245ad3b5380202966df6ff128e9eecaq';
@@ -123,14 +127,12 @@ final class NewsletterStatusTest extends TestCase
             'mutation {
                 newsletterUnsubscribe (newsletterStatus: {
                   email: "' . self::OTHER_USERNAME . '"
-                }) {
-                  email
-                }
+                })
             }'
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertSame(self::OTHER_USERNAME, $result['body']['data']['newsletterUnsubscribe']['email']);
+        $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
 
         $subscription = oxNew(EshopNewsSubscribed::class);
         $subscription->load(self::SUBSCRIPTION_ID);
@@ -147,13 +149,37 @@ final class NewsletterStatusTest extends TestCase
             'mutation {
                 newsletterUnsubscribe (newsletterStatus: {
                   email: "nouser@oxid-esales.com"
-                }) {
-                  email
-                }
+                })
             }'
         );
 
         $this->assertResponseStatus(404, $result);
+    }
+
+    public function testNewsletterStatusUnsubscribeWithTokenOnly(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                newsletterUnsubscribe
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
+    }
+
+    public function testNewsletterStatusUnsubscribeForMissingDataOrToken(): void
+    {
+        $result = $this->query(
+            'mutation {
+                newsletterUnsubscribe
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
+        $this->assertEquals('Missing subscriber email or token', $result['body']['errors']['0']['message']);
     }
 
     private function prepareTestData(int $optin = 2): void

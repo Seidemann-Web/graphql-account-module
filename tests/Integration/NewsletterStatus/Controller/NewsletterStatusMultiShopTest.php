@@ -126,19 +126,17 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
         $result = $this->query('mutation{
           newsletterUnsubscribe(newsletterStatus: {
             email:"' . self::OTHER_USERNAME . '"
-          }){
-            email
-          }
+          })
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertSame(self::OTHER_USERNAME, $result['body']['data']['newsletterUnsubscribe']['email']);
+        $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
     }
 
     /**
      * @dataProvider dataProviderNewsletterStatusMallUser
      */
-    public function testNewsletterUbsubcribeForMallUserFromOtherSubshop(bool $flag, int $expected, bool $verify): void
+    public function testNewsletterUbsubcribeForMallUserFromOtherSubshop(bool $flag, int $expected): void
     {
         EshopRegistry::getConfig()->setConfigParam('blMallUsers', $flag);
 
@@ -151,15 +149,13 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
         $result = $this->query('mutation{
           newsletterUnsubscribe(newsletterStatus: {
             email:"' . self::OTHER_USERNAME . '"
-          }){
-            email
-          }
+          })
         }');
 
         $this->assertResponseStatus($expected, $result);
 
-        if ($verify) {
-            $this->assertSame(self::OTHER_USERNAME, $result['body']['data']['newsletterUnsubscribe']['email']);
+        if ($flag) {
+            $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
         }
     }
 

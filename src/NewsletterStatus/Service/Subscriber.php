@@ -39,12 +39,12 @@ final class Subscriber
         $ignoreSubshop = (bool) $this->legacyService->getConfigParam('blMallUsers');
 
         try {
-            /** @var SubscriberDataType $Subscriber */
-            $Subscriber = $this->repository->getById($id, SubscriberDataType::class, $ignoreSubshop);
+            /** @var SubscriberDataType $subscriber */
+            $subscriber = $this->repository->getById($id, SubscriberDataType::class, $ignoreSubshop);
         } catch (NotFound $e) {
             throw SubscriberNotFound::byId($id);
         }
 
-        return $Subscriber;
+        return $subscriber;
     }
 }

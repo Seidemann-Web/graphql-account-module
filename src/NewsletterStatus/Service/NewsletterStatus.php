@@ -11,10 +11,12 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
+use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class NewsletterStatus
@@ -66,11 +68,22 @@ final class NewsletterStatus
         return $this->repository->saveModel($modelItem);
     }
 
-    public function unsubscribe(NewsletterStatusUnsubscribeType $newsletterStatus): NewsletterStatusUnsubscribeType
+    public function unsubscribe(?NewsletterStatusUnsubscribeType $newsletterStatus): bool
     {
-        $subscriber = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
-        $subscriber->getEshopModel()->setNewsSubscription(false, false);
+        $userId = null;
 
-        return $newsletterStatus;
+        if ($newsletterStatus) {
+            $userId = (string) $newsletterStatus->userId();
+        } elseif ($this->authenticationService->isLogged()) {
+            $userId = $this->authenticationService->getUserId();
+        }
+
+        /** If we don't have email from token or as parameter */
+        if (!$userId) {
+            throw new SubscriberNotFound('Missing subscriber email or token');
+        }
+
+        $subscriber = $this->subscriberService->subscriber($userId);
+        return $subscriber->getEshopModel()->setNewsSubscription(false, false);
     }
 }
