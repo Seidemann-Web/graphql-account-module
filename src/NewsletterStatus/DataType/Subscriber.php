@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\DataType;
 
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
+use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 
 /**
@@ -36,6 +37,9 @@ final class Subscriber implements DataType
         return (string) $this->subscriber->getFieldData('oxid');
     }
 
+    /**
+     * @Field
+     */
     public function getUserName(): string
     {
         return (string) $this->subscriber->getFieldData('oxusername');
