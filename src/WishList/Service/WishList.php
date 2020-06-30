@@ -63,7 +63,6 @@ final class WishList
         /** @var EshopUserBasketModel $wishListBasket */
         $wishListBasket = $customer->getEshopModel()->getBasket(self::SHOP_WISH_LIST_NAME);
         $wishListBasket->addItemToBasket($productId, 1);
-        $wishListBasket->getItemCount(true);
 
         return new WishListDataType($wishListBasket);
     }
