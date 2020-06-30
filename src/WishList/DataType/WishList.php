@@ -78,6 +78,13 @@ final class WishList implements DataType
         return new DateTimeImmutable((string) $this->wishList->getFieldData('oxupdate'));
     }
 
+    public function getUserId(): ID
+    {
+        return new ID(
+            (string) $this->wishList->getFieldData('oxuserid')
+        );
+    }
+
     /**
      * @return class-string
      */
