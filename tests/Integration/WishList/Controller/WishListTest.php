@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\WishList\Controller;
 
 use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasket;
-use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
+use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class WishListTest extends TokenTestCase
 {
@@ -66,26 +66,26 @@ final class WishListTest extends TokenTestCase
 
     public function testAddProductToWishListNoToken(): void
     {
-        $result = $this->query(
-            'mutation{
-                 wishListAddProduct(productId: "' . self::PRODUCT_ID . '"){
-                id
-              }
-            }'
-        );
+        $result = $this->query('
+            mutation{
+                wishListAddProduct(productId: "' . self::PRODUCT_ID . '") {
+                    id
+                }
+            }
+        ');
 
         $this->assertResponseStatus(400, $result);
     }
 
     private function addProductToWishListMutation(string $productId = self::PRODUCT_ID): array
     {
-        return $this->query(
-            'mutation{
-                 wishListAddProduct(productId: "' . $productId . '"){
-                id
-              }
-            }'
-        );
+        return $this->query('
+            mutation{
+                wishListAddProduct(productId: "' . $productId . '") {
+                    id
+                }
+            }
+        ');
     }
 
     private function getWishList(): EshopUserBasket
