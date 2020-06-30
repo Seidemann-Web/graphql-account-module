@@ -36,6 +36,10 @@ final class NewsletterStatus
     }
 
     /**
+     * NewsletterStatusUnsubscribeInput email field is optional.
+     * In case of missing input email but available token, newsletter will be unsubscribed for token email.
+     * Input email is preferred over token email.
+     *
      * @Mutation()
      */
     public function newsletterUnsubscribe(

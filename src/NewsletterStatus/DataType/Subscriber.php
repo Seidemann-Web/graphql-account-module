@@ -32,9 +32,6 @@ final class Subscriber implements DataType
         return $this->subscriber;
     }
 
-    /**
-     * @Field()
-     */
     public function getId(): string
     {
         return (string) $this->subscriber->getFieldData('oxid');

@@ -16,7 +16,6 @@ use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as New
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class NewsletterStatus
@@ -84,6 +83,7 @@ final class NewsletterStatus
         }
 
         $subscriber = $this->subscriberService->subscriber($userId);
+
         return $subscriber->getEshopModel()->setNewsSubscription(false, false);
     }
 }

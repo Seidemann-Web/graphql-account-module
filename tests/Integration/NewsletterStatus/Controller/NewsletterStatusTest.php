@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\NewsletterStatus\Controll
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\Eshop\Application\Model\user as EshopUser;
-use OxidEsales\GraphQL\Catalogue\Tests\Integration\TokenTestCase;
+use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class NewsletterStatusTest extends TokenTestCase
 {
@@ -180,6 +180,27 @@ final class NewsletterStatusTest extends TokenTestCase
 
         $this->assertResponseStatus(404, $result);
         $this->assertEquals('Missing subscriber email or token', $result['body']['errors']['0']['message']);
+    }
+
+    public function testNewsletterStatusUnsubscribePreferInputOverToken(): void
+    {
+        $this->prepareTestData(1);
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                newsletterUnsubscribe (newsletterStatus: {
+                  email: "' . self::OTHER_USERNAME . '"
+                })
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
+
+        $subscription = oxNew(EshopNewsSubscribed::class);
+        $subscription->load(self::SUBSCRIPTION_ID);
+        $this->assertEquals(0, $subscription->getFieldData('oxdboptin'));
     }
 
     private function prepareTestData(int $optin = 2): void

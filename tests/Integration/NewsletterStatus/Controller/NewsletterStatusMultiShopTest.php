@@ -22,6 +22,12 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
 
     private const OTHER_USER_OXPASSALT = 'b186f117054b700a89de929ce90c6aef';
 
+    private const OTHER_USER_PASSWORD = 'useruser';
+
+    private const USERNAME = 'user@oxid-esales.com';
+
+    private const PASSWORD = 'useruser';
+
     protected function tearDown(): void
     {
         $this->cleanUpTable('oxnewssubscribed', 'oxid');
@@ -72,12 +78,10 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
             'malluser' => [
                 'flag'     => true,
                 'expected' => 200,
-                'verify'   => true,
             ],
             'no_malluser' => [
                 'flag'     => false,
                 'expected' => 404,
-                'verify'   => false,
             ],
         ];
     }
@@ -85,7 +89,7 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderNewsletterStatusMallUser
      */
-    public function testNewsletterOptInForMallUserFromOtherSubshop(bool $flag, int $expected, bool $verify): void
+    public function testNewsletterOptInForMallUserFromOtherSubshop(bool $flag, int $expected): void
     {
         EshopRegistry::getConfig()->setConfigParam('blMallUsers', $flag);
 
@@ -107,7 +111,7 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
 
         $this->assertResponseStatus($expected, $result);
 
-        if ($verify) {
+        if ($flag) {
             $this->assertSame('SUBSCRIBED', $result['body']['data']['newsletterOptIn']['status']);
         }
     }
@@ -157,6 +161,66 @@ final class NewsletterStatusMultiShopTest extends MultishopTestCase
         if ($flag) {
             $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
         }
+    }
+
+    public function testNewsletterStatusMallUserUnsubscribeFromToken(): void
+    {
+        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
+
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+
+        $this->prepareTestdata(1);
+        $this->prepareTestdata(2);
+        $this->assignUserToShop(1);
+
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_USER_PASSWORD);
+
+        $result = $this->query('mutation{
+            newsletterUnsubscribe
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
+
+        //malluser is still subscribed in shop 1
+        $subscription = oxNew(EshopNewsSubscribed::class);
+        $subscription->load('_othertestuser1');
+        $this->assertEquals(2, $subscription->getFieldData('oxdboptin'));
+
+        //malluser is unsubscribed from shop 2
+        $subscription = oxNew(EshopNewsSubscribed::class);
+        $subscription->load('_othertestuser2');
+        $this->assertEquals(0, $subscription->getFieldData('oxdboptin'));
+    }
+
+    public function testNewsletterStatusMallUserUnsubscribePreferInputOverToken(): void
+    {
+        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
+
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+
+        // otheruser belongs to subshop 2
+        $this->prepareTestdata(2);
+        $this->assignUserToShop(2);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('mutation{
+          newsletterUnsubscribe(newsletterStatus: {
+            email:"' . self::OTHER_USERNAME . '"
+          })
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $this->assertTrue($result['body']['data']['newsletterUnsubscribe']);
+
+        $subscription = oxNew(EshopNewsSubscribed::class);
+        $subscription->load('_othertestuser2');
+        $this->assertEquals(0, $subscription->getFieldData('oxdboptin'));
     }
 
     private function prepareTestdata(int $shopid): void
