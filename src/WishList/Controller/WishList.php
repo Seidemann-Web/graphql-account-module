@@ -77,4 +77,12 @@ final class WishList
     {
         return $this->wishListService->wishListByOwnerId($ownerId);
     }
+
+    /**
+     * @Logged
+     */
+    public function wishListRemoveProduct(string $productId): WishListDataType
+    {
+        return $this->wishListService->removeProduct($productId);
+    }
 }

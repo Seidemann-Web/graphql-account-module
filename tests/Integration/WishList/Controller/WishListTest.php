@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Tests\Integration\WishList\Controller;
 
 use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasket;
+use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class WishListTest extends TokenTestCase
@@ -204,6 +205,16 @@ final class WishListTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
     }
 
+    public function testRemoveProductFromWishListWithoutToken(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $this->addProductToWishListMutation(self::PRODUCT_ID);
+
+        $this->setAuthToken('');
+        $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
+        $this->assertResponseStatus(400, $result);
+    }
+
     public function makeWishListPublicProvider(): array
     {
         return [
@@ -291,6 +302,57 @@ final class WishListTest extends TokenTestCase
         $this->assertResponseStatus(404, $result);
     }
 
+    public function testRemoveProductFromWishList(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $this->addProductToWishListMutation(self::PRODUCT_ID);
+
+        $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
+        $this->assertResponseStatus(200, $result);
+
+        $products = $this->getWishListArticles();
+        $this->assertEmpty($products);
+    }
+
+    public function testRemoveMultipleProductsFromWishList(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $this->addProductToWishListMutation(self::PRODUCT_ID);
+        $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
+
+        $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
+        $this->assertResponseStatus(200, $result);
+
+        $products = $this->getWishListArticles();
+        $this->assertCount(1, $products);
+        $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
+    }
+
+    public function testRemoveProductWhichIsNotPartOfUsersWishList(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
+
+        $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
+        $this->assertResponseStatus(200, $result);
+        $products = $this->getWishListArticles();
+        $this->assertCount(1, $products);
+        $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
+    }
+
+    public function testRemoveNonExistingProductFromWishList(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
+
+        $result = $this->removeProductFromWishListMutation('not_a_product');
+        $this->assertResponseStatus(404, $result);
+        $this->assertSame('Product was not found by id: not_a_product', $result['body']['errors'][0]['message']);
+        $products = $this->getWishListArticles();
+        $this->assertCount(1, $products);
+        $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
+    }
+
     private function addProductToWishListMutation(string $productId = self::PRODUCT_ID): array
     {
         return $this->query('
@@ -302,14 +364,29 @@ final class WishListTest extends TokenTestCase
         ');
     }
 
+    private function removeProductFromWishListMutation(string $productId = self::PRODUCT_ID): array
+    {
+        return $this->query(
+            'mutation {
+                wishListRemoveProduct(productId: "' . $productId . '") {
+                    id
+                    public
+                    creationDate
+                    lastUpdateDate
+                }
+            }'
+        );
+    }
+
     private function getWishList(): EshopUserBasket
     {
         $user = oxNew(EshopUser::class);
         $user->load(self::OTHER_USER_OXID);
 
-        return $user->getBasket('wishlist');
+        return $user->getBasket(WishListService::SHOP_WISH_LIST_NAME);
     }
 
+    // TODO: When product relation is added to WishList data type use it instead of `getWishListArticles`
     private function getWishListArticles(): array
     {
         return $this->getWishList()->getArticles();
