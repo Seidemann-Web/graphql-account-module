@@ -19,4 +19,9 @@ final class WishListNotFound extends NotFound
     {
         return new self(sprintf('Wish list was not found by id: %s', $id));
     }
+
+    public static function byOwnerId(string $userId): self
+    {
+        return new self(sprintf("Wish list was not found by user's id: %s", $userId));
+    }
 }

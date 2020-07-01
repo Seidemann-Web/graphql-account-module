@@ -44,7 +44,7 @@ final class RelationService
      */
     public function getCustomer(WishList $wishList): Customer
     {
-        return $this->customerService->customer((string) $wishList->getUserId());
+        return $this->customerService->wishListOwner((string) $wishList->getUserId());
     }
 
     /**

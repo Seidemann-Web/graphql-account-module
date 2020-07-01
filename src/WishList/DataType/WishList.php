@@ -49,7 +49,7 @@ final class WishList implements DataType
     /**
      * @Field()
      */
-    public function getPublic(): bool
+    public function isPublic(): bool
     {
         return (bool) $this->wishList->getFieldData('oxpublic');
     }

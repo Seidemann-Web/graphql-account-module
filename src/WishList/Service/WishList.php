@@ -11,9 +11,12 @@ namespace OxidEsales\GraphQL\Account\WishList\Service;
 
 use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasketModel;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
+use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
+use OxidEsales\GraphQL\Account\Account\Service\RelationService as CustomerRelationService;
 use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
 use OxidEsales\GraphQL\Account\WishList\Exception\WishListNotFound;
+use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
@@ -24,7 +27,7 @@ use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class WishList
 {
-    private const SHOP_WISH_LIST_NAME = 'wishlist';
+    public const SHOP_WISH_LIST_NAME = 'wishlist';
 
     /** @var Repository */
     private $repository;
@@ -41,18 +44,25 @@ final class WishList
     /** @var CatalogueProductService */
     private $productService;
 
+    /** @var CustomerRelationService */
+    private $customerRelationService;
+
     public function __construct(
         Repository $repository,
         Authentication $authenticationService,
+        Authorization $authorizationService,
         Legacy $legacyService,
         CustomerService $customerService,
+        CustomerRelationService $customerRelationService,
         CatalogueProductService $productService
     ) {
-        $this->repository             = $repository;
-        $this->authenticationService  = $authenticationService;
-        $this->legacyService          = $legacyService;
-        $this->customerService        = $customerService;
-        $this->productService         = $productService;
+        $this->repository              = $repository;
+        $this->authenticationService   = $authenticationService;
+        $this->authorizationService    = $authorizationService;
+        $this->legacyService           = $legacyService;
+        $this->customerService         = $customerService;
+        $this->customerRelationService = $customerRelationService;
+        $this->productService          = $productService;
     }
 
     public function addProduct(string $productId): WishListDataType
@@ -104,8 +114,30 @@ final class WishList
             throw WishListNotFound::byId($id);
         }
 
-        if ($wishList->getPublic() === false && (string) $wishList->getUserId() !== $this->authenticationService->getUserId()) {
+        if ($wishList->isPublic() === false && !$this->isSameUser($wishList)) {
             throw new InvalidToken('Wish list is private.');
+        }
+
+        return $wishList;
+    }
+
+    /**
+     * @throws CustomerNotFound
+     * @throws InvalidLogin
+     * @throws InvalidToken
+     * @throws WishListNotFound
+     */
+    public function wishListByOwnerId(string $customerId): WishListDataType
+    {
+        if (!$this->authenticationService->isLogged()) {
+            throw new InvalidLogin('Unauthenticated');
+        }
+
+        $customer = $this->customerService->wishListOwner($customerId);
+        $wishList = $this->customerRelationService->getWishList($customer);
+
+        if (!$wishList->isPublic() && !$this->isSameUser($wishList)) {
+            throw WishListNotFound::byOwnerId($customerId);
         }
 
         return $wishList;
@@ -125,5 +157,10 @@ final class WishList
         }
 
         return true;
+    }
+
+    private function isSameUser(WishListDataType $wishList): bool
+    {
+        return (string) $wishList->getUserId() === (string) $this->authenticationService->getUserId();
     }
 }

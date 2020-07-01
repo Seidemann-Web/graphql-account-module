@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishList\Controller;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasket;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
@@ -30,6 +32,8 @@ final class WishListTest extends TokenTestCase
 
     private const PASSWORD = 'useruser';
 
+    private const USERNAME_ID = 'e7af1c3b786fd02906ccd75698f4e6b9';
+
     // Private wish list
     private const WISH_LIST_PRIVATE = '_test_wish_list_private';
 
@@ -37,7 +41,11 @@ final class WishListTest extends TokenTestCase
 
     private const OTHER_PASSWORD = 'useruser';
 
+    private const OTHER_USERNAME_ID = '245ad3b5380202966df6ff128e9eecaq';
+
     private const PRODUCT = '_test_product_for_wish_list';
+
+    private const OWNER_ID_WITHOUT_WISH_LIST = 'c0ea0473445326f4b43724e3b76547a5';
 
     protected function setUp(): void
     {
@@ -268,6 +276,67 @@ final class WishListTest extends TokenTestCase
         $this->assertEquals($expectedWishList, $actualWishList);
     }
 
+    public function testGetOwnPublicWishList(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->wishListByOwnerQuery(self::USERNAME_ID);
+        $this->assertResponseStatus(200, $result);
+
+        $wishList = $result['body']['data']['wishListByOwnerId'];
+        $this->assertSame('Marc', $wishList['customer']['firstName']);
+        $this->assertSame('_test_wish_list_public', $wishList['id']);
+        $this->assertTrue($wishList['public']);
+        $this->assertInstanceOf(DateTimeInterface::class, new DateTimeImmutable($wishList['creationDate']));
+        $this->assertInstanceOf(DateTimeInterface::class, new DateTimeImmutable($wishList['lastUpdateDate']));
+    }
+
+    public function testGetOwnPrivateWishList(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+
+        $result = $this->wishListByOwnerQuery(self::OTHER_USERNAME_ID);
+        $this->assertResponseStatus(200, $result);
+    }
+
+    public function testGetPublicWishListByOwnerId(): void
+    {
+        $this->prepareToken();
+
+        $result = $this->wishListByOwnerQuery(self::USERNAME_ID);
+        $this->assertResponseStatus(200, $result);
+    }
+
+    public function testGetPrivateWishListByOwnerId(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->wishListByOwnerQuery(self::OTHER_USERNAME_ID);
+        $this->assertResponseStatus(404, $result);
+    }
+
+    public function testGetPublicWishListByOwnerIdWithoutToken(): void
+    {
+        $result = $this->wishListByOwnerQuery(self::OTHER_USERNAME_ID);
+        $this->assertResponseStatus(401, $result);
+    }
+
+    public function testGetWishListByNonExistingOwnerId(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->wishListByOwnerQuery('non-existing-owner');
+        $this->assertResponseStatus(404, $result);
+    }
+
+    public function testGetWishListByOwnerIdWithoutWishList(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->wishListByOwnerQuery(self::OWNER_ID_WITHOUT_WISH_LIST);
+        $this->assertResponseStatus(404, $result);
+    }
+
     private function addProductToWishListMutation(string $productId = self::PRODUCT_ID): array
     {
         return $this->query('
@@ -290,5 +359,20 @@ final class WishListTest extends TokenTestCase
     private function getWishListArticles(): array
     {
         return $this->getWishList()->getArticles();
+    }
+
+    private function wishListByOwnerQuery(string $ownerId): array
+    {
+        return $this->query('query {
+            wishListByOwnerId(ownerId: "' . $ownerId . '") {
+                customer {
+                    firstName
+                }
+                id
+                public
+                creationDate
+                lastUpdateDate
+            }
+        }');
     }
 }

@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
-use OxidEsales\GraphQL\Account\Account\DataType\Customer;
+use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
 use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
 use OxidEsales\GraphQL\Account\Review\Service\Review as ReviewService;
+use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
+use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
@@ -45,7 +47,7 @@ final class RelationService
      *
      * @return ReviewDataType[]
      */
-    public function getReviews(Customer $customer): array
+    public function getReviews(CustomerDataType $customer): array
     {
         return $this->reviewService->reviews(
             new ReviewFilterList(
@@ -69,5 +71,12 @@ final class RelationService
         }
 
         return null;
+    }
+
+    public function getWishList(CustomerDataType $customer): WishListDataType
+    {
+        $wishList = $customer->getEshopModel()->getBasket(WishListService::SHOP_WISH_LIST_NAME);
+
+        return new WishListDataType($wishList);
     }
 }
