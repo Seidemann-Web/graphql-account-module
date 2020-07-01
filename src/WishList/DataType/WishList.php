@@ -73,9 +73,15 @@ final class WishList implements DataType
     /**
      * @Field()
      */
-    public function getLastUpdateDate(): DateTimeInterface
+    public function getLastUpdateDate(): ?DateTimeInterface
     {
-        return new DateTimeImmutable((string) $this->wishList->getFieldData('oxupdate'));
+        $timeStamp = (int) $this->wishList->getFieldData('oxupdate');
+
+        if ($timeStamp > 0) {
+            return (new DateTimeImmutable())->setTimestamp($timeStamp);
+        }
+
+        return null;
     }
 
     public function getUserId(): ID

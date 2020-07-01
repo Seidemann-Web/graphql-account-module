@@ -13,6 +13,7 @@ use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
 use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
+use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class WishList
 {
@@ -50,5 +51,13 @@ final class WishList
     public function wishListMakePublic(): WishListDataType
     {
         return $this->wishListService->makePublic();
+    }
+
+    /**
+     * @Query()
+     */
+    public function wishList(string $id): WishListDataType
+    {
+        return $this->wishListService->wishList($id);
     }
 }
