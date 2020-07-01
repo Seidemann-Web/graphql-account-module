@@ -71,4 +71,8 @@ final class Repository
 
         return $newsletterStatusModel;
     }
+
+    //todo move eshop stuff here.
+    //new function -> pass data types -> use eshop models here
+
 }

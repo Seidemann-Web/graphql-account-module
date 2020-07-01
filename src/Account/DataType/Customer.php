@@ -49,6 +49,11 @@ final class Customer implements DataType
         return (string) $this->customer->getFieldData('oxfname');
     }
 
+    public function getEmail(): string
+    {
+        return (string) $this->customer->getFieldData('oxlogin');
+    }
+
     public static function getModelClass(): string
     {
         return EshopUserModel::class;

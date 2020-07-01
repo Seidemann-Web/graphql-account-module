@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
@@ -81,5 +82,12 @@ final class NewsletterStatus
         $subscriber = $this->subscriberService->subscriber($userId);
 
         return $this->newsletterStatusRepository->unsubscribe($subscriber);
+    }
+
+    //todo
+    public function subscribe(?NewsletterStatusSubscribeType $newsletterStatus): string
+    {
+        //todo
+        return 'todo move logic and return SubscribeType ?';
     }
 }
