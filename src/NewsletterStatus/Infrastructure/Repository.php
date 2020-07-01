@@ -10,13 +10,31 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
+use OxidEsales\Eshop\Core\MailValidator as EhopMailValidator;
+use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as CustomerRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\Subscriber as SubscriberDataType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 
 final class Repository
 {
+    /** @var CustomerRepository */
+    private $customerRepository;
+
+    /** @var SubscriberService */
+    private $subscriberService;
+
+    public function __construct(
+        CustomerRepository $customerRepository,
+        SubscriberService $subscriberService
+    ) {
+        $this->customerRepository = $customerRepository;
+        $this->subscriberService  = $subscriberService;
+    }
+
     /**
      * @throws NewsletterStatusNotFound
      */
@@ -54,7 +72,38 @@ final class Repository
 
     public function unsubscribe(SubscriberDataType $subscriber): bool
     {
-        return $subscriber->getEshopModel()->setNewsSubscription(false, false);
+        return $this->subscriberService->setNewsSubscription($subscriber, false);
+    }
+
+    public function subscribe(SubscriberDataType $subscriber): NewsletterStatusType
+    {
+        $this->subscriberService->setNewsSubscription($subscriber, true);
+
+        return $this->getByEmail($subscriber->getUserName());
+    }
+
+    public function subscribeFromInput(
+        NewsletterStatusSubscribeType $newsletterStatusSubscribeInput
+    ): NewsletterStatusType {
+        try {
+            $newsletterStatus = $this->getByEmail($newsletterStatusSubscribeInput->email());
+            $subscriber       = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
+        } catch (NewsletterStatusNotFound $exception) {
+            $customer   = $this->customerRepository->createNewsletterUser($newsletterStatusSubscribeInput);
+            $subscriber = new SubscriberDataType($customer->getEshopModel());
+        }
+
+        $this->unsubscribe($subscriber);
+
+        return $this->subscribe($subscriber);
+    }
+
+    public function isValidEmail(string $email): bool
+    {
+        /** @var EhopMailValidator $mailValidator */
+        $mailValidator = oxNew(EhopMailValidator::class);
+
+        return $mailValidator->isValidEmail($email);
     }
 
     /**
@@ -71,8 +120,4 @@ final class Repository
 
         return $newsletterStatusModel;
     }
-
-    //todo move eshop stuff here.
-    //new function -> pass data types -> use eshop models here
-
 }

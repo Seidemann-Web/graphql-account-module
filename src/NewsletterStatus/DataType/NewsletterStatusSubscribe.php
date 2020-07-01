@@ -9,29 +9,37 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\DataType;
 
-use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
-use TheCodingMachine\GraphQLite\Types\ID;
 
 /**
  * @Type()
  */
 final class NewsletterStatusSubscribe implements DataType
 {
-    /** @var EshopNewsletterSubscriptionStatusModel */
-    private $newsletterSubscriptionStatus;
+    /** @var string */
+    private $lastName;
+
+    /** @var string */
+    private $firstName;
+
+    /** @var string */
+    private $salutation;
+
+    /** @var string */
+    private $email;
 
     public function __construct(
-        EshopNewsletterSubscriptionStatusModel $newsletterSubscriptionStatus
+        string $firstName,
+        string $lastName,
+        string $salutation,
+        string $email
     ) {
-        $this->newsletterSubscriptionStatus = $newsletterSubscriptionStatus;
-    }
-
-    public function getEshopModel(): EshopNewsletterSubscriptionStatusModel
-    {
-        return $this->newsletterSubscriptionStatus;
+        $this->salutation = $salutation;
+        $this->firstName  = $firstName;
+        $this->lastName   = $lastName;
+        $this->email      = $email;
     }
 
     /**
@@ -39,23 +47,23 @@ final class NewsletterStatusSubscribe implements DataType
      */
     public function salutation(): string
     {
-        return (string) $this->newsletterSubscriptionStatus->getFieldData('oxsal');
+        return $this->salutation;
     }
 
     /**
      * @Field()
      */
-    public function firstname(): string
+    public function firstName(): string
     {
-        return (string) $this->newsletterSubscriptionStatus->getFieldData('oxfname');
+        return $this->firstName;
     }
 
     /**
      * @Field()
      */
-    public function lastname(): string
+    public function lastName(): string
     {
-        return (string) $this->newsletterSubscriptionStatus->getFieldData('oxlname');
+        return $this->lastName;
     }
 
     /**
@@ -63,18 +71,14 @@ final class NewsletterStatusSubscribe implements DataType
      */
     public function email(): string
     {
-        return (string) $this->newsletterSubscriptionStatus->getFieldData('oxemail');
+        return $this->email;
     }
 
-    public function userId(): ID
-    {
-        return new ID(
-            (string) $this->newsletterSubscriptionStatus->getFieldData('oxuserid')
-        );
-    }
-
+    /**
+     * @return class-string
+     */
     public static function getModelClass(): string
     {
-        return EshopNewsletterSubscriptionStatusModel::class;
+        return self::class;
     }
 }

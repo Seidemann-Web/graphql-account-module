@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
-use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
@@ -84,10 +84,22 @@ final class NewsletterStatus
         return $this->newsletterStatusRepository->unsubscribe($subscriber);
     }
 
-    //todo
-    public function subscribe(?NewsletterStatusSubscribeType $newsletterStatus): string
+    public function subscribe(?NewsletterStatusSubscribeType $newsletterStatusSubscribe): NewsletterStatusType
     {
-        //todo
-        return 'todo move logic and return SubscribeType ?';
+        $newsletterStatus = null;
+
+        if ($newsletterStatusSubscribe) {
+            $newsletterStatus = $this->newsletterStatusRepository->subscribeFromInput($newsletterStatusSubscribe);
+        } elseif ($this->authenticationService->isLogged()) {
+            $userId           = $this->authenticationService->getUserId();
+            $subscriber       = $this->subscriberService->subscriber($userId);
+            $newsletterStatus = $this->newsletterStatusRepository->subscribe($subscriber);
+        }
+
+        if (!$newsletterStatus) {
+            throw new SubscriberNotFound('Missing subscriber email or token');
+        }
+
+        return $newsletterStatus;
     }
 }

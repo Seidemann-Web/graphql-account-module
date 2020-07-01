@@ -67,7 +67,7 @@ final class Customer
     public function create(CustomerDataType $customer): CustomerDataType
     {
         $this->repository->saveModel($customer->getEshopModel());
+
         return $customer;
     }
-
 }

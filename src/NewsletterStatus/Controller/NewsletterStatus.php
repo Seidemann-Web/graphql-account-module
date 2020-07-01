@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Controller;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
-use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
@@ -50,11 +50,24 @@ final class NewsletterStatus
     }
 
     /**
+     * NewsletterStatusSubscribeInput is optional in case of token.
+     * - If token exists without NewsletterStatusSubscribeInput, token email will be subscribed.
+     *   If token user is already subscribed, status will not be changed and no optin mail is sent.
+     * - If token and NewsletterStatusSubscribeInput exists, input email will be subscribed.
+     *   If input email user is already subscribed, status will be changed to 2 and
+     *   optin mail is sent depending on shop cinfig parameter blOrderOptInEmail.
+     * - If only NewsletterStatusSubscribeInput exists, input email will be subscribed.
+     *   If input email user is already subscribed, status will be changed to 2 and
+     *   optin mail is sent depending on shop cinfig parameter blOrderOptInEmail.
+     *
+     * If user account for email and shop exists, input fields are overruled by existing user data.
+     * If user account for email and shop does not exist, new user will be created (no password, mininal data)
+     *
      * @Mutation()
      */
     public function newsletterSubscribe(
         ?NewsletterStatusSubscribeType $newsletterStatus
-    ): NewsletterStatusSubscribeType {
+    ): NewsletterStatusType {
         return $this->newsletterStatusService->subscribe($newsletterStatus);
     }
 }

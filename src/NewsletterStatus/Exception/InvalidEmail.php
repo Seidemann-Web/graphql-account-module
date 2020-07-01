@@ -12,9 +12,9 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Exception;
 use Exception;
 use Throwable;
 
-final class IncorrectSalutation extends Exception
+final class InvalidEmail extends Exception
 {
-    public function __construct(string $message = 'Incorrect salutation. Please use "mr" or "mrs"', int $code = 0, ?Throwable $previous = null)
+    public function __construct(string $message = 'Email is not valid', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
