@@ -87,12 +87,19 @@ final class WishList
     {
         /** @var CustomerDataType $customer */
         $customer = $this->customerService->customer($this->authenticationService->getUserId());
+        $wishList = $customer->getWishList();
+        $wishList->setPublic(false);
 
-        /** @var EshopUserBasketModel $wishList */
-        $wishList = $customer->getEshopModel()->getBasket(self::SHOP_WISH_LIST_NAME);
-        $wishList->assign(['oxpublic' => false]);
-        $wishList->save();
+        return $wishList;
+    }
 
-        return new WishListDataType($wishList);
+    public function makePublic(): WishListDataType
+    {
+        /** @var CustomerDataType $customer */
+        $customer = $this->customerService->customer($this->authenticationService->getUserId());
+        $wishList = $customer->getWishList();
+        $wishList->setPublic(true);
+
+        return $wishList;
     }
 }

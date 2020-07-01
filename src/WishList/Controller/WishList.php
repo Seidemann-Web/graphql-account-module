@@ -38,4 +38,13 @@ final class WishList
     {
         return $this->wishListService->makePrivate();
     }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     */
+    public function wishListMakePublic(): WishListDataType
+    {
+        return $this->wishListService->makePublic();
+    }
 }

@@ -54,6 +54,14 @@ final class WishList implements DataType
         return (bool) $this->wishList->getFieldData('oxpublic');
     }
 
+    public function setPublic(bool $public): void
+    {
+        $value = $public ? 1 : 0;
+
+        $this->wishList->assign(['oxpublic' => $value]);
+        $this->wishList->save();
+    }
+
     /**
      * @Field()
      */

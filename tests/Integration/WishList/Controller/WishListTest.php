@@ -142,4 +142,45 @@ final class WishListTest extends TokenTestCase
 
         $this->assertResponseStatus(400, $result);
     }
+
+    public function makeWishListPublicProvider(): array
+    {
+        return [
+            [
+                'userHasToken'     => false,
+                'expectedStatus'   => 400,
+                'expectedWishList' => null,
+            ],
+            [
+                'userHasToken'     => true,
+                'expectedStatus'   => 200,
+                'expectedWishList' => ['public' => true],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider makeWishListPublicProvider
+     *
+     * @param mixed $expectedWishList
+     */
+    public function testMakeWishListPublic(bool $userHasToken, int $expectedStatus, $expectedWishList): void
+    {
+        if ($userHasToken) {
+            $this->prepareToken(self::USERNAME, self::PASSWORD);
+        }
+
+        $result = $this->query('
+            mutation {
+                wishListMakePublic {
+                    public
+                }
+            }
+        ');
+
+        $this->assertResponseStatus($expectedStatus, $result);
+        $actualWishList = $result['body']['data']['wishListMakePublic'] ?? null;
+
+        $this->assertEquals($expectedWishList, $actualWishList);
+    }
 }
