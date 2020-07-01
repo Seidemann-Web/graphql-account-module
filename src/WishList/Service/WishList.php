@@ -82,4 +82,17 @@ final class WishList
 
         return true;
     }
+
+    public function makePrivate(): WishListDataType
+    {
+        /** @var CustomerDataType $customer */
+        $customer = $this->customerService->customer($this->authenticationService->getUserId());
+
+        /** @var EshopUserBasketModel $wishList */
+        $wishList = $customer->getEshopModel()->getBasket(self::SHOP_WISH_LIST_NAME);
+        $wishList->assign(['oxpublic' => false]);
+        $wishList->save();
+
+        return new WishListDataType($wishList);
+    }
 }

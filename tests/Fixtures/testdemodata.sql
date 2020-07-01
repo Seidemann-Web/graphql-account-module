@@ -38,3 +38,6 @@ UPDATE `oxnewssubscribed` SET `OXDBOPTIN` = 1 where `OXUSERID` = 'e7af1c3b786fd0
 
 REPLACE INTO `oxobject2group` (`OXID`, `OXSHOPID`, `OXOBJECTID`, `OXGROUPSID`, `OXTIMESTAMP`) VALUES
 ('test_unsubscribe', 1, 'e7af1c3b786fd02906ccd75698f4e6b9', 'oxidnewsletter', '2012-06-04 07:04:54')
+
+REPLACE INTO `oxuserbaskets` (`OXID`, `OXUSERID`, `OXTITLE`, `OXTIMESTAMP`, `OXPUBLIC`, `OXUPDATE`) VALUES
+('test_make_wishlist_private',	'e7af1c3b786fd02906ccd75698f4e6b9',	'wishlist',	'2020-06-30 15:03:20',	1,	1593522181);

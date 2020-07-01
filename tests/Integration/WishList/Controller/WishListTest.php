@@ -25,6 +25,12 @@ final class WishListTest extends TokenTestCase
 
     private const OTHER_PRODUCT_ID = '_test_product_for_rating_avg';
 
+    private const USERNAME = 'user@oxid-esales.com';
+
+    private const PASSWORD = 'useruser';
+
+    private const PRIVATE_WISHLIST_ID = 'test_make_wishlist_private';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -99,5 +105,41 @@ final class WishListTest extends TokenTestCase
     private function getWishListArticles(): array
     {
         return $this->getWishList()->getArticles();
+    }
+
+    public function testMakeWishListPrivateWithToken(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation{
+                 wishListMakePrivate {
+                    id
+                    public
+                 }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertEquals(
+            [
+                'id'     => self::PRIVATE_WISHLIST_ID,
+                'public' => false,
+            ],
+            $result['body']['data']['wishListMakePrivate']
+        );
+    }
+
+    public function testMakeWishListPrivateWithoutToken(): void
+    {
+        $result = $this->query(
+            'mutation{
+                 wishListMakePrivate {
+                    id
+                 }
+            }'
+        );
+
+        $this->assertResponseStatus(400, $result);
     }
 }
