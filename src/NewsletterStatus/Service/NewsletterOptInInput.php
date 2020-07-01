@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
-use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\Subscriber as SubscriberType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailConfirmationCode;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
@@ -24,10 +24,15 @@ final class NewsletterOptInInput
     /** @var SubscriberService */
     private $subscriberService;
 
+    /** @var NewsletterStatusRepository */
+    private $newsletterStatusRepository;
+
     public function __construct(
-        SubscriberService $subscriberService
+        SubscriberService $subscriberService,
+        NewsletterStatusRepository $newsletterStatusRepository
     ) {
-        $this->subscriberService   = $subscriberService;
+        $this->subscriberService          = $subscriberService;
+        $this->newsletterStatusRepository = $newsletterStatusRepository;
     }
 
     /**
@@ -36,14 +41,7 @@ final class NewsletterOptInInput
     public function fromUserInput(string $email, string $confirmCode): NewsletterStatusType
     {
         $this->assertEmailNotEmpty($email);
-
-        /** @var EshopNewsletterSubscriptionStatusModel $newsletterStatusModel */
-        $newsletterStatusModel = oxNew(NewsletterStatusType::getModelClass());
-
-        if (!$newsletterStatusModel->loadFromEmail($email)) {
-            throw NewsletterStatusNotFound::byEmail($email);
-        }
-        $newsletterStatus = new NewsletterStatusType($newsletterStatusModel);
+        $newsletterStatus = $this->newsletterStatusRepository->getByEmail($email);
 
         try {
             /** @var SubscriberType $subscriber */

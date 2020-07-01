@@ -9,14 +9,22 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
-use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class NewsletterUnsubscribeInput
 {
+    /** @var NewsletterStatusRepository */
+    private $newsletterStatusRepository;
+
+    public function __construct(
+        NewsletterStatusRepository $newsletterStatusRepository
+    ) {
+        $this->newsletterStatusRepository = $newsletterStatusRepository;
+    }
+
     /**
      * @Factory
      */
@@ -24,14 +32,7 @@ final class NewsletterUnsubscribeInput
     {
         $this->assertEmailNotEmpty($email);
 
-        /** @var EshopNewsletterSubscriptionStatusModel $newsletterStatusModel */
-        $newsletterStatusModel = oxNew(NewsletterStatusUnsubscribeType::getModelClass());
-
-        if (!$newsletterStatusModel->loadFromEmail($email)) {
-            throw NewsletterStatusNotFound::byEmail($email);
-        }
-
-        return new NewsletterStatusUnsubscribeType($newsletterStatusModel);
+        return $this->newsletterStatusRepository->getUnsubscribeByEmail($email);
     }
 
     private function assertEmailNotEmpty(string $email): bool

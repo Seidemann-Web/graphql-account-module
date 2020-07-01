@@ -60,11 +60,7 @@ final class NewsletterStatus
     {
         $subscriber = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
 
-        $modelItem = $newsletterStatus->getEshopModel();
-        $modelItem->updateSubscription($subscriber->getEshopModel());
-        $modelItem->setOptInStatus(1);
-
-        return $this->repository->saveModel($modelItem);
+        return $this->newsletterStatusRepository->optIn($subscriber, $newsletterStatus);
     }
 
     public function unsubscribe(?NewsletterStatusUnsubscribeType $newsletterStatus): bool
@@ -84,6 +80,6 @@ final class NewsletterStatus
 
         $subscriber = $this->subscriberService->subscriber($userId);
 
-        return $subscriber->getEshopModel()->setNewsSubscription(false, false);
+        return $this->newsletterStatusRepository->unsubscribe($subscriber);
     }
 }
