@@ -310,8 +310,10 @@ final class WishListTest extends TokenTestCase
         $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
         $this->assertResponseStatus(200, $result);
 
-        $products = $this->getWishListArticles();
-        $this->assertEmpty($products);
+        $this->assertArrayNotHasKey(
+            self::PRODUCT_ID,
+            $this->getWishListArticles()
+        );
     }
 
     public function testRemoveMultipleProductsFromWishList(): void
@@ -324,7 +326,7 @@ final class WishListTest extends TokenTestCase
         $this->assertResponseStatus(200, $result);
 
         $products = $this->getWishListArticles();
-        $this->assertCount(1, $products);
+        $this->assertCount(2, $products);
         $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
     }
 
@@ -336,7 +338,7 @@ final class WishListTest extends TokenTestCase
         $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
         $this->assertResponseStatus(200, $result);
         $products = $this->getWishListArticles();
-        $this->assertCount(1, $products);
+        $this->assertCount(2, $products);
         $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
     }
 
@@ -349,7 +351,7 @@ final class WishListTest extends TokenTestCase
         $this->assertResponseStatus(404, $result);
         $this->assertSame('Product was not found by id: not_a_product', $result['body']['errors'][0]['message']);
         $products = $this->getWishListArticles();
-        $this->assertCount(1, $products);
+        $this->assertCount(2, $products);
         $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
     }
 

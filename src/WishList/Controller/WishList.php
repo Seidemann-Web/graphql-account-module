@@ -79,7 +79,8 @@ final class WishList
     }
 
     /**
-     * @Logged
+     * @Mutation()
+     * @Logged()
      */
     public function wishListRemoveProduct(string $productId): WishListDataType
     {
