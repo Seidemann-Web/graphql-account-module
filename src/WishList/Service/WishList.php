@@ -50,7 +50,6 @@ final class WishList
     public function __construct(
         Repository $repository,
         Authentication $authenticationService,
-        Authorization $authorizationService,
         Legacy $legacyService,
         CustomerService $customerService,
         CustomerRelationService $customerRelationService,
@@ -58,7 +57,6 @@ final class WishList
     ) {
         $this->repository              = $repository;
         $this->authenticationService   = $authenticationService;
-        $this->authorizationService    = $authorizationService;
         $this->legacyService           = $legacyService;
         $this->customerService         = $customerService;
         $this->customerRelationService = $customerRelationService;

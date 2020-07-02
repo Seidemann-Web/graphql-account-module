@@ -24,7 +24,7 @@ use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Types\ID;
 
 /**
- * @ExtendType(class=Customer::class)
+ * @ExtendType(class=CustomerDataType::class)
  */
 final class RelationService
 {

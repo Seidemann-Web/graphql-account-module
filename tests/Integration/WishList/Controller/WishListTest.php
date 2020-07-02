@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\WishList\Controller;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasket;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
@@ -46,35 +44,6 @@ final class WishListTest extends TokenTestCase
     private const PRODUCT = '_test_product_for_wish_list';
 
     private const OWNER_ID_WITHOUT_WISH_LIST = 'c0ea0473445326f4b43724e3b76547a5';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->getWishList()->delete();
-    }
-
-    public function testAddProductToWishList(): void
-    {
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-
-        $result = $this->addProductToWishListMutation(self::PRODUCT_ID);
-        $this->assertResponseStatus(200, $result);
-        $this->assertNotEmpty($result['body']['data']['wishListAddProduct']['id']);
-
-        $products = $this->getWishListArticles();
-        $this->assertSame(self::PRODUCT_ID, array_pop($products)->getId());
-    }
-
-    public function testAddMultipleProductsToWishList(): void
-    {
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-        $this->addProductToWishListMutation(self::PRODUCT_ID);
-        $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
-
-        $products = $this->getWishListArticles();
-        $this->assertSame(2, count($products));
-    }
 
     public function testAddInvalidProductToWishList(): void
     {
@@ -274,21 +243,6 @@ final class WishListTest extends TokenTestCase
         $actualWishList = $result['body']['data']['wishListMakePublic'] ?? null;
 
         $this->assertEquals($expectedWishList, $actualWishList);
-    }
-
-    public function testGetOwnPublicWishList(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->wishListByOwnerQuery(self::USERNAME_ID);
-        $this->assertResponseStatus(200, $result);
-
-        $wishList = $result['body']['data']['wishListByOwnerId'];
-        $this->assertSame('Marc', $wishList['customer']['firstName']);
-        $this->assertSame('_test_wish_list_public', $wishList['id']);
-        $this->assertTrue($wishList['public']);
-        $this->assertInstanceOf(DateTimeInterface::class, new DateTimeImmutable($wishList['creationDate']));
-        $this->assertInstanceOf(DateTimeInterface::class, new DateTimeImmutable($wishList['lastUpdateDate']));
     }
 
     public function testGetOwnPrivateWishList(): void
