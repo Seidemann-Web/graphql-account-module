@@ -26,14 +26,18 @@ final class WishList
     }
 
     /**
-     * @Mutation
-     * @Logged
+     * @Mutation()
+     * @Logged()
      */
     public function wishListAddProduct(string $productId): WishListDataType
     {
         return $this->wishListService->addProduct($productId);
     }
 
+    /**
+     * @Mutation()
+     * @Logged()
+     */
     public function wishListMakePrivate(): WishListDataType
     {
         return $this->wishListService->makePrivate();
