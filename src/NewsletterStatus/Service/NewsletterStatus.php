@@ -10,24 +10,38 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class NewsletterStatus
 {
+    /** @var NewsletterStatusRepository */
+    private $newsletterStatusRepository;
+
     /** @var Repository */
     private $repository;
+
+    /** @var SubscriberService */
+    private $subscriberService;
 
     /** @var Authentication */
     private $authenticationService;
 
     public function __construct(
+        NewsletterStatusRepository $newsletterStatusRepository,
+        Authentication $authenticationService,
         Repository $repository,
-        Authentication $authenticationService
+        SubscriberService $subscriberService
     ) {
-        $this->repository            = $repository;
-        $this->authenticationService = $authenticationService;
+        $this->newsletterStatusRepository = $newsletterStatusRepository;
+        $this->authenticationService      = $authenticationService;
+        $this->repository                 = $repository;
+        $this->subscriberService          = $subscriberService;
     }
 
     public function newsletterStatus(): NewsletterStatusType
@@ -37,8 +51,35 @@ final class NewsletterStatus
             throw new InvalidLogin('Unauthenticated');
         }
 
-        return $this->repository->getByUserId(
+        return $this->newsletterStatusRepository->getByUserId(
             $this->authenticationService->getUserId()
         );
+    }
+
+    public function optIn(NewsletterStatusType $newsletterStatus): bool
+    {
+        $subscriber = $this->subscriberService->subscriber((string) $newsletterStatus->userId());
+
+        return $this->newsletterStatusRepository->optIn($subscriber, $newsletterStatus);
+    }
+
+    public function unsubscribe(?NewsletterStatusUnsubscribeType $newsletterStatus): bool
+    {
+        $userId = null;
+
+        if ($newsletterStatus) {
+            $userId = (string) $newsletterStatus->userId();
+        } elseif ($this->authenticationService->isLogged()) {
+            $userId = $this->authenticationService->getUserId();
+        }
+
+        /** If we don't have email from token or as parameter */
+        if (!$userId) {
+            throw new SubscriberNotFound('Missing subscriber email or token');
+        }
+
+        $subscriber = $this->subscriberService->subscriber($userId);
+
+        return $this->newsletterStatusRepository->unsubscribe($subscriber);
     }
 }
