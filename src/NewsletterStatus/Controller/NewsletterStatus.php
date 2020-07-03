@@ -55,10 +55,10 @@ final class NewsletterStatus
      *   If token user is already subscribed, status will not be changed and no optin mail is sent.
      * - If token and NewsletterStatusSubscribeInput exists, input email will be subscribed.
      *   If input email user is already subscribed, status will be changed to 2 and
-     *   optin mail is sent depending on shop cinfig parameter blOrderOptInEmail.
+     *   optin mail is sent depending on shop config parameter blOrderOptInEmail.
      * - If only NewsletterStatusSubscribeInput exists, input email will be subscribed.
      *   If input email user is already subscribed, status will be changed to 2 and
-     *   optin mail is sent depending on shop cinfig parameter blOrderOptInEmail.
+     *   optin mail is sent depending on shop config parameter blOrderOptInEmail.
      *
      * If user account for email and shop exists, input fields are overruled by existing user data.
      * If user account for email and shop does not exist, new user will be created (no password, mininal data)
