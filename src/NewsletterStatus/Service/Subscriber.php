@@ -47,11 +47,4 @@ final class Subscriber
 
         return $subscriber;
     }
-
-    public function setNewsSubscription(SubscriberDataType $subscriber, bool $flag): bool
-    {
-        $sendOptinMail = $this->legacyService->getConfigParam('blOrderOptInEmail');
-
-        return $subscriber->getEshopModel()->setNewsSubscription($flag, $sendOptinMail);
-    }
 }

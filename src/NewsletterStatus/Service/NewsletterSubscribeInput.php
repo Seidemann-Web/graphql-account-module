@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
+use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class NewsletterSubscribeInput
@@ -19,10 +20,15 @@ final class NewsletterSubscribeInput
     /** @var NewsletterStatusRepository */
     private $newsletterStatusRepository;
 
+    /** @var Authentication */
+    private $authenticationService;
+
     public function __construct(
-        NewsletterStatusRepository $newsletterStatusRepository
+        NewsletterStatusRepository $newsletterStatusRepository,
+        Authentication $authenticationService
     ) {
         $this->newsletterStatusRepository = $newsletterStatusRepository;
+        $this->authenticationService      = $authenticationService;
     }
 
     /**
@@ -32,11 +38,24 @@ final class NewsletterSubscribeInput
         ?string $firstName,
         ?string $lastName,
         ?string $salutation,
-        string $email
+        ?string $email
     ): NewsletterStatusSubscribeType {
-        $this->assertValidEmail($email);
+        $userId = null;
 
-        return new NewsletterStatusSubscribeType((string) $firstName, (string) $lastName, (string) $salutation, $email);
+        if (!$email && $this->authenticationService->isLogged()) {
+            $email  = $this->authenticationService->getUserName();
+            $userId = $this->authenticationService->getUserId();
+        } else {
+            $this->assertValidEmail((string) $email);
+        }
+
+        return new NewsletterStatusSubscribeType(
+            (string) $firstName,
+            (string) $lastName,
+            (string) $salutation,
+            (string) $email,
+            $userId
+        );
     }
 
     private function assertValidEmail(string $email): bool

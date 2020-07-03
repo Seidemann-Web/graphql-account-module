@@ -51,13 +51,14 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
     {
         $result = $this->query(
             'mutation {
-                newsletterSubscribe {
+                newsletterSubscribe (newsletterStatus: {})
+                {
                    status
                 }
             }'
         );
 
-        $this->assertResponseStatus(404, $result);
+        $this->assertResponseStatus(400, $result);
     }
 
     public function testNewsletterSubscribeMissingInputDataButToken(): void
@@ -68,7 +69,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                newsletterSubscribe {
+                newsletterSubscribe (newsletterStatus: {})
+                {
                    status
                 }
             }'
@@ -127,7 +129,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                newsletterSubscribe
+                newsletterSubscribe (newsletterStatus: {})
                 {
                     status
                 }

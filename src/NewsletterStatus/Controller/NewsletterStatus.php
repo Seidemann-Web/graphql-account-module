@@ -50,7 +50,7 @@ final class NewsletterStatus
     }
 
     /**
-     * NewsletterStatusSubscribeInput is optional in case of token.
+     * NewsletterStatusSubscribeInput input fields are optional in case of token.
      * - If token exists without NewsletterStatusSubscribeInput, token email will be subscribed.
      *   If token user is already subscribed, status will not be changed and no optin mail is sent.
      * - If token and NewsletterStatusSubscribeInput exists, input email will be subscribed.
@@ -66,7 +66,7 @@ final class NewsletterStatus
      * @Mutation()
      */
     public function newsletterSubscribe(
-        ?NewsletterStatusSubscribeType $newsletterStatus
+        NewsletterStatusSubscribeType $newsletterStatus
     ): NewsletterStatusType {
         return $this->newsletterStatusService->subscribe($newsletterStatus);
     }

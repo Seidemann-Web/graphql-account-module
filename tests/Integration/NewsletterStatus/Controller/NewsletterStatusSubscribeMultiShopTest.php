@@ -98,9 +98,10 @@ final class NewsletterStatusSubscribeMultiShopTest extends MultishopTestCase
         $this->prepareToken(self::DIFFERENT_USERNAME, self::DIFFERENT_USER_PASSWORD);
 
         $result = $this->query('mutation{
-            newsletterSubscribe {
-                  status
-                }
+            newsletterSubscribe (newsletterStatus: {})
+            {
+                status
+            }
         }');
 
         $this->assertResponseStatus(200, $result);

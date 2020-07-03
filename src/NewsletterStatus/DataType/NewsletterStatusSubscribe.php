@@ -29,16 +29,25 @@ final class NewsletterStatusSubscribe
     /** @var string */
     private $email;
 
+    /** @var ?string */
+    private $userId;
+
+    /** @var bool */
+    private $needsForceOptin;
+
     public function __construct(
         string $firstName,
         string $lastName,
         string $salutation,
-        string $email
+        string $email,
+        ?string $userId
     ) {
-        $this->salutation = $salutation;
-        $this->firstName  = $firstName;
-        $this->lastName   = $lastName;
-        $this->email      = $email;
+        $this->salutation      = $salutation;
+        $this->firstName       = $firstName;
+        $this->lastName        = $lastName;
+        $this->email           = $email;
+        $this->userId          = $userId;
+        $this->needsForceOptin = empty($userId);
     }
 
     /**
@@ -71,5 +80,15 @@ final class NewsletterStatusSubscribe
     public function email(): string
     {
         return $this->email;
+    }
+
+    public function userId(): ?string
+    {
+        return $this->userId;
+    }
+
+    public function needsForceOptin(): bool
+    {
+        return $this->needsForceOptin;
     }
 }
