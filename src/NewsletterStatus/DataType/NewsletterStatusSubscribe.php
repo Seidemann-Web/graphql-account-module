@@ -9,14 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\DataType;
 
-use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 
 /**
  * @Type()
  */
-final class NewsletterStatusSubscribe implements DataType
+final class NewsletterStatusSubscribe
 {
     /** @var string */
     private $lastName;
@@ -72,13 +71,5 @@ final class NewsletterStatusSubscribe implements DataType
     public function email(): string
     {
         return $this->email;
-    }
-
-    /**
-     * @return class-string
-     */
-    public static function getModelClass(): string
-    {
-        return self::class;
     }
 }
