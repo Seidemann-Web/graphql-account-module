@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
@@ -44,6 +46,44 @@ final class CustomerTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(400, $result);
+    }
+
+    public function testMeForLoggedInUser(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('query {
+            me {
+               id
+               firstName
+               lastName
+               email
+               customerNumber
+               birthdate
+               points
+               registered
+               created
+               updated
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $customerData = $result['body']['data']['me'];
+
+        $this->assertEquals('e7af1c3b786fd02906ccd75698f4e6b9', $customerData['id']);
+        $this->assertEquals('Marc', $customerData['firstName']);
+        $this->assertEquals('Muster', $customerData['lastName']);
+        $this->assertEquals(self::USERNAME, $customerData['email']);
+        $this->assertEquals('2', $customerData['customerNumber']);
+        $this->assertSame(0, $customerData['points']);
+        $this->assertSame('1984-12-21T00:00:00+01:00', $customerData['birthdate']);
+        $this->assertSame('2011-02-01T08:41:25+01:00', $customerData['registered']);
+        $this->assertSame('2011-02-01T08:41:25+01:00', $customerData['created']);
+        $this->assertInstanceOf(
+            DateTimeInterface::class,
+            new DateTimeImmutable($customerData['updated'])
+        );
     }
 
     public function testMeNewsletterStatusNoEntryInDatabase(): void

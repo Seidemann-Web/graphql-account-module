@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
@@ -47,6 +49,78 @@ final class Customer implements DataType
     public function getFirstName(): string
     {
         return (string) $this->customer->getFieldData('oxfname');
+    }
+
+    /**
+     * @Field()
+     */
+    public function getLastName(): string
+    {
+        return (string) $this->customer->getFieldData('oxlname');
+    }
+
+    /**
+     * @Field()
+     */
+    public function getEmail(): string
+    {
+        return (string) $this->customer->getFieldData('oxusername');
+    }
+
+    /**
+     * @Field()
+     */
+    public function getCustomerNumber(): string
+    {
+        return (string) $this->customer->getFieldData('oxcustnr');
+    }
+
+    /**
+     * @Field()
+     */
+    public function getBirthdate(): ?DateTimeInterface
+    {
+        return new DateTimeImmutable(
+            (string) $this->customer->getFieldData('oxbirthdate')
+        );
+    }
+
+    /**
+     * @Field()
+     */
+    public function getPoints(): int
+    {
+        return (int) $this->customer->getFieldData('oxpoints');
+    }
+
+    /**
+     * @Field()
+     */
+    public function getRegistered(): ?DateTimeInterface
+    {
+        return new DateTimeImmutable(
+            (string) $this->customer->getFieldData('oxregister')
+        );
+    }
+
+    /**
+     * @Field()
+     */
+    public function getCreated(): ?DateTimeInterface
+    {
+        return new DateTimeImmutable(
+            (string) $this->customer->getFieldData('oxcreate')
+        );
+    }
+
+    /**
+     * @Field()
+     */
+    public function getUpdated(): ?DateTimeInterface
+    {
+        return new DateTimeImmutable(
+            (string) $this->customer->getFieldData('oxtimestamp')
+        );
     }
 
     public static function getModelClass(): string
