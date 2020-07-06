@@ -92,7 +92,7 @@ final class NewsletterStatus
 
         return $newsletterStatus = $this->newsletterStatusRepository->subscribe(
             $subscriber,
-            $newsletterStatusSubscribe->needsForceOptin()
+            $newsletterStatusSubscribe->userId() ?? true : false
         );
     }
 }
