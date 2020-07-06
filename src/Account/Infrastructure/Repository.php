@@ -35,7 +35,7 @@ final class Repository
         }
 
         if (!$user->load($user->getId())) {
-            throw CustomerNotFound::byEmail($user->getFieldData('oxemail'));
+            throw CustomerNotFound::byId($user->getId());
         }
 
         return new CustomerDataType($user);
