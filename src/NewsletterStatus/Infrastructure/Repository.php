@@ -11,7 +11,6 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
-use OxidEsales\Eshop\Core\MailValidator as EhopMailValidator;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as CustomerRepository;
@@ -88,14 +87,6 @@ final class Repository
         $this->setNewsSubscription($subscriber, true);
 
         return $this->getByEmail($subscriber->getUserName());
-    }
-
-    public function isValidEmail(string $email): bool
-    {
-        /** @var EhopMailValidator $mailValidator */
-        $mailValidator = oxNew(EhopMailValidator::class);
-
-        return $mailValidator->isValidEmail($email);
     }
 
     /**

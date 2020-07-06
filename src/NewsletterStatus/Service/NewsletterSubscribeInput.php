@@ -11,24 +11,24 @@ namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\InvalidEmail;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
+use OxidEsales\GraphQL\Account\Shared\Infrastructure\Legacy;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class NewsletterSubscribeInput
 {
-    /** @var NewsletterStatusRepository */
-    private $newsletterStatusRepository;
-
     /** @var Authentication */
     private $authenticationService;
 
+    /** @var Legacy */
+    private $legacyService;
+
     public function __construct(
-        NewsletterStatusRepository $newsletterStatusRepository,
-        Authentication $authenticationService
+        Authentication $authenticationService,
+        Legacy $legacyService
     ) {
-        $this->newsletterStatusRepository = $newsletterStatusRepository;
-        $this->authenticationService      = $authenticationService;
+        $this->authenticationService = $authenticationService;
+        $this->legacyService         = $legacyService;
     }
 
     /**
@@ -60,7 +60,7 @@ final class NewsletterSubscribeInput
 
     private function assertValidEmail(string $email): bool
     {
-        if (!$this->newsletterStatusRepository->isValidEmail($email)) {
+        if (!$this->legacyService->isValidEmail($email)) {
             throw new InvalidEmail();
         }
 
