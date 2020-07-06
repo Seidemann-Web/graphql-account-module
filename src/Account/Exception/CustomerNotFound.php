@@ -19,4 +19,9 @@ final class CustomerNotFound extends NotFound
     {
         return new self(sprintf('Customer was not found by id: %s', $id));
     }
+
+    public static function byEmail(string $email): self
+    {
+        return new self(sprintf('Customer was not found for: %s', $email));
+    }
 }

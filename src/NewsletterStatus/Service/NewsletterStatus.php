@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusSubscribe as NewsletterStatusSubscribeType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
+use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\Subscriber as SubscriberType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\Subscriber as SubscriberService;
@@ -81,5 +83,16 @@ final class NewsletterStatus
         $subscriber = $this->subscriberService->subscriber($userId);
 
         return $this->newsletterStatusRepository->unsubscribe($subscriber);
+    }
+
+    public function subscribe(NewsletterStatusSubscribeType $newsletterStatusSubscribe): NewsletterStatusType
+    {
+        $customer   = $this->newsletterStatusRepository->createNewsletterUser($newsletterStatusSubscribe);
+        $subscriber = new SubscriberType($customer->getEshopModel());
+
+        return $newsletterStatus = $this->newsletterStatusRepository->subscribe(
+            $subscriber,
+            $newsletterStatusSubscribe->userId() ? false : true
+        );
     }
 }
