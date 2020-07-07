@@ -9,8 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
-use DateTimeImmutable;
-use DateTimeInterface;
+use DateTime;
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
@@ -19,6 +18,8 @@ final class CustomerTest extends TokenTestCase
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
+
+    private const USER_OXID = 'e7af1c3b786fd02906ccd75698f4e6b9';
 
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
@@ -36,10 +37,10 @@ final class CustomerTest extends TokenTestCase
         parent::tearDown();
     }
 
-    public function testMeForNotLoggedInUser(): void
+    public function testCustomerForNotLoggedInUser(): void
     {
         $result = $this->query('query {
-            me {
+            customer {
                id
                firstName
             }
@@ -48,12 +49,12 @@ final class CustomerTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
     }
 
-    public function testMeForLoggedInUser(): void
+    public function testCustomerForLoggedInUser(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query('query {
-            me {
+            customer {
                id
                firstName
                lastName
@@ -69,9 +70,9 @@ final class CustomerTest extends TokenTestCase
 
         $this->assertResponseStatus(200, $result);
 
-        $customerData = $result['body']['data']['me'];
+        $customerData = $result['body']['data']['customer'];
 
-        $this->assertEquals('e7af1c3b786fd02906ccd75698f4e6b9', $customerData['id']);
+        $this->assertEquals(self::USER_OXID, $customerData['id']);
         $this->assertEquals('Marc', $customerData['firstName']);
         $this->assertEquals('Muster', $customerData['lastName']);
         $this->assertEquals(self::USERNAME, $customerData['email']);
@@ -80,18 +81,15 @@ final class CustomerTest extends TokenTestCase
         $this->assertSame('1984-12-21T00:00:00+01:00', $customerData['birthdate']);
         $this->assertSame('2011-02-01T08:41:25+01:00', $customerData['registered']);
         $this->assertSame('2011-02-01T08:41:25+01:00', $customerData['created']);
-        $this->assertInstanceOf(
-            DateTimeInterface::class,
-            new DateTimeImmutable($customerData['updated'])
-        );
+        $this->assertInstanceOf(DateTime::class, DateTime::createFromFormat(DateTime::ATOM, $customerData['updated']));
     }
 
-    public function testMeNewsletterStatusNoEntryInDatabase(): void
+    public function testCustomerNewsletterStatusNoEntryInDatabase(): void
     {
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
         $result = $this->query('query {
-            me {
+            customer {
                 id
                 firstName
                 newsletterStatus {
@@ -101,11 +99,11 @@ final class CustomerTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertSame('Marc', $result['body']['data']['me']['firstName']);
-        $this->assertNull($result['body']['data']['me']['newsletterStatus']);
+        $this->assertSame('Marc', $result['body']['data']['customer']['firstName']);
+        $this->assertNull($result['body']['data']['customer']['newsletterStatus']);
     }
 
-    public function testMeNewsletterStatusInvalidEntryInDatabase(): void
+    public function testCustomerNewsletterStatusInvalidEntryInDatabase(): void
     {
         $subscription = oxNew(EshopNewsSubscribed::class);
         $subscription->setId('_othertestuser');
@@ -120,7 +118,7 @@ final class CustomerTest extends TokenTestCase
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
         $result = $this->query('query {
-            me {
+            customer {
                 id
                 firstName
                 newsletterStatus {
@@ -130,15 +128,15 @@ final class CustomerTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertSame('UNSUBSCRIBED', $result['body']['data']['me']['newsletterStatus']['status']);
+        $this->assertSame('UNSUBSCRIBED', $result['body']['data']['customer']['newsletterStatus']['status']);
     }
 
-    public function testMeAndNewsletterStatusForUser(): void
+    public function testCustomerAndNewsletterStatusForUser(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query('query {
-            me {
+            customer {
                 id
                 firstName
                 newsletterStatus {
@@ -168,12 +166,12 @@ final class CustomerTest extends TokenTestCase
             'unsubscribed'     => null,
         ];
 
-        $this->assertContains('T', $result['body']['data']['me']['newsletterStatus']['updated']);
-        unset($result['body']['data']['me']['newsletterStatus']['updated']);
+        $this->assertContains('T', $result['body']['data']['customer']['newsletterStatus']['updated']);
+        unset($result['body']['data']['customer']['newsletterStatus']['updated']);
 
         $this->assertEquals(
             $expected,
-            $result['body']['data']['me']['newsletterStatus']
+            $result['body']['data']['customer']['newsletterStatus']
         );
     }
 }

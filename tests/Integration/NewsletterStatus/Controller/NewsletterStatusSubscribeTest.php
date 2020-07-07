@@ -365,7 +365,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
         $this->prepareToken($email, self::PASSWORD);
 
         $result = $this->query('query {
-            me {
+            customer {
                 id
                 newsletterStatus {
                     status
@@ -374,7 +374,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals($status, $result['body']['data']['me']['newsletterStatus']['status']);
+        $this->assertEquals($status, $result['body']['data']['customer']['newsletterStatus']['status']);
     }
 
     /**

@@ -35,7 +35,7 @@ final class Customer
      * @Query()
      * @Logged()
      */
-    public function me(): CustomerDataType
+    public function customer(): CustomerDataType
     {
         return $this->customerService->customer(
             $this->authenticationService->getUserId()
