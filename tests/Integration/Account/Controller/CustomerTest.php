@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsSubscribed;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
@@ -172,6 +174,192 @@ final class CustomerTest extends TokenTestCase
         $this->assertEquals(
             $expected,
             $result['body']['data']['customer']['newsletterStatus']
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderSuccessfulCustomerRegister
+     */
+    public function testSuccessfulCustomerRegister(string $email, string $password, ?string $birthdate = null): void
+    {
+        $result = $this->query('mutation {
+            customerRegister(customer: {
+                email: "' . $email . '",
+                password: "' . $password . '",
+                ' . ($birthdate ? 'birthdate: "' . $birthdate . '"' : '') . '
+            }) {
+                id
+                email
+                birthdate
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $customerData = $result['body']['data']['customerRegister'];
+        $this->assertNotEmpty($customerData['id']);
+        $this->assertSame($email, $customerData['email']);
+
+        if ($birthdate) {
+            $this->assertInstanceOf(
+                DateTimeInterface::class,
+                new DateTimeImmutable($customerData['birthdate'])
+            );
+
+            $this->assertSame(
+                $birthdate . 'T00:00:00+01:00',
+                $customerData['birthdate']
+            );
+        }
+    }
+
+    public function dataProviderSuccessfulCustomerRegister()
+    {
+        return [
+            [
+                'testUser1@oxid-esales.com',
+                'useruser',
+            ],
+            [
+                'testUser2@oxid-esales.com',
+                'useruser',
+            ],
+            [
+                'testUser3@oxid-esales.com',
+                'useruser',
+                '1986-12-25',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderFailedCustomerRegistration
+     */
+    public function testFailedCustomerRegistration(string $email, string $password, string $message): void
+    {
+        $result = $this->query('mutation {
+            customerRegister(customer: {
+                email: "' . $email . '",
+                password: "' . $password . '"
+            }) {
+                id
+                email
+                birthdate
+            }
+        }');
+
+        $this->assertResponseStatus(400, $result);
+        $this->assertSame($message, $result['body']['errors'][0]['message']);
+    }
+
+    public function dataProviderFailedCustomerRegistration()
+    {
+        return [
+            [
+                'testUser1',
+                'useruser',
+                'Email is not valid',
+            ],
+            [
+                'user@oxid-esales.com',
+                'useruser',
+                "This e-mail address 'user@oxid-esales.com' already exists!",
+            ],
+            [
+                'testUser3@oxid-esales.com',
+                '',
+                'Password does not match length requirements',
+            ],
+            [
+                '',
+                'useruser',
+                'Email empty',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderCustomerEmailUpdate
+     */
+    public function testCustomerEmailUpdate(string $email, int $expectedStatus, ?string $expectedError = null): void
+    {
+        $this->prepareToken('differentuser@oxid-esales.com', 'useruser');
+
+        $result = $this->query('mutation {
+            customerEmailUpdate(email: "' . $email . '") {
+                id
+                email
+            }
+        }');
+
+        $this->assertResponseStatus($expectedStatus, $result);
+
+        if ($expectedError) {
+            $this->assertSame($expectedError, $result['body']['errors'][0]['message']);
+        } else {
+            $customerData = $result['body']['data']['customerEmailUpdate'];
+
+            $this->assertNotEmpty($customerData['id']);
+            $this->assertSame($email, $customerData['email']);
+        }
+    }
+
+    public function dataProviderCustomerEmailUpdate()
+    {
+        return [
+            [
+                'email'          => 'user@oxid-esales.com',
+                'expectedStatus' => 400,
+                'expectedError'  => "This e-mail address 'user@oxid-esales.com' already exists!",
+            ],
+            [
+                'email'          => '',
+                'expectedStatus' => 400,
+                'expectedError'  => 'Email empty',
+            ],
+            [
+                'email'          => 'someuser',
+                'expectedStatus' => 400,
+                'expectedError'  => 'Email is not valid',
+            ],
+            [
+                'email'          => 'newUser@oxid-esales.com',
+                'expectedStatus' => 200,
+            ],
+        ];
+    }
+
+    public function testCustomerBirthdateUpdateWithoutToken(): void
+    {
+        $result = $this->query('
+            customerBirthdateUpdate(birthdate: "1986-12-25") {
+                email
+                birthdate
+            }
+        ');
+
+        $this->assertResponseStatus(400, $result);
+    }
+
+    public function testCustomerBirthdateUpdate(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('mutation {
+            customerBirthdateUpdate(birthdate: "1986-12-25") {
+                email
+                birthdate
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $this->assertEquals(
+            [
+                'email'     => self::USERNAME,
+                'birthdate' => '1986-12-25T00:00:00+01:00',
+            ],
+            $result['body']['data']['customerBirthdateUpdate']
         );
     }
 }

@@ -16,6 +16,10 @@ use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
 final class CustomerMultiShopTest extends MultishopTestCase
 {
+    private const USERNAME = 'user@oxid-esales.com';
+
+    private const PASSWORD = 'useruser';
+
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
     private const OTHER_PASSWORD = 'useruser';
@@ -119,6 +123,166 @@ final class CustomerMultiShopTest extends MultishopTestCase
         $this->assertSame('2011-02-01T08:41:25+01:00', $customerData['registered']);
         $this->assertSame('2011-02-01T08:41:25+01:00', $customerData['created']);
         $this->assertInstanceOf(DateTime::class, DateTime::createFromFormat(DateTime::ATOM, $customerData['updated']));
+    }
+
+    public function dataProviderCustomerRegister()
+    {
+        return [
+            [
+                'shopId'         => '1',
+                [
+                    'email'    => 'user@oxid-esales.com',
+                    'password' => 'useruser',
+                ],
+                'expectedStatus' => 400,
+                'expectedError'  => "This e-mail address 'user@oxid-esales.com' already exists!",
+            ],
+            [
+                'shopId'         => '2',
+                [
+                    'email'    => 'user@oxid-esales.com',
+                    'password' => 'useruser',
+                ],
+                'expectedStatus' => 400,
+                'expectedError'  => "This e-mail address 'user@oxid-esales.com' already exists!",
+            ],
+            [
+                'shopId'         => '1',
+                [
+                    'email'    => 'testUser1@oxid-esales.com',
+                    'password' => 'useruser',
+                ],
+                'expectedStatus' => 200,
+            ],
+            [
+                'shopId'         => '2',
+                [
+                    'email'    => 'testUser1@oxid-esales.com',
+                    'password' => 'useruser',
+                ],
+                'expectedStatus' => 200,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderCustomerRegister
+     */
+    public function testCustomerRegister(string $shopId, array $data, int $expectedStatus, ?string $expectedError = null): void
+    {
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $result = $this->query('mutation {
+            customerRegister(customer: {
+                email: "' . $data['email'] . '",
+                password: "' . $data['password'] . '"
+            }) {
+                id
+                email
+                birthdate
+            }
+        }');
+
+        $this->assertResponseStatus($expectedStatus, $result);
+
+        if ($expectedError) {
+            $this->assertSame($expectedError, $result['body']['errors'][0]['message']);
+        } else {
+            $customerData = $result['body']['data']['customerRegister'];
+            $this->assertNotEmpty($customerData['id']);
+            $this->assertSame($data['email'], $customerData['email']);
+        }
+    }
+
+    public function dataProviderCustomerEmailUpdate()
+    {
+        return [
+            [
+                'shopId'         => '2',
+                'email'          => 'user@oxid-esales.com',
+                'userId'         => '309db395b6c85c3881fcb9b437a73dd6',
+                'expectedStatus' => 400,
+                'expectedError'  => "This e-mail address 'user@oxid-esales.com' already exists!",
+            ],
+            [
+                'shopId'         => '2',
+                'email'          => '',
+                'userId'         => '309db395b6c85c3881fcb9b437a73dd6',
+                'expectedStatus' => 400,
+                'expectedError'  => 'Email empty',
+            ],
+            [
+                'shopId'         => '2',
+                'email'          => 'otheruser@oxid-esales.com',
+                'userId'         => '309db395b6c85c3881fcb9b437a73dd6',
+                'expectedStatus' => 200,
+            ],
+            [
+                'shopId'         => '1',
+                'email'          => 'newUser@oxid-esales.com',
+                'userId'         => '9119cc8cd9593c214be93ee558235f3c',
+                'expectedStatus' => 200,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderCustomerEmailUpdate
+     */
+    public function testCustomerEmailUpdate(string $shopId, string $email, string $userId, int $expectedStatus, ?string $expectedError = null): void
+    {
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $this->prepareToken('existinguser@oxid-esales.com', 'useruser');
+
+        $result = $this->query('mutation {
+            customerEmailUpdate(email: "' . $email . '") {
+                id
+                email
+            }
+        }');
+
+        $this->assertResponseStatus($expectedStatus, $result);
+
+        if ($expectedError) {
+            $this->assertSame($expectedError, $result['body']['errors'][0]['message']);
+        } else {
+            $customerData = $result['body']['data']['customerEmailUpdate'];
+
+            $this->assertSame($userId, $customerData['id']);
+            $this->assertSame($email, $customerData['email']);
+        }
+    }
+
+    public function testCustomerBirthdateUpdate(): void
+    {
+        $shopId = '2';
+
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('mutation {
+            customerBirthdateUpdate(birthdate: "1986-12-25") {
+                id
+                email
+                birthdate
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $this->assertEquals(
+            [
+                'id'        => '123ad3b5380202966df6ff128e9eecaq',
+                'email'     => self::USERNAME,
+                'birthdate' => '1986-12-25T00:00:00+01:00',
+            ],
+            $result['body']['data']['customerBirthdateUpdate']
+        );
     }
 
     private function prepareTestdata(int $shopid, int $status): void
