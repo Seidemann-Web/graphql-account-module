@@ -45,7 +45,7 @@ final class Country implements DataType
     /**
      * @Field()
      */
-    public function getOrder(): int
+    public function getPosition(): int
     {
         return (int) $this->country->getFieldData('oxorder');
     }
