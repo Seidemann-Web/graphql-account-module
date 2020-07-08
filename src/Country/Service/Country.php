@@ -12,10 +12,8 @@ namespace OxidEsales\GraphQL\Account\Country\Service;
 use OxidEsales\GraphQL\Account\Country\DataType\Country as CountryDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\CountryFilterList;
 use OxidEsales\GraphQL\Account\Country\Exception\CountryNotFound;
-use OxidEsales\GraphQL\Base\DataType\BoolFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
-use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
