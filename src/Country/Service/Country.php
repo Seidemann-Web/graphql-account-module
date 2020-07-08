@@ -24,19 +24,14 @@ final class Country
     /** @var Repository */
     private $repository;
 
-    /** @var Authentication */
-    private $authenticationService;
-
     /** @var Authorization */
     private $authorizationService;
 
     public function __construct(
         Repository $repository,
-        Authentication $authenticationService,
         Authorization $authorizationService
     ) {
         $this->repository            = $repository;
-        $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
     }
 
@@ -73,8 +68,8 @@ final class Country
      */
     public function countries(CountryFilterList $filter): array
     {
-        if (!$this->authorizationService->isAllowed('VIEW_INACTIVE_COUNTRY')) {
-            $filter = $filter->withActiveFilter(new BoolFilter(true));
+        if ($this->authorizationService->isAllowed('VIEW_INACTIVE_COUNTRY')) {
+            $filter = $filter->withActiveFilter(null);
         }
 
         return $this->repository->getByFilter($filter, CountryDataType::class);
