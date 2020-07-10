@@ -77,8 +77,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals('SUBSCRIBED_MISSING_DBOPTIN', $result['body']['data']['newsletterSubscribe']['status']);
-        $this->assertSubscriptionStatus('SUBSCRIBED_MISSING_DBOPTIN');
+        $this->assertEquals('MISSING_DOUBLE_OPTIN', $result['body']['data']['newsletterSubscribe']['status']);
+        $this->assertSubscriptionStatus('MISSING_DOUBLE_OPTIN');
     }
 
     public function testNewsletterSubscribeExistingUserWithoutToken(): void
@@ -97,8 +97,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals('SUBSCRIBED_MISSING_DBOPTIN', $result['body']['data']['newsletterSubscribe']['status']);
-        $this->assertSubscriptionStatus('SUBSCRIBED_MISSING_DBOPTIN');
+        $this->assertEquals('MISSING_DOUBLE_OPTIN', $result['body']['data']['newsletterSubscribe']['status']);
+        $this->assertSubscriptionStatus('MISSING_DOUBLE_OPTIN');
     }
 
     public function testNewsletterSubscribeExistingSubcribedUser(): void
@@ -117,8 +117,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals('SUBSCRIBED_MISSING_DBOPTIN', $result['body']['data']['newsletterSubscribe']['status']);
-        $this->assertSubscriptionStatus('SUBSCRIBED_MISSING_DBOPTIN');
+        $this->assertEquals('MISSING_DOUBLE_OPTIN', $result['body']['data']['newsletterSubscribe']['status']);
+        $this->assertSubscriptionStatus('MISSING_DOUBLE_OPTIN');
     }
 
     public function testNewsletterSubscribeExistingSubcribedUserByToken(): void
@@ -152,7 +152,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
                     'firstname'  => 'Newgirl',
                     'lastname'   => 'Intown',
                     'email'      => $newUserMail,
-                    'status'     => 'SUBSCRIBED_MISSING_DBOPTIN',
+                    'status'     => 'MISSING_DOUBLE_OPTIN',
                 ],
                 'require_optin' => true,
                 'mock'          => 'once',
@@ -163,7 +163,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
                     'firstname'  => '',
                     'lastname'   => '',
                     'email'      => '2' . $newUserMail,
-                    'status'     => 'SUBSCRIBED_MISSING_DBOPTIN',
+                    'status'     => 'MISSING_DOUBLE_OPTIN',
                 ],
                 'require_optin' => true,
                 'mock'          => 'once',
@@ -302,10 +302,10 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
             'firstname'  => 'Marc',
             'lastname'   => 'Muster',
             'email'      => self::OTHER_USERNAME,
-            'status'     => 'SUBSCRIBED_MISSING_DBOPTIN',
+            'status'     => 'MISSING_DOUBLE_OPTIN',
         ];
         $this->assertEquals($expected, $result['body']['data']['newsletterSubscribe']);
-        $this->assertSubscriptionStatus('SUBSCRIBED_MISSING_DBOPTIN');
+        $this->assertSubscriptionStatus('MISSING_DOUBLE_OPTIN');
     }
 
     public function testNewsletterSubscribePreferInputOverToken(): void
@@ -338,10 +338,10 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
             'firstname'  => 'Marc',
             'lastname'   => 'Muster',
             'email'      => self::OTHER_USERNAME,
-            'status'     => 'SUBSCRIBED_MISSING_DBOPTIN',
+            'status'     => 'MISSING_DOUBLE_OPTIN',
         ];
         $this->assertEquals($expected, $result['body']['data']['newsletterSubscribe']);
-        $this->assertSubscriptionStatus('SUBSCRIBED_MISSING_DBOPTIN');
+        $this->assertSubscriptionStatus('MISSING_DOUBLE_OPTIN');
     }
 
     private function prepareTestData(int $optin = 2): void

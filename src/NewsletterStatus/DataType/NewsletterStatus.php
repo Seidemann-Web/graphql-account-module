@@ -26,7 +26,7 @@ final class NewsletterStatus implements DataType
 
     private const STATUS_1 = 'SUBSCRIBED';
 
-    private const STATUS_2 = 'SUBSCRIBED_MISSING_DBOPTIN';
+    private const STATUS_2 = 'MISSING_DOUBLE_OPTIN';
 
     private const DEFAULT_STATUS = 0;
 

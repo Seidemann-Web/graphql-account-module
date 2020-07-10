@@ -82,7 +82,7 @@ final class NewsletterStatusSubscribeMultiShopTest extends MultishopTestCase
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals('SUBSCRIBED_MISSING_DBOPTIN', $result['body']['data']['newsletterSubscribe']['status']);
+        $this->assertEquals('MISSING_DOUBLE_OPTIN', $result['body']['data']['newsletterSubscribe']['status']);
         $this->assertSubscriptionStatus(2, (int) $shopId);
     }
 
@@ -105,7 +105,7 @@ final class NewsletterStatusSubscribeMultiShopTest extends MultishopTestCase
         }');
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals('SUBSCRIBED_MISSING_DBOPTIN', $result['body']['data']['newsletterSubscribe']['status']);
+        $this->assertEquals('MISSING_DOUBLE_OPTIN', $result['body']['data']['newsletterSubscribe']['status']);
 
         //malluser is still not subscribed in shop 1 but subscribed in shop 2 (before optin)
         $this->assertSubscriptionStatus(0, 1);
@@ -152,7 +152,7 @@ final class NewsletterStatusSubscribeMultiShopTest extends MultishopTestCase
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertEquals('SUBSCRIBED_MISSING_DBOPTIN', $result['body']['data']['newsletterSubscribe']['status']);
+        $this->assertEquals('MISSING_DOUBLE_OPTIN', $result['body']['data']['newsletterSubscribe']['status']);
 
         $this->assertSubscriptionStatus(0, 1);
         $userId = $this->assertSubscriptionStatus(2, 2);

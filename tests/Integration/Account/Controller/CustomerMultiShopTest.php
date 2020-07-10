@@ -52,7 +52,7 @@ final class CustomerMultiShopTest extends MultishopTestCase
             ],
             'shop_2' => [
                 'shopid'   => '2',
-                'expected' => 'SUBSCRIBED_MISSING_DBOPTIN',
+                'expected' => 'MISSING_DOUBLE_OPTIN',
             ],
         ];
     }
