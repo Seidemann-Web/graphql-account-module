@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
+use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository as CatalogueRepository;
 
@@ -39,5 +40,21 @@ final class Repository
         }
 
         return new CustomerDataType($user);
+    }
+
+    /**
+     * @return DeliveryAddress[]
+     */
+    public function addresses(CustomerDataType $customer): array
+    {
+        $addresses   = [];
+        $addressList = $customer->getEshopModel()
+                                ->getUserAddresses();
+
+        foreach ($addressList as $address) {
+            $addresses[] = new DeliveryAddress($address);
+        }
+
+        return $addresses;
     }
 }

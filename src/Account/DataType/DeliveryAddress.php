@@ -35,6 +35,13 @@ final class DeliveryAddress implements DataType
         return $this->address;
     }
 
+    public function countryId(): ID
+    {
+        return new ID(
+            $this->address->getFieldData('oxcountryid')
+        );
+    }
+
     /**
      * @Field()
      */

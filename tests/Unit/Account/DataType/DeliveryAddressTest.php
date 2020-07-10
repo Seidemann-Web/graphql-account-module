@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Tests\Unit\Account\DataType;
 
 use OxidEsales\Eshop\Application\Model\Address as EshopAddressModel;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,39 +28,23 @@ final class DeliveryAddressTest extends TestCase
             EshopAddressModel::class,
             $dataType->getEshopModel()
         );
-        $this->assertIsString(
-            $dataType->salutation()
-        );
-        $this->assertIsString(
-            $dataType->firstname()
-        );
-        $this->assertIsString(
-            $dataType->lastname()
-        );
-        $this->assertIsString(
-            $dataType->company()
-        );
-        $this->assertIsString(
-            $dataType->additionalInfo()
-        );
-        $this->assertIsString(
-            $dataType->street()
-        );
-        $this->assertIsString(
-            $dataType->streetNumber()
-        );
-        $this->assertIsString(
-            $dataType->zipCode()
-        );
-        $this->assertIsString(
-            $dataType->city()
-        );
-        $this->assertIsString(
-            $dataType->phone()
-        );
-        $this->assertIsString(
-            $dataType->fax()
-        );
+        $fields = [
+            'salutation',
+            'firstname',
+            'lastname',
+            'company',
+            'additionalInfo',
+            'street',
+            'streetNumber',
+            'zipCode',
+            'city',
+            'phone',
+            'fax',
+        ];
+
+        foreach ($fields as $field) {
+            $this->assertThat($dataType->$field(), $this->isType(IsType::TYPE_STRING));
+        }
     }
 
     public function testEnrichedDeliveryAddress(): void

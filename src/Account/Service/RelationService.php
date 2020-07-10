@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\Customer;
+use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
+use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as AccountRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
@@ -32,12 +34,17 @@ final class RelationService
     /** @var NewsletterStatusService */
     private $newsletterStatusService;
 
+    /** @var AccountRepository */
+    private $accountRepository;
+
     public function __construct(
         ReviewService $reviewService,
-        NewsletterStatusService $newsletterStatusService
+        NewsletterStatusService $newsletterStatusService,
+        AccountRepository $accountRepository
     ) {
         $this->reviewService           = $reviewService;
         $this->newsletterStatusService = $newsletterStatusService;
+        $this->accountRepository       = $accountRepository;
     }
 
     /**
@@ -69,5 +76,15 @@ final class RelationService
         }
 
         return null;
+    }
+
+    /**
+     * @Field()
+     *
+     * @return DeliveryAddress[]
+     */
+    public function deliveryAddresses(Customer $customer): array
+    {
+        return $this->accountRepository->addresses($customer);
     }
 }
