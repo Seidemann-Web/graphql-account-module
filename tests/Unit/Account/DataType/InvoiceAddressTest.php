@@ -42,7 +42,7 @@ final class InvoiceAddressTest extends TestCase
             'vatID',
             'phone',
             'mobile',
-            'fax'
+            'fax',
         ];
 
         foreach ($fields as $field) {
