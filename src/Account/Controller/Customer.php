@@ -10,10 +10,14 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Controller;
 
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
+use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
+use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
+use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddressInput;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Query;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
 final class Customer
 {
@@ -23,12 +27,17 @@ final class Customer
     /** @var Authentication */
     private $authenticationService;
 
+    /** @var AddressService */
+    private $addressService;
+
     public function __construct(
         CustomerService $customerService,
-        Authentication $authenticationService
+        Authentication $authenticationService,
+        AddressService $addressService
     ) {
-        $this->customerService       = $customerService;
+        $this->customerService = $customerService;
         $this->authenticationService = $authenticationService;
+        $this->addressService = $addressService;
     }
 
     /**
@@ -40,5 +49,14 @@ final class Customer
         return $this->customerService->customer(
             $this->authenticationService->getUserId()
         );
+    }
+
+    /**
+     * @Mutation()
+     */
+    public function customerInvoiceAddressSet(
+        InvoiceAddress $invoiceAddress
+    ): InvoiceAddress {
+        return $this->addressService->updateInvoiceAddress($invoiceAddress);
     }
 }
