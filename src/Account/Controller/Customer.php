@@ -11,13 +11,12 @@ namespace OxidEsales\GraphQL\Account\Account\Controller;
 
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
-use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
-use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddressInput;
+use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
-use TheCodingMachine\GraphQLite\Annotations\Query;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
+use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class Customer
 {
@@ -35,9 +34,9 @@ final class Customer
         Authentication $authenticationService,
         AddressService $addressService
     ) {
-        $this->customerService = $customerService;
+        $this->customerService       = $customerService;
         $this->authenticationService = $authenticationService;
-        $this->addressService = $addressService;
+        $this->addressService        = $addressService;
     }
 
     /**

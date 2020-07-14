@@ -9,14 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
+use DateTimeImmutable;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
-//use OxidEsales\GraphQL\Account\Country\DataType\Country;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
-use DateTimeImmutable;
+use TheCodingMachine\GraphQLite\Types\ID;
 
 final class InvoiceAddressInput
 {
@@ -31,7 +30,7 @@ final class InvoiceAddressInput
         CustomerService $customerService
     ) {
         $this->authenticationService = $authenticationService;
-        $this->customerService = $customerService;
+        $this->customerService       = $customerService;
     }
 
     /**
@@ -47,20 +46,34 @@ final class InvoiceAddressInput
         string $streetNumber,
         string $zipCode,
         string $city,
-//        Country $country,
+        ID $countryID,
         ?string $vatID,
         ?string $phone,
         ?string $mobile,
         ?string $fax,
         DateTimeImmutable $creationDate
-    ): InvoiceAddress
-    {
+    ): InvoiceAddress {
         /** @var User $customer */
-        $customer = $this->customerService->customer($this->authenticationService->getUserId())->getEshopModel();
+        $customer = $this->customerService
+            ->customer($this->authenticationService->getUserId())
+            ->getEshopModel();
 
-        //todo: create mapping
         $customer->assign([
-           'oxsal' => $salutation
+            'oxsal'       => $salutation,
+            'oxfname'     => $firstname,
+            'oxlname'     => $lastname,
+            'oxcompany'   => $company ?: $customer->getFieldData('oxcompany'),
+            'oxaddinfo'   => $additionalInfo ?: $customer->getFieldData('oxaddinfo'),
+            'oxstreet'    => $street,
+            'oxstreetnr'  => $streetNumber,
+            'oxzip'       => $zipCode,
+            'oxcity'      => $city,
+            'oxcountryid' => $countryID,
+            'oxustid'     => $vatID ?: $customer->getFieldData('oxustid'),
+            'oxprivphone' => $phone ?: $customer->getFieldData('oxprivphone'),
+            'oxmobfone'   => $mobile ?: $customer->getFieldData('oxmobfone'),
+            'oxfax'       => $fax ?: $customer->getFieldData('oxfax'),
+            'oxcreate'    => $creationDate->format('Y-m-d'),
         ]);
 
         return new InvoiceAddress($customer);
