@@ -68,6 +68,7 @@ final class DeliveryAddressInput
                 },
                 $validator->getInvalidFields()
             );
+
             throw DeliveryAddressMissingFields::byFields($invalidFields);
         }
 
