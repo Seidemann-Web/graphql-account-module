@@ -54,7 +54,7 @@ final class InvoiceAddressInput
         ?string $phone = null,
         ?string $mobile = null,
         ?string $fax = null,
-        ?DateTimeImmutable $creationDate
+        ?DateTimeImmutable $creationDate = null
     ): InvoiceAddress {
         /** @var User $customer */
         $customer = $this->customerService
@@ -76,7 +76,7 @@ final class InvoiceAddressInput
             'oxprivphone' => $phone ?: $customer->getFieldData('oxprivphone'),
             'oxmobfone'   => $mobile ?: $customer->getFieldData('oxmobfone'),
             'oxfax'       => $fax ?: $customer->getFieldData('oxfax'),
-            'oxcreate'    => $creationDate->format('Y-m-d'),
+            'oxcreate'    => $creationDate ? $creationDate->format('Y-m-d'): $customer->getFieldData('oxcreate'),
         ]);
 
         /** @var RequiredFieldsValidator */
