@@ -168,6 +168,47 @@ final class DeliveryAddressTest extends TokenTestCase
         $this->assertSame($expected, $result['body']['errors'][0]['message']);
     }
 
+    public function testAddDeliveryAddressForLoggedInUserInvalidCountryId(): void
+    {
+        $this->prepareToken(self::DIFFERENT_USERNAME, self::DIFFERENT_PASSWORD);
+
+        $inputFields =  [
+            'salutation'     => 'MR',
+            'firstname'      => 'Marc',
+            'lastname'       => 'Muster',
+            'company'        => 'No GmbH',
+            'additionalInfo' => 'private delivery',
+            'street'         => 'Bertoldstrasse',
+            'streetNumber'   => '48',
+            'zipCode'        => '79098',
+            'city'           => 'Freiburg',
+            'countryId'      => 'lalaland',
+            'phone'          => '1234',
+            'fax'            => '4321',
+        ];
+
+        $queryPart = '';
+
+        foreach ($inputFields as $key => $value) {
+            $queryPart .= $key . ': "' . $value . '",' . PHP_EOL;
+        }
+
+        $result = $this->query(
+            'mutation {
+                deliveryAddressAdd(deliveryAddress: {' .
+            $queryPart .
+            '})
+                {
+                    firstname
+                }
+            }'
+        );
+
+        $this->markTestIncomplete('check for error message and do we get 404 or 400 in this case?');
+
+        $this->assertResponseStatus(400, $result);
+    }
+
     public function testAddDeliveryAddressForLoggedInUserInvalidInput(): void
     {
         $this->markTestIncomplete('Shop is not validating the input so we mark test as incomplete until further notice.');
