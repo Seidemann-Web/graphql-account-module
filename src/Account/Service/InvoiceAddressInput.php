@@ -10,8 +10,11 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use DateTimeImmutable;
+use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
+use OxidEsales\Eshop\Application\Model\RequiredFieldsValidator;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\Exception\InvoiceAddressMissingFields;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
@@ -75,6 +78,26 @@ final class InvoiceAddressInput
             'oxfax'       => $fax ?: $customer->getFieldData('oxfax'),
             'oxcreate'    => $creationDate->format('Y-m-d'),
         ]);
+
+        /** @var RequiredFieldsValidator */
+        $validator = oxNew(RequiredFieldsValidator::class);
+
+        /** @var RequiredAddressFields */
+        $requiredAddressFields = oxNew(RequiredAddressFields::class);
+        $validator->setRequiredFields(
+            $requiredAddressFields->getBillingFields()
+        );
+
+        if (!$validator->validateFields($customer)) {
+            $invalidFields = array_map(
+                function ($v) {
+                    return str_replace('oxuser__ox', '', $v);
+                },
+                $validator->getInvalidFields()
+            );
+
+            throw InvoiceAddressMissingFields::byFields($invalidFields);
+        }
 
         return new InvoiceAddress($customer);
     }
