@@ -16,6 +16,7 @@ use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
 final class Address
 {
@@ -43,7 +44,7 @@ final class Address
 
     /**
      * @Mutation()
-     * @Logged
+     * @Logged()
      */
     public function customerDeliveryAddressDelete(string $id): bool
     {
