@@ -17,6 +17,51 @@ final class AddressTest extends TokenTestCase
 
     private const PASSWORD = 'useruser';
 
+    public function testDeliveryAddressesForNotLoggedInUser(): void
+    {
+        $result = $this->query('query {
+            customerDeliveryAddresses {
+                id
+            }
+        }');
+
+        $this->assertResponseStatus(400, $result);
+    }
+
+    public function testDeliveryAddressesForLoggedInUser(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('query {
+            customerDeliveryAddresses {
+                id
+                firstname
+                street
+                streetNumber
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $this->assertSame(
+            [
+                [
+                    'id'           => 'test_delivery_address',
+                    'firstname'    => 'Marc',
+                    'street'       => 'Hauptstr',
+                    'streetNumber' => '13',
+                ],
+                [
+                    'id'           => 'test_delivery_address_2',
+                    'firstname'    => 'Marc',
+                    'street'       => 'Hauptstr2',
+                    'streetNumber' => '132',
+                ],
+            ],
+            $result['body']['data']['customerDeliveryAddresses']
+        );
+    }
+
     public function customerInvoiceAddressProvider(): array
     {
         return [

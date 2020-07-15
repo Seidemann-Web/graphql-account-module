@@ -57,4 +57,12 @@ final class Repository
 
         return $addresses;
     }
+
+    public function checkEmailExists(string $email): bool
+    {
+        /** @var EshopUserModel $customerModel */
+        $customerModel = oxNew(CustomerDataType::getModelClass());
+
+        return (bool) $customerModel->checkIfEmailExists($email);
+    }
 }

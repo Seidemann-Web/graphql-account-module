@@ -9,8 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
+use DateTimeInterface;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
+use OxidEsales\GraphQL\Account\Account\Exception\CustomerExists;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
+use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as CustomerRepository;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
+use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
@@ -22,6 +27,9 @@ final class Customer
     /** @var Repository */
     private $repository;
 
+    /** @var CustomerRepository */
+    private $customerRepository;
+
     /** @var Authentication */
     private $authenticationService;
 
@@ -30,10 +38,12 @@ final class Customer
 
     public function __construct(
         Repository $repository,
+        CustomerRepository $customerRepository,
         Authentication $authenticationService,
         Legacy $legacyService
     ) {
         $this->repository            = $repository;
+        $this->customerRepository    = $customerRepository;
         $this->authenticationService = $authenticationService;
         $this->legacyService         = $legacyService;
     }
@@ -48,6 +58,54 @@ final class Customer
             throw new InvalidLogin('Unauthorized');
         }
 
+        return $this->fetchCustomer($id);
+    }
+
+    public function create(CustomerDataType $customer): CustomerDataType
+    {
+        return $this->customerRepository->createUser($customer->getEshopModel());
+    }
+
+    public function changeEmail(string $email): CustomerDataType
+    {
+        if (!((string) $id = $this->authenticationService->getUserId())) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        if (!strlen($email)) {
+            throw new EmailEmpty();
+        }
+
+        if (!$this->legacyService->isValidEmail($email)) {
+            throw new InvalidEmail();
+        }
+
+        $customer = $this->fetchCustomer($id);
+
+        if ($customer->getEshopModel()->checkIfEmailExists($email) == true) {
+            throw CustomerExists::byEmail($email);
+        }
+
+        return $this->updateCustomer($customer, [
+            'OXUSERNAME' => $email,
+        ]);
+    }
+
+    public function changeBirthdate(DateTimeInterface $birthdate): CustomerDataType
+    {
+        if (!((string) $id = $this->authenticationService->getUserId())) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        $customer = $this->fetchCustomer($id);
+
+        return $this->updateCustomer($customer, [
+            'OXBIRTHDATE' => $birthdate->format('Y-m-d 00:00:00'),
+        ]);
+    }
+
+    private function fetchCustomer(string $id): CustomerDataType
+    {
         $ignoreSubshop = (bool) $this->legacyService->getConfigParam('blMallUsers');
 
         try {
@@ -64,9 +122,12 @@ final class Customer
         return $customer;
     }
 
-    public function create(CustomerDataType $customer): CustomerDataType
+    private function updateCustomer(CustomerDataType $customer, array $data = []): CustomerDataType
     {
-        $this->repository->saveModel($customer->getEshopModel());
+        $customerModel = $customer->getEshopModel();
+
+        $customerModel->assign($data);
+        $customerModel->save();
 
         return $customer;
     }

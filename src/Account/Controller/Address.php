@@ -9,10 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Controller;
 
+use OxidEsales\GraphQL\Account\Account\DataType\AddressFilterList;
+use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
 use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
+use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class Address
 {
@@ -22,7 +25,20 @@ final class Address
     public function __construct(
         AddressService $addressService
     ) {
-        $this->addressService        = $addressService;
+        $this->addressService = $addressService;
+    }
+
+    /**
+     * @Query()
+     * @Logged()
+     *
+     * @return DeliveryAddressDataType[]
+     */
+    public function customerDeliveryAddresses(): array
+    {
+        return $this->addressService->customerDeliveryAddresses(
+            new AddressFilterList()
+        );
     }
 
     /**

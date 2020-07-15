@@ -89,7 +89,7 @@ final class NewsletterStatusTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(400, $result);
-        $this->assertEquals('Email empty', $result['body']['errors'][0]['debugMessage']);
+        $this->assertEquals('Email empty', $result['body']['errors'][0]['message']);
     }
 
     public function testNewsletterOptInWorks(): void

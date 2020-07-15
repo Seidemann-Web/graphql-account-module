@@ -270,7 +270,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
         $result = $this->query(sprintf($template, ...array_values($data)));
 
         $this->assertResponseStatus(400, $result);
-        $this->assertEquals($expected, $result['body']['errors'][0]['debugMessage']);
+        $this->assertEquals($expected, $result['body']['errors'][0]['message']);
     }
 
     public function testNewsletterSubscribeExistingUserDifferentInputGetsIgnored(): void
