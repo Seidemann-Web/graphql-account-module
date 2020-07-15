@@ -19,6 +19,7 @@ use TheCodingMachine\GraphQLite\Types\ID;
 final class AddressFactory
 {
     public function createValidAddressType(
+        string $userid,
         ?string $salutation = null,
         ?string $firstname = null,
         ?string $lastname = null,
@@ -36,6 +37,7 @@ final class AddressFactory
         $address = oxNew(EshopAddressModel::class);
         $address->assign([
             'oxsal'       => $salutation,
+            'oxuserid'    => $userid,
             'oxfname'     => $firstname,
             'oxlname'     => $lastname,
             'oxcompany'   => $company,
