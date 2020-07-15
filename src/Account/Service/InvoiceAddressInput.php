@@ -40,21 +40,21 @@ final class InvoiceAddressInput
      * @Factory(name="InvoiceAddressInput")
      */
     public function fromUserInput(
-        string $salutation,
-        string $firstname,
-        string $lastname,
-        ?string $company,
-        ?string $additionalInfo,
-        string $street,
-        string $streetNumber,
-        string $zipCode,
-        string $city,
-        ID $countryID,
-        ?string $vatID,
-        ?string $phone,
-        ?string $mobile,
-        ?string $fax,
-        DateTimeImmutable $creationDate
+        ?string $salutation = null,
+        ?string $firstname = null,
+        ?string $lastname = null,
+        ?string $company = null,
+        ?string $additionalInfo = null,
+        ?string $street = null,
+        ?string $streetNumber = null,
+        ?string $zipCode = null,
+        ?string $city = null,
+        ?ID $countryID = null,
+        ?string $vatID = null,
+        ?string $phone = null,
+        ?string $mobile = null,
+        ?string $fax = null,
+        ?DateTimeImmutable $creationDate
     ): InvoiceAddress {
         /** @var User $customer */
         $customer = $this->customerService

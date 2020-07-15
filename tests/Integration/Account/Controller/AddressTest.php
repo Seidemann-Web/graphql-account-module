@@ -266,17 +266,17 @@ final class AddressTest extends TokenTestCase
         return [
             [
                 'invoiceData' => [
-                    'salutation'     => 'Mr.',
-                    'firstname'      => 'Invoice First',
-                    'lastname'       => 'Invoice Last',
+                    'salutation'     => '',
+                    'firstname'      => '',
+                    'lastname'       => '',
                     'company'        => '',
                     'additionalInfo' => '',
-                    'street'         => 'Invoice street',
-                    'streetNumber'   => '123',
-                    'zipCode'        => '3210',
-                    'city'           => 'Invoice city',
+                    'street'         => '',
+                    'streetNumber'   => '',
+                    'zipCode'        => '',
+                    'city'           => '',
                     'country'        => [
-                        'id'    => '', // no country
+                        'id'    => '',
                         'title' => '',
                     ],
                     'vatID'  => '',
@@ -284,7 +284,7 @@ final class AddressTest extends TokenTestCase
                     'mobile' => '',
                     'fax'    => '',
                 ],
-                'expectedStatus' => 404,
+                'expectedStatus' => 400,
             ],
             [
                 'invoiceData' => [
@@ -307,6 +307,19 @@ final class AddressTest extends TokenTestCase
                     'fax'    => '',
                 ],
                 'expectedStatus' => 401,
+            ],
+            [
+                'invoiceData' => [
+                    'salutation'     => 'Mrs.',
+                    'company'        => '',
+                    'additionalInfo' => '',
+                    'city'           => 'Another invoice city',
+                    'country'        => [
+                        'id'    => '8f241f1109621faf8.40135556', // invalid country
+                        'title' => 'Philippinen',
+                    ],
+                ],
+                'expectedStatus' => 400,
             ],
         ];
     }
