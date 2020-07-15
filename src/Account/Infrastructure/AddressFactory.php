@@ -16,7 +16,7 @@ use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddre
 use OxidEsales\GraphQL\Account\Account\Exception\DeliveryAddressMissingFields;
 use TheCodingMachine\GraphQLite\Types\ID;
 
-final class DeliveryAddressFactory
+final class AddressFactory
 {
     public function createValidAddressType(
         ?string $salutation = null,
