@@ -13,6 +13,7 @@ use OxidEsales\GraphQL\Account\Account\DataType\AddressFilterList;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class Address
@@ -37,5 +38,14 @@ final class Address
         return $this->addressService->customerDeliveryAddresses(
             new AddressFilterList()
         );
+    }
+
+    /**
+     * @Mutation()
+     * @Logged
+     */
+    public function customerDeliveryAddressDelete(string $id): bool
+    {
+        return $this->addressService->delete($id);
     }
 }

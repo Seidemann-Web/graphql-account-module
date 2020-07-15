@@ -18,6 +18,10 @@ final class AddressMultiShopTest extends MultishopTestCase
 
     private const PASSWORD = 'useruser';
 
+    private const DELIVERY_ADDRESS_SHOP_1 = 'test_delivery_address';
+
+    private const DELIVERY_ADDRESS_SHOP_2 = 'test_delivery_address_shop_2';
+
     public function deliveryAddressesDataProviderPerShop()
     {
         return [
@@ -25,7 +29,7 @@ final class AddressMultiShopTest extends MultishopTestCase
                 'shopid'   => '1',
                 'expected' => [
                     [
-                        'id'           => 'test_delivery_address',
+                        'id'           => self::DELIVERY_ADDRESS_SHOP_1,
                         'firstname'    => 'Marc',
                         'street'       => 'Hauptstr',
                         'streetNumber' => '13',
@@ -40,7 +44,14 @@ final class AddressMultiShopTest extends MultishopTestCase
             ],
             'shop_2' => [
                 'shopid'   => '2',
-                'expected' => [],
+                'expected' => [
+                    [
+                        'id'           => self::DELIVERY_ADDRESS_SHOP_2,
+                        'firstname'    => 'Marc2',
+                        'street'       => 'Hauptstr2',
+                        'streetNumber' => '2',
+                    ],
+                ],
             ],
         ];
     }
@@ -51,9 +62,10 @@ final class AddressMultiShopTest extends MultishopTestCase
      * @param string $shopId
      * @param array  $expected
      */
-    public function testDeliveryAddressesForLoggedInUser($shopId, $expected): void
+    public function testGetDeliveryAddressesForLoggedInUser($shopId, $expected): void
     {
         EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query('query {
@@ -70,6 +82,61 @@ final class AddressMultiShopTest extends MultishopTestCase
         $this->assertSame(
             $expected,
             $result['body']['data']['customerDeliveryAddresses']
+        );
+    }
+
+    /**
+     * @dataProvider deliveryAddressDeletionProvider
+     */
+    public function testDeliveryAddressDeletionPerShop(string $shopId, string $deliveryAddressId): void
+    {
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->deleteCustomerDeliveryAddressMutation($deliveryAddressId);
+
+        $this->assertResponseStatus(200, $result);
+    }
+
+    public function deliveryAddressDeletionProvider(): array
+    {
+        return [
+            ['1', self::DELIVERY_ADDRESS_SHOP_1],
+            ['2', self::DELIVERY_ADDRESS_SHOP_2],
+        ];
+    }
+
+    /**
+     * @dataProvider deliveryAddressDeletionPerDifferentShopProvider
+     */
+    public function testDeliveryAddressDeletionFromShop1ToShop2(string $shopId, string $deliveryAddressId): void
+    {
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->deleteCustomerDeliveryAddressMutation($deliveryAddressId);
+
+        $this->assertResponseStatus(404, $result);
+    }
+
+    public function deliveryAddressDeletionPerDifferentShopProvider(): array
+    {
+        return [
+            ['1', self::DELIVERY_ADDRESS_SHOP_2],
+            ['2', self::DELIVERY_ADDRESS_SHOP_1],
+        ];
+    }
+
+    private function deleteCustomerDeliveryAddressMutation(string $deliveryAddressId): array
+    {
+        return $this->query(
+            'mutation {
+                customerDeliveryAddressDelete(id: "' . $deliveryAddressId . '")
+            }'
         );
     }
 }
