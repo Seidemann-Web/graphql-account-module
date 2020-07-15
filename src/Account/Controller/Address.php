@@ -59,4 +59,13 @@ final class Address
     ): InvoiceAddress {
         return $this->addressService->updateInvoiceAddress($invoiceAddress);
     }
+
+    /**
+     * @Mutation()
+     * @Logged
+     */
+    public function deliveryAddressAdd(DeliveryAddressDataType $deliveryAddress): DeliveryAddressDataType
+    {
+        return $deliveryAddress;
+    }
 }
