@@ -45,7 +45,7 @@ final class DeliveryAddressFactory
             'oxzip'       => $zipCode,
             'oxcity'      => $city,
             'oxcountryid' => (string) $countryId,
-            'oxphone'     => $phone,
+            'oxfon'       => $phone,
             'oxfax'       => $fax,
         ]);
 
