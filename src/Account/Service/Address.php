@@ -116,4 +116,14 @@ final class Address
     {
         return (string) $deliveryAddress->userId() === (string) $this->authenticationService->getUserId();
     }
+
+    /**
+     * @return true
+     */
+    public function store(DeliveryAddress $address): bool
+    {
+        return $this->repository->saveModel(
+            $address->getEshopModel()
+        );
+    }
 }
