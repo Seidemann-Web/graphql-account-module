@@ -54,7 +54,7 @@ final class Address
             throw new InvalidLogin('Unauthorized');
         }
 
-        $invoiceAddress->getEshopModel()->save();
+        $this->repository->saveModel($invoiceAddress->getEshopModel());
 
         return $invoiceAddress;
     }
