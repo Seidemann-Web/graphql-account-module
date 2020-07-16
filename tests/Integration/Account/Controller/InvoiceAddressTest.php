@@ -21,8 +21,8 @@ final class InvoiceAddressTest extends TokenTestCase
     {
         $result = $this->query('query {
             customerInvoiceAddress {
-                firstname
-                lastname
+                firstName
+                lastName
             }
         }');
 
@@ -36,8 +36,8 @@ final class InvoiceAddressTest extends TokenTestCase
         $result = $this->query('query {
             customerInvoiceAddress {
                 salutation
-                firstname
-                lastname
+                firstName
+                lastName
                 company
                 additionalInfo
                 street
@@ -56,8 +56,8 @@ final class InvoiceAddressTest extends TokenTestCase
         $this->assertSame(
             [
                 'salutation'     => 'MR',
-                'firstname'      => 'Marc',
-                'lastname'       => 'Muster',
+                'firstName'      => 'Marc',
+                'lastName'       => 'Muster',
                 'company'        => '',
                 'additionalInfo' => '',
                 'street'         => 'Hauptstr.',

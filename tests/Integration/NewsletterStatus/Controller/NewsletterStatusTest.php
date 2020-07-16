@@ -102,8 +102,8 @@ final class NewsletterStatusTest extends TokenTestCase
             confirmCode:"' . md5(self::OTHER_USERNAME . self::OTHER_USER_OXPASSALT) . '"
           }){
             salutation
-            firstname
-            lastname
+            firstName
+            lastName
             email
             status
             failedEmailCount

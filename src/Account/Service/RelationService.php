@@ -11,7 +11,9 @@ namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as AccountRepository;
+use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddress as InvoiceAddressService;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
@@ -39,14 +41,19 @@ final class RelationService
     /** @var AccountRepository */
     private $accountRepository;
 
+    /** @var InvoiceAddressService */
+    private $invoiceAddressService;
+
     public function __construct(
         ReviewService $reviewService,
         NewsletterStatusService $newsletterStatusService,
-        AccountRepository $accountRepository
+        AccountRepository $accountRepository,
+        InvoiceAddressService $invoiceAddressService
     ) {
         $this->reviewService           = $reviewService;
         $this->newsletterStatusService = $newsletterStatusService;
         $this->accountRepository       = $accountRepository;
+        $this->invoiceAddressService   = $invoiceAddressService;
     }
 
     /**
@@ -88,6 +95,14 @@ final class RelationService
     public function deliveryAddresses(CustomerDataType $customer): array
     {
         return $this->accountRepository->addresses($customer);
+    }
+
+    /**
+     * @Field()
+     */
+    public function invoiceAddress(): InvoiceAddressDataType
+    {
+        return $this->invoiceAddressService->customerInvoiceAddress();
     }
 
     public function getWishList(CustomerDataType $customer): WishListDataType

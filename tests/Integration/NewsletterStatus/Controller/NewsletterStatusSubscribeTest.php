@@ -149,8 +149,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
             'max_data' => [
                 'input' => [
                     'salutation' => 'mrs',
-                    'firstname'  => 'Newgirl',
-                    'lastname'   => 'Intown',
+                    'firstName'  => 'Newgirl',
+                    'lastName'   => 'Intown',
                     'email'      => $newUserMail,
                     'status'     => 'MISSING_DOUBLE_OPTIN',
                 ],
@@ -160,8 +160,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
             'min_data' => [
                 'input' => [
                     'salutation' => '',
-                    'firstname'  => '',
-                    'lastname'   => '',
+                    'firstName'  => '',
+                    'lastName'   => '',
                     'email'      => '2' . $newUserMail,
                     'status'     => 'MISSING_DOUBLE_OPTIN',
                 ],
@@ -171,8 +171,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
             'no_optin_required' => [
                 'input' => [
                     'salutation' => '',
-                    'firstname'  => '',
-                    'lastname'   => '',
+                    'firstName'  => '',
+                    'lastName'   => '',
                     'email'      => '3' . $newUserMail,
                     'status'     => 'SUBSCRIBED',
                 ],
@@ -197,13 +197,13 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
             'mutation {
                 newsletterSubscribe(newsletterStatus: {
                   salutation: "' . $input['salutation'] . '"
-                  firstName: "' . $input['firstname'] . '"
-                  lastName: "' . $input['lastname'] . '"
+                  firstName: "' . $input['firstName'] . '"
+                  lastName: "' . $input['lastName'] . '"
                   email: "' . $newUserMail . '"
                 }) {
                     salutation
-                    firstname
-                    lastname
+                    firstName
+                    lastName
                     email
                     status
                 }
@@ -287,8 +287,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
                   email: "' . self::OTHER_USERNAME . '"
                 }) {
                     salutation
-                    firstname
-                    lastname
+                    firstName
+                    lastName
                     email
                     status
                 }
@@ -299,8 +299,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
 
         $expected = [
             'salutation' => '',
-            'firstname'  => 'Marc',
-            'lastname'   => 'Muster',
+            'firstName'  => 'Marc',
+            'lastName'   => 'Muster',
             'email'      => self::OTHER_USERNAME,
             'status'     => 'MISSING_DOUBLE_OPTIN',
         ];
@@ -323,8 +323,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
                   email: "' . self::OTHER_USERNAME . '"
                 }) {
                     salutation
-                    firstname
-                    lastname
+                    firstName
+                    lastName
                     email
                     status
                 }
@@ -335,8 +335,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
 
         $expected = [
             'salutation' => '',
-            'firstname'  => 'Marc',
-            'lastname'   => 'Muster',
+            'firstName'  => 'Marc',
+            'lastName'   => 'Muster',
             'email'      => self::OTHER_USERNAME,
             'status'     => 'MISSING_DOUBLE_OPTIN',
         ];

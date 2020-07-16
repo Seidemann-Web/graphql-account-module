@@ -36,7 +36,7 @@ final class AddressMultiShopTest extends MultishopTestCase
                     ],
                     [
                         'id'           => 'test_delivery_address_2',
-                        'firstname'    => 'Marc',
+                        'firstName'    => 'Marc',
                         'street'       => 'Hauptstr2',
                         'streetNumber' => '132',
                     ],
@@ -71,7 +71,7 @@ final class AddressMultiShopTest extends MultishopTestCase
         $result = $this->query('query {
             customerDeliveryAddresses {
                 id
-                firstname
+                firstName
                 street
                 streetNumber
             }

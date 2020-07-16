@@ -102,8 +102,8 @@ final class Repository
                 'oxactive'   => 1,
                 'oxrights'   => 'user',
                 'oxsal'      => $input->salutation(),
-                'oxfname'    => $input->firstname(),
-                'oxlname'    => $input->lastname(),
+                'oxfname'    => $input->firstName(),
+                'oxlname'    => $input->lastName(),
                 'oxusername' => $input->email(),
             ]
         );

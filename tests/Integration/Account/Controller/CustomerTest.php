@@ -143,8 +143,8 @@ final class CustomerTest extends TokenTestCase
                 firstName
                 newsletterStatus {
                     salutation
-                    firstname
-                    lastname
+                    firstName
+                    lastName
                     email
                     status
                     failedEmailCount
@@ -159,8 +159,8 @@ final class CustomerTest extends TokenTestCase
 
         $expected = [
             'salutation'       => 'MR',
-            'firstname'        => 'Marc',
-            'lastname'         => 'Muster',
+            'firstName'        => 'Marc',
+            'lastName'         => 'Muster',
             'email'            => self::USERNAME,
             'status'           => 'SUBSCRIBED',
             'failedEmailCount' => 0,

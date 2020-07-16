@@ -63,7 +63,7 @@ final class DeliveryAddress implements DataType
     /**
      * @Field()
      */
-    public function firstname(): string
+    public function firstName(): string
     {
         return (string) $this->address->getFieldData('oxfname');
     }
@@ -71,7 +71,7 @@ final class DeliveryAddress implements DataType
     /**
      * @Field()
      */
-    public function lastname(): string
+    public function lastName(): string
     {
         return (string) $this->address->getFieldData('oxlname');
     }

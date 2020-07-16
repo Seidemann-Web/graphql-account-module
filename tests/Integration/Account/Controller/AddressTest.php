@@ -41,7 +41,7 @@ final class AddressTest extends TokenTestCase
         $result = $this->query('query {
             customerDeliveryAddresses {
                 id
-                firstname
+                firstName
                 street
                 streetNumber
             }
@@ -53,13 +53,13 @@ final class AddressTest extends TokenTestCase
             [
                 [
                     'id'           => 'test_delivery_address',
-                    'firstname'    => 'Marc',
+                    'firstName'    => 'Marc',
                     'street'       => 'Hauptstr',
                     'streetNumber' => '13',
                 ],
                 [
                     'id'           => 'test_delivery_address_2',
-                    'firstname'    => 'Marc',
+                    'firstName'    => 'Marc',
                     'street'       => 'Hauptstr2',
                     'streetNumber' => '132',
                 ],

@@ -46,7 +46,7 @@ final class InvoiceAddress implements DataType
     /**
      * @Field()
      */
-    public function firstname(): string
+    public function firstName(): string
     {
         return (string) $this->customer->getFieldData('oxfname');
     }
@@ -54,7 +54,7 @@ final class InvoiceAddress implements DataType
     /**
      * @Field()
      */
-    public function lastname(): string
+    public function lastName(): string
     {
         return (string) $this->customer->getFieldData('oxlname');
     }

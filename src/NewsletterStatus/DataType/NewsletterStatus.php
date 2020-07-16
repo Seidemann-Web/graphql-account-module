@@ -62,7 +62,7 @@ final class NewsletterStatus implements DataType
     /**
      * @Field()
      */
-    public function firstname(): string
+    public function firstName(): string
     {
         return (string) $this->newsletterSubscriptionStatus->getFieldData('oxfname');
     }
@@ -70,7 +70,7 @@ final class NewsletterStatus implements DataType
     /**
      * @Field()
      */
-    public function lastname(): string
+    public function lastName(): string
     {
         return (string) $this->newsletterSubscriptionStatus->getFieldData('oxlname');
     }

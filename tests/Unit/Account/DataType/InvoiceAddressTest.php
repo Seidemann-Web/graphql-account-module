@@ -31,8 +31,8 @@ final class InvoiceAddressTest extends TestCase
 
         $fields = [
             'salutation',
-            'firstname',
-            'lastname',
+            'firstName',
+            'lastName',
             'company',
             'additionalInfo',
             'street',
@@ -80,11 +80,11 @@ final class InvoiceAddressTest extends TestCase
             $data['oxsal']
         );
         $this->assertSame(
-            $dataType->firstname(),
+            $dataType->firstName(),
             $data['oxfname']
         );
         $this->assertSame(
-            $dataType->lastname(),
+            $dataType->lastName(),
             $data['oxlname']
         );
         $this->assertSame(
