@@ -204,8 +204,6 @@ final class DeliveryAddressTest extends TokenTestCase
             }'
         );
 
-        $this->markTestIncomplete('check for error message and do we get 404 or 400 in this case?');
-
         $this->assertResponseStatus(400, $result);
     }
 
