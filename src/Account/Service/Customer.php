@@ -107,7 +107,7 @@ final class Customer
     /**
      * @throws CustomerNotFound
      */
-    public function wishListOwner(string $id): CustomerDataType
+    public function basketOwner(string $id): CustomerDataType
     {
         $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
 

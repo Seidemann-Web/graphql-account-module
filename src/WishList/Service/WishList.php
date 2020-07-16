@@ -14,7 +14,7 @@ use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Account\Account\Service\RelationService as CustomerRelationService;
-use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
+use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
 use OxidEsales\GraphQL\Account\WishList\Exception\WishListNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
@@ -112,7 +112,7 @@ final class WishList
             throw WishListNotFound::byId($id);
         }
 
-        if ($wishList->isPublic() === false && !$this->isSameUser($wishList)) {
+        if ($wishList->public() === false && !$this->isSameUser($wishList)) {
             throw new InvalidToken('Wish list is private.');
         }
 
@@ -131,10 +131,10 @@ final class WishList
             throw new InvalidLogin('Unauthenticated');
         }
 
-        $customer = $this->customerService->wishListOwner($customerId);
+        $customer = $this->customerService->basketOwner($customerId);
         $wishList = $this->customerRelationService->getWishList($customer);
 
-        if (!$wishList->isPublic() && !$this->isSameUser($wishList)) {
+        if (!$wishList->public() && !$this->isSameUser($wishList)) {
             throw WishListNotFound::byOwnerId($customerId);
         }
 
