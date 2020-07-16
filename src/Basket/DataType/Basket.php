@@ -47,9 +47,20 @@ final class Basket implements DataType
     }
 
     /**
+     * Beware of the following values with special meaning
+     * - wishList
+     * - noticeList
+     * - savedBasket
+     */
+    public function title(): string
+    {
+        return (string) $this->basket->getFieldData('oxtitle');
+    }
+
+    /**
      * @Field()
      */
-    public function isPublic(): bool
+    public function public(): bool
     {
         return (bool) $this->basket->getFieldData('oxpublic');
     }

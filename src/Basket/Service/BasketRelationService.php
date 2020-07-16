@@ -52,7 +52,7 @@ final class BasketRelationService
      *
      * @return BasketItem[]
      */
-    public function basketItems(
+    public function items(
         Basket $basket,
         ?PaginationFilter $pagination
     ): array {

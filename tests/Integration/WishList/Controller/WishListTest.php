@@ -98,7 +98,7 @@ final class WishListTest extends TokenTestCase
         $result = $this->query(
             'query{
                 wishList(id: "' . self::WISH_LIST_PUBLIC . '") {
-                    basketItems {
+                    items {
                         id
                         amount
                         lastUpdateDate
@@ -121,8 +121,8 @@ final class WishListTest extends TokenTestCase
         $this->assertEquals(true, $wishList['public']);
         $this->assertNull($wishList['lastUpdateDate']);
 
-        $this->assertCount(1, $wishList['basketItems']);
-        $basketItem = $wishList['basketItems'][0];
+        $this->assertCount(1, $wishList['items']);
+        $basketItem = $wishList['items'][0];
         $this->assertEquals('_test_wish_list_item_1', $basketItem['id']);
         $this->assertEquals(1, $basketItem['amount']);
         $this->assertEquals(self::PRODUCT, $basketItem['product']['id']);

@@ -112,7 +112,7 @@ final class WishList
             throw WishListNotFound::byId($id);
         }
 
-        if ($wishList->isPublic() === false && !$this->isSameUser($wishList)) {
+        if ($wishList->public() === false && !$this->isSameUser($wishList)) {
             throw new InvalidToken('Wish list is private.');
         }
 
@@ -134,7 +134,7 @@ final class WishList
         $customer = $this->customerService->basketOwner($customerId);
         $wishList = $this->customerRelationService->getWishList($customer);
 
-        if (!$wishList->isPublic() && !$this->isSameUser($wishList)) {
+        if (!$wishList->public() && !$this->isSameUser($wishList)) {
             throw WishListNotFound::byOwnerId($customerId);
         }
 
