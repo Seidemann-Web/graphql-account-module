@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Account\Controller;
 
 use OxidEsales\GraphQL\Account\Account\DataType\AddressFilterList;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
+use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
 use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
@@ -47,5 +48,15 @@ final class Address
     public function customerDeliveryAddressDelete(string $id): bool
     {
         return $this->addressService->delete($id);
+    }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     */
+    public function customerInvoiceAddressSet(
+        InvoiceAddress $invoiceAddress
+    ): InvoiceAddress {
+        return $this->addressService->updateInvoiceAddress($invoiceAddress);
     }
 }

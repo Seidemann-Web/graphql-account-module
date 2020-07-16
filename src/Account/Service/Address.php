@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\AddressFilterList;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
 use OxidEsales\GraphQL\Account\Account\Exception\DeliveryAddressNotFound;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -103,5 +104,16 @@ final class Address
     private function isSameUser(DeliveryAddress $deliveryAddress): bool
     {
         return (string) $deliveryAddress->userId() === (string) $this->authenticationService->getUserId();
+    }
+
+    public function updateInvoiceAddress(InvoiceAddress $invoiceAddress): InvoiceAddress
+    {
+        if (!$id = (string) $this->authenticationService->getUserId()) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        $this->repository->saveModel($invoiceAddress->getEshopModel());
+
+        return $invoiceAddress;
     }
 }
