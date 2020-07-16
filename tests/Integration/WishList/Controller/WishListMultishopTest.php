@@ -33,27 +33,6 @@ final class WishListMultiShopTest extends MultishopTestCase
 
     private const LIST_OWNER_ID_SHOP_1 = 'e7af1c3b786fd02906ccd75698f4e6b9'; // customer shop 1 -> user@oxid-esales.com
 
-    public function testGetWishListFromDifferentShop(): void
-    {
-        $this->setGETRequestParameter('shp', '2');
-
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->wishListByOwnerQuery(self::LIST_OWNER_ID_SHOP_1);
-        $this->assertResponseStatus(404, $result);
-    }
-
-    public function testGetWishListForMallUser(): void
-    {
-        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
-        $this->setGETRequestParameter('shp', '2');
-
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->wishListByOwnerQuery(self::LIST_OWNER_ID_SHOP_1);
-        $this->assertResponseStatus(200, $result);
-    }
-
     public function dataProviderWishListPerShop()
     {
         return [
@@ -152,16 +131,6 @@ final class WishListMultiShopTest extends MultishopTestCase
         $products = $this->getWishListArticles();
         $this->assertCount(1, $products);
         $this->assertSame($productId, array_pop($products)->getId());
-    }
-
-    private function wishListByOwnerQuery(string $ownerId): array
-    {
-        return $this->query('query {
-            wishListByOwnerId(ownerId: "' . $ownerId . '") {
-                id
-                public
-            }
-        }');
     }
 
     private function addProductToWishListMutation(string $productId): array

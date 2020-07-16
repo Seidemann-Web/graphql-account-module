@@ -42,4 +42,18 @@ final class Basket
     {
         return $this->basketService->remove($id);
     }
+
+    /**
+     * Argument `owner` will be matched against lastname and / or email
+     *
+     * @Query()
+     *
+     * @return BasketDataType[]
+     */
+    public function baskets(string $owner): array
+    {
+        return $this->basketService->publicBasketsByOwnerNameOrEmail(
+            $owner
+        );
+    }
 }

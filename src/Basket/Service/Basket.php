@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\Service;
 
+use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner as BasketOwnerDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
+use OxidEsales\GraphQL\Account\Basket\Infrastructure\Repository as BasketRepository;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
@@ -25,6 +27,9 @@ final class Basket
 {
     /** @var Repository */
     private $repository;
+
+    /** @var BasketRepository */
+    private $basketRepository;
 
     /** @var Authentication */
     private $authenticationService;
@@ -39,12 +44,14 @@ final class Basket
         Repository $repository,
         Authentication $authenticationService,
         Authorization $authorizationService,
-        Legacy $legacyService
+        Legacy $legacyService,
+        BasketRepository $basketRepository
     ) {
         $this->repository            = $repository;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
         $this->legacyService         = $legacyService;
+        $this->basketRepository      = $basketRepository;
     }
 
     /**
@@ -60,6 +67,19 @@ final class Basket
         }
 
         return $basket;
+    }
+
+    public function basketByOwnerAndTitle(CustomerDataType $customer, string $title): BasketDataType
+    {
+        return $this->basketRepository->customerBasketByTitle($customer, $title);
+    }
+
+    /**
+     * @return BasketDataType[]
+     */
+    public function basketsByOwner(CustomerDataType $customer): array
+    {
+        return $this->basketRepository->customerBaskets($customer);
     }
 
     /**
@@ -79,6 +99,35 @@ final class Basket
         }
 
         throw new InvalidLogin('Unauthorized');
+    }
+
+    /**
+     * @return BasketDataType[]
+     */
+    public function publicBasketsByOwnerNameOrEmail(string $owner): array
+    {
+        return $this->basketRepository->publicBasketsByOwnerNameOrEmail($owner);
+    }
+
+    /**
+     * @throws CustomerNotFound
+     */
+    public function basketOwner(string $id): BasketOwnerDataType
+    {
+        $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
+
+        try {
+            /** @var BasketOwnerDataType $customer */
+            $customer = $this->repository->getById(
+                $id,
+                BasketOwnerDataType::class,
+                $ignoreSubShop
+            );
+        } catch (NotFound $e) {
+            throw CustomerNotFound::byId($id);
+        }
+
+        return $customer;
     }
 
     /**
@@ -103,26 +152,5 @@ final class Basket
     private function isSameUser(BasketDataType $basket): bool
     {
         return (string) $basket->getUserId() === (string) $this->authenticationService->getUserId();
-    }
-
-    /**
-     * @throws CustomerNotFound
-     */
-    public function basketOwner(string $id): BasketOwnerDataType
-    {
-        $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
-
-        try {
-            /** @var BasketOwnerDataType $customer */
-            $customer = $this->repository->getById(
-                $id,
-                BasketOwnerDataType::class,
-                $ignoreSubShop
-            );
-        } catch (NotFound $e) {
-            throw CustomerNotFound::byId($id);
-        }
-
-        return $customer;
     }
 }
