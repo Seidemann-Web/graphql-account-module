@@ -28,7 +28,7 @@ final class Password
      * @Mutation()
      * @Logged()
      */
-    public function userPasswordChange(string $old, string $new): bool
+    public function customerPasswordChange(string $old, string $new): bool
     {
         return $this->passwordService->change($old, $new);
     }
