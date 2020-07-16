@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
+use TheCodingMachine\GraphQLite\Types\ID;
 
 /**
  * @Type()
@@ -155,6 +156,13 @@ final class InvoiceAddress implements DataType
     {
         return new DateTimeImmutable(
             (string) $this->customer->getFieldData('oxtimestamp')
+        );
+    }
+
+    public function countryId(): ID
+    {
+        return new ID(
+            $this->customer->getFieldData('oxcountryid')
         );
     }
 
