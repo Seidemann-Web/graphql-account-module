@@ -95,8 +95,8 @@ final class AddressTest extends TokenTestCase
             [
                 [
                     'salutation'     => 'Mrs.',
-                    'firstname'      => 'First',
-                    'lastname'       => 'Last',
+                    'firstName'      => 'First',
+                    'lastName'       => 'Last',
                     'company'        => '',
                     'additionalInfo' => '',
                     'street'         => 'Invoice street',
@@ -116,8 +116,8 @@ final class AddressTest extends TokenTestCase
             [
                 [
                     'salutation'     => 'Mr.',
-                    'firstname'      => 'Invoice First',
-                    'lastname'       => 'Invoice Last',
+                    'firstName'      => 'Invoice First',
+                    'lastName'       => 'Invoice Last',
                     'company'        => 'Invoice Company',
                     'additionalInfo' => 'Invoice address additional info',
                     'street'         => 'Another invoice street',
@@ -148,8 +148,8 @@ final class AddressTest extends TokenTestCase
             customerInvoiceAddressSet (
                 invoiceAddress: {
                     salutation: "' . $invoiceData['salutation'] . '"
-                    firstname: "' . $invoiceData['firstname'] . '"
-                    lastname: "' . $invoiceData['lastname'] . '"
+                    firstName: "' . $invoiceData['firstName'] . '"
+                    lastName: "' . $invoiceData['lastName'] . '"
                     company: "' . $invoiceData['company'] . '"
                     additionalInfo: "' . $invoiceData['additionalInfo'] . '"
                     street: "' . $invoiceData['street'] . '"
@@ -164,8 +164,8 @@ final class AddressTest extends TokenTestCase
                 }
             ){
                 salutation
-                firstname
-                lastname
+                firstName
+                lastName
                 company
                 additionalInfo
                 street
@@ -195,8 +195,8 @@ final class AddressTest extends TokenTestCase
             [
                 [
                     'salutation'     => 'Mrs.',
-                    'firstname'      => 'First',
-                    'lastname'       => 'Last',
+                    'firstName'      => 'First',
+                    'lastName'       => 'Last',
                     'company'        => 'Invoice Company',
                     'additionalInfo' => 'Invoice address additional info',
                     'street'         => 'Invoice street',
@@ -216,8 +216,8 @@ final class AddressTest extends TokenTestCase
             [
                 [
                     'salutation'     => 'Mr.',
-                    'firstname'      => 'Invoice First',
-                    'lastname'       => 'Invoice Last',
+                    'firstName'      => 'Invoice First',
+                    'lastName'       => 'Invoice Last',
                     'company'        => 'Invoice Company',
                     'additionalInfo' => 'Invoice address additional info',
                     'street'         => 'Another invoice street',
@@ -248,8 +248,8 @@ final class AddressTest extends TokenTestCase
             customerInvoiceAddressSet (
                 invoiceAddress: {
                     salutation: "' . $invoiceData['salutation'] . '"
-                    firstname: "' . $invoiceData['firstname'] . '"
-                    lastname: "' . $invoiceData['lastname'] . '"
+                    firstName: "' . $invoiceData['firstName'] . '"
+                    lastName: "' . $invoiceData['lastName'] . '"
                     street: "' . $invoiceData['street'] . '"
                     streetNumber: "' . $invoiceData['streetNumber'] . '"
                     zipCode: "' . $invoiceData['zipCode'] . '"
@@ -258,8 +258,8 @@ final class AddressTest extends TokenTestCase
                 }
             ){
                 salutation
-                firstname
-                lastname
+                firstName
+                lastName
                 company
                 additionalInfo
                 street
@@ -292,8 +292,8 @@ final class AddressTest extends TokenTestCase
             customerInvoiceAddressSet (
                 invoiceAddress {
                     salutation: "' . $invoiceData['salutation'] . '"
-                    firstname: "' . $invoiceData['firstname'] . '"
-                    lastname: "' . $invoiceData['lastname'] . '"
+                    firstName: "' . $invoiceData['firstName'] . '"
+                    lastName: "' . $invoiceData['lastName'] . '"
                     company: "Invoice ' . $invoiceData['company'] . '"
                     additionalInfo: "Invoice address additional ' . $invoiceData['additionalInfo'] . '"
                     street: "Invoice ' . $invoiceData['street'] . '"
@@ -308,8 +308,8 @@ final class AddressTest extends TokenTestCase
                 }
             ){
                 salutation
-                firstname
-                lastname
+                firstName
+                lastName
                 company
                 additionalInfo
                 street
@@ -336,8 +336,8 @@ final class AddressTest extends TokenTestCase
             [
                 'invoiceData' => [
                     'salutation'     => '',
-                    'firstname'      => '',
-                    'lastname'       => '',
+                    'firstName'      => '',
+                    'lastName'       => '',
                     'company'        => '',
                     'additionalInfo' => '',
                     'street'         => '',
@@ -358,8 +358,8 @@ final class AddressTest extends TokenTestCase
             [
                 'invoiceData' => [
                     'salutation'     => 'Mrs.',
-                    'firstname'      => 'First',
-                    'lastname'       => 'Last',
+                    'firstName'      => 'First',
+                    'lastName'       => 'Last',
                     'company'        => '',
                     'additionalInfo' => '',
                     'street'         => 'Another invoice street',
@@ -404,8 +404,8 @@ final class AddressTest extends TokenTestCase
             customerInvoiceAddressSet (
                 invoiceAddress: {
                     salutation: "' . $invoiceData['salutation'] . '"
-                    firstname: "' . $invoiceData['firstname'] . '"
-                    lastname: "' . $invoiceData['lastname'] . '"
+                    firstName: "' . $invoiceData['firstName'] . '"
+                    lastName: "' . $invoiceData['lastName'] . '"
                     street: "' . $invoiceData['street'] . '"
                     streetNumber: "' . $invoiceData['streetNumber'] . '"
                     zipCode: "' . $invoiceData['zipCode'] . '"
@@ -414,8 +414,8 @@ final class AddressTest extends TokenTestCase
                 }
             ){
                 salutation
-                firstname
-                lastname
+                firstName
+                lastName
                 company
                 additionalInfo
                 street

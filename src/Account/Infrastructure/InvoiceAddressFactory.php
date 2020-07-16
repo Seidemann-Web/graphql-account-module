@@ -23,8 +23,8 @@ final class InvoiceAddressFactory
     public function createValidInvoiceAddressType(
         CustomerDataType $customerDataType,
         ?string $salutation = null,
-        ?string $firstname = null,
-        ?string $lastname = null,
+        ?string $firstName = null,
+        ?string $lastName = null,
         ?string $company = null,
         ?string $additionalInfo = null,
         ?string $street = null,
@@ -43,8 +43,8 @@ final class InvoiceAddressFactory
         $customer->assign(
             [
                 'oxsal'       => $salutation,
-                'oxfname'     => $firstname,
-                'oxlname'     => $lastname,
+                'oxfname'     => $firstName,
+                'oxlname'     => $lastName,
                 'oxcompany'   => $company ?: $customer->getFieldData('oxcompany'),
                 'oxaddinfo'   => $additionalInfo ?: $customer->getFieldData('oxaddinfo'),
                 'oxstreet'    => $street,

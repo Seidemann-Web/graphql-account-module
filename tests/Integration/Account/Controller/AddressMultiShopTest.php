@@ -93,8 +93,8 @@ final class AddressMultiShopTest extends MultishopTestCase
         $result = $this->query('mutation {
             customerInvoiceAddressSet(invoiceAddress: {
                 salutation: "MRS"
-                firstname: "Jane"
-                lastname: "Doe"
+                firstName: "Jane"
+                lastName: "Doe"
                 company: "No GmbH"
                 additionalInfo: "Invoice address"
                 street: "SomeStreet"
@@ -107,8 +107,8 @@ final class AddressMultiShopTest extends MultishopTestCase
                 fax: "555"
             }){
                 salutation
-                firstname
-                lastname
+                firstName
+                lastName
                 company
                 additionalInfo
                 street
@@ -125,8 +125,8 @@ final class AddressMultiShopTest extends MultishopTestCase
 
         $this->assertSame([
             'salutation'     => 'MRS',
-            'firstname'      => 'Jane',
-            'lastname'       => 'Doe',
+            'firstName'      => 'Jane',
+            'lastName'       => 'Doe',
             'company'        => 'No GmbH',
             'additionalInfo' => 'Invoice address',
             'street'         => 'SomeStreet',
@@ -152,8 +152,8 @@ final class AddressMultiShopTest extends MultishopTestCase
         $result = $this->query('mutation {
             customerInvoiceAddressSet(invoiceAddress: {
                 salutation: "MRS"
-                firstname: "Janice"
-                lastname: "Dodo"
+                firstName: "Janice"
+                lastName: "Dodo"
                 company: "No GmbH"
                 additionalInfo: "Invoice address"
                 street: "SomeStreet"
@@ -165,8 +165,8 @@ final class AddressMultiShopTest extends MultishopTestCase
                 mobile: "12345678"
                 fax: "555"
             }){
-                firstname
-                lastname
+                firstName
+                lastName
               }
         }');
 
@@ -174,8 +174,8 @@ final class AddressMultiShopTest extends MultishopTestCase
 
         $this->assertSame(
             [
-                'firstname' => 'Janice',
-                'lastname'  => 'Dodo',
+                'firstName' => 'Janice',
+                'lastName'  => 'Dodo',
             ],
             $result['body']['data']['customerInvoiceAddressSet']
         );

@@ -42,8 +42,8 @@ final class InvoiceAddressInput
      */
     public function fromUserInput(
         ?string $salutation = null,
-        ?string $firstname = null,
-        ?string $lastname = null,
+        ?string $firstName = null,
+        ?string $lastName = null,
         ?string $company = null,
         ?string $additionalInfo = null,
         ?string $street = null,
@@ -62,8 +62,8 @@ final class InvoiceAddressInput
         return $this->invoiceAddressFactory->createValidInvoiceAddressType(
             $customer,
             $salutation,
-            $firstname,
-            $lastname,
+            $firstName,
+            $lastName,
             $company,
             $additionalInfo,
             $street,
