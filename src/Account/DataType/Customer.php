@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\Account\DataType;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
+use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -22,6 +23,8 @@ use TheCodingMachine\GraphQLite\Types\ID;
  */
 final class Customer implements DataType
 {
+    private const WISHLIST_NAME = 'wishlist';
+
     /** @var EshopUserModel */
     private $customer;
 
@@ -121,6 +124,11 @@ final class Customer implements DataType
         return new DateTimeImmutable(
             (string) $this->customer->getFieldData('oxtimestamp')
         );
+    }
+
+    public function getWishList(): WishListDataType
+    {
+        return new WishListDataType($this->getEshopModel()->getBasket(self::WISHLIST_NAME));
     }
 
     public static function getModelClass(): string

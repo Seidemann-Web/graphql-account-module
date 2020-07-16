@@ -49,9 +49,17 @@ final class WishList implements DataType
     /**
      * @Field()
      */
-    public function getPublic(): bool
+    public function isPublic(): bool
     {
         return (bool) $this->wishList->getFieldData('oxpublic');
+    }
+
+    public function setPublic(bool $public): void
+    {
+        $value = $public ? 1 : 0;
+
+        $this->wishList->assign(['oxpublic' => $value]);
+        $this->wishList->save();
     }
 
     /**
@@ -65,9 +73,22 @@ final class WishList implements DataType
     /**
      * @Field()
      */
-    public function getLastUpdateDate(): DateTimeInterface
+    public function getLastUpdateDate(): ?DateTimeInterface
     {
-        return new DateTimeImmutable((string) $this->wishList->getFieldData('oxupdate'));
+        $timeStamp = (int) $this->wishList->getFieldData('oxupdate');
+
+        if ($timeStamp > 0) {
+            return (new DateTimeImmutable())->setTimestamp($timeStamp);
+        }
+
+        return null;
+    }
+
+    public function getUserId(): ID
+    {
+        return new ID(
+            (string) $this->wishList->getFieldData('oxuserid')
+        );
     }
 
     /**

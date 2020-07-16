@@ -104,6 +104,27 @@ final class Customer
         ]);
     }
 
+    /**
+     * @throws CustomerNotFound
+     */
+    public function wishListOwner(string $id): CustomerDataType
+    {
+        $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
+
+        try {
+            /** @var CustomerDataType $customer */
+            $customer = $this->repository->getById(
+                $id,
+                CustomerDataType::class,
+                $ignoreSubShop
+            );
+        } catch (NotFound $e) {
+            throw CustomerNotFound::byId($id);
+        }
+
+        return $customer;
+    }
+
     private function fetchCustomer(string $id): CustomerDataType
     {
         $ignoreSubshop = (bool) $this->legacyService->getConfigParam('blMallUsers');
