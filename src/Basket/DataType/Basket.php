@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\WishList\DataType;
+namespace OxidEsales\GraphQL\Account\Basket\DataType;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use OxidEsales\Eshop\Application\Model\UserBasket as WishListModel;
+use OxidEsales\Eshop\Application\Model\UserBasket as BasketModel;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -20,29 +20,29 @@ use TheCodingMachine\GraphQLite\Types\ID;
 /**
  * @Type()
  */
-final class WishList implements DataType
+final class Basket implements DataType
 {
-    /** @var WishListModel */
-    private $wishList;
+    /** @var BasketModel */
+    private $basket;
 
     public function __construct(
-        WishListModel $wishList
+        BasketModel $basket
     ) {
-        $this->wishList = $wishList;
+        $this->basket = $basket;
     }
 
-    public function getEshopModel(): WishListModel
+    public function getEshopModel(): BasketModel
     {
-        return $this->wishList;
+        return $this->basket;
     }
 
     /**
      * @Field()
      */
-    public function getId(): ID
+    public function id(): ID
     {
         return new ID(
-            $this->wishList->getId()
+            $this->basket->getId()
         );
     }
 
@@ -51,31 +51,31 @@ final class WishList implements DataType
      */
     public function isPublic(): bool
     {
-        return (bool) $this->wishList->getFieldData('oxpublic');
+        return (bool) $this->basket->getFieldData('oxpublic');
     }
 
     public function setPublic(bool $public): void
     {
         $value = $public ? 1 : 0;
 
-        $this->wishList->assign(['oxpublic' => $value]);
-        $this->wishList->save();
+        $this->basket->assign(['oxpublic' => $value]);
+        $this->basket->save();
     }
 
     /**
      * @Field()
      */
-    public function getCreationDate(): DateTimeInterface
+    public function creationDate(): DateTimeInterface
     {
-        return new DateTimeImmutable((string) $this->wishList->getFieldData('oxtimestamp'));
+        return new DateTimeImmutable((string) $this->basket->getFieldData('oxtimestamp'));
     }
 
     /**
      * @Field()
      */
-    public function getLastUpdateDate(): ?DateTimeInterface
+    public function lastUpdateDate(): ?DateTimeInterface
     {
-        $timeStamp = (int) $this->wishList->getFieldData('oxupdate');
+        $timeStamp = (int) $this->basket->getFieldData('oxupdate');
 
         if ($timeStamp > 0) {
             return (new DateTimeImmutable())->setTimestamp($timeStamp);
@@ -87,7 +87,7 @@ final class WishList implements DataType
     public function getUserId(): ID
     {
         return new ID(
-            (string) $this->wishList->getFieldData('oxuserid')
+            (string) $this->basket->getFieldData('oxuserid')
         );
     }
 
@@ -96,6 +96,6 @@ final class WishList implements DataType
      */
     public static function getModelClass(): string
     {
-        return WishListModel::class;
+        return BasketModel::class;
     }
 }

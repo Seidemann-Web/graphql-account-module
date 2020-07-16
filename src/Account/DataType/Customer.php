@@ -12,7 +12,7 @@ namespace OxidEsales\GraphQL\Account\Account\DataType;
 use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
-use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
+use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;

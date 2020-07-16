@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\WishList\Controller;
 
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
-use OxidEsales\GraphQL\Account\WishList\DataType\WishList as WishListDataType;
+use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
 use OxidEsales\GraphQL\Account\WishList\Exception\WishListNotFound;
 use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;

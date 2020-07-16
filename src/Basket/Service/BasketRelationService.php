@@ -7,23 +7,23 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\WishList\Service;
+namespace OxidEsales\GraphQL\Account\Basket\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\Customer;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
+use OxidEsales\GraphQL\Account\Basket\DataType\Basket;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketItem;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketItemFilterList;
 use OxidEsales\GraphQL\Account\Basket\Service\BasketItem as BasketItemService;
-use OxidEsales\GraphQL\Account\WishList\DataType\WishList;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Base\DataType\PaginationFilter;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 
 /**
- * @ExtendType(class=WishList::class)
+ * @ExtendType(class=Basket::class)
  */
-final class RelationService
+final class BasketRelationService
 {
     /** @var BasketItemService */
     private $basketItemService;
@@ -42,9 +42,9 @@ final class RelationService
     /**
      * @Field()
      */
-    public function getCustomer(WishList $wishList): Customer
+    public function customer(Basket $basket): Customer
     {
-        return $this->customerService->wishListOwner((string) $wishList->getUserId());
+        return $this->customerService->basketOwner((string) $basket->getUserId());
     }
 
     /**
@@ -52,13 +52,13 @@ final class RelationService
      *
      * @return BasketItem[]
      */
-    public function getBasketItems(
-        WishList $wishList,
+    public function basketItems(
+        Basket $basket,
         ?PaginationFilter $pagination
     ): array {
         return $this->basketItemService->basketItems(
             new BasketItemFilterList(
-                new IDFilter($wishList->getId())
+                new IDFilter($basket->id())
             ),
             $pagination
         );
