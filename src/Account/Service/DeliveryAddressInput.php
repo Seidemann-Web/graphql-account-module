@@ -36,8 +36,8 @@ final class DeliveryAddressInput
      */
     public function fromUserInput(
         ?string $salutation = null,
-        ?string $firstname = null,
-        ?string $lastname = null,
+        ?string $firstName = null,
+        ?string $lastName = null,
         ?string $company = null,
         ?string $additionalInfo = null,
         ?string $street = null,
@@ -51,8 +51,8 @@ final class DeliveryAddressInput
         return $this->addressFactory->createValidAddressType(
             $this->authenticationService->getUserId(),
             $salutation,
-            $firstname,
-            $lastname,
+            $firstName,
+            $lastName,
             $company,
             $additionalInfo,
             $street,

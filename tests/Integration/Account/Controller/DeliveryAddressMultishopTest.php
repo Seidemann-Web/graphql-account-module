@@ -14,21 +14,9 @@ use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
 final class DeliveryAddressMultiShopTest extends MultishopTestCase
 {
-    private const USERNAME = 'user@oxid-esales.com';
-
-    private const PASSWORD = 'useruser';
-
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
     private const OTHER_PASSWORD = 'useruser';
-
-    private const OTHER_USER_OXID = '245ad3b5380202966df6ff128e9eecaq';
-
-    private const PRIMARY_SHOP_USERNAME = 'user@oxid-esales.com';
-
-    private const PRIMARY_SHOP_PASSWORD = 'useruser';
-
-    private const PRIMARY_SHOP_USER_OXID = '123ad3b5380202966df6ff128e9eecaq';
 
     public function dataProviderDeliveryAddressPerShop()
     {
@@ -58,15 +46,15 @@ final class DeliveryAddressMultiShopTest extends MultishopTestCase
         $result = $this->executeMutation();
 
         $this->assertResponseStatus(200, $result);
-        $this->assertNotEmpty($result['body']['data']['deliveryAddressAdd']['id']);
+        $this->assertNotEmpty($result['body']['data']['customerDeliveryAddressAdd']['id']);
     }
 
     private function executeMutation(): array
     {
         $inputFields =  [
             'salutation'     => 'MR',
-            'firstname'      => 'Marc',
-            'lastname'       => 'Muster',
+            'firstName'      => 'Marc',
+            'lastName'       => 'Muster',
             'company'        => 'No GmbH',
             'additionalInfo' => 'private delivery',
             'street'         => 'Bertoldstrasse',
@@ -85,14 +73,14 @@ final class DeliveryAddressMultiShopTest extends MultishopTestCase
 
         return $this->query(
             'mutation {
-                deliveryAddressAdd(deliveryAddress: {' .
+                customerDeliveryAddressAdd(deliveryAddress: {' .
             $queryPart .
             '})
                 {
                     id
                     salutation
-                    firstname
-                    lastname
+                    firstName
+                    lastName
                     company
                     additionalInfo
                     street

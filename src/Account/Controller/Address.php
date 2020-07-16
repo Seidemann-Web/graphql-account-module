@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Account\Controller;
 
 use OxidEsales\GraphQL\Account\Account\DataType\AddressFilterList;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
-use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Service\Address as AddressService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
@@ -55,8 +55,8 @@ final class Address
      * @Logged()
      */
     public function customerInvoiceAddressSet(
-        InvoiceAddress $invoiceAddress
-    ): InvoiceAddress {
+        InvoiceAddressDataType $invoiceAddress
+    ): InvoiceAddressDataType {
         return $this->addressService->updateInvoiceAddress($invoiceAddress);
     }
 
@@ -64,7 +64,7 @@ final class Address
      * @Mutation()
      * @Logged()
      */
-    public function deliveryAddressAdd(DeliveryAddressDataType $deliveryAddress): DeliveryAddressDataType
+    public function customerDeliveryAddressAdd(DeliveryAddressDataType $deliveryAddress): DeliveryAddressDataType
     {
         $this->addressService->store($deliveryAddress);
 

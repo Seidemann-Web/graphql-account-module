@@ -88,6 +88,16 @@ final class Address
     }
 
     /**
+     * @return true
+     */
+    public function store(DeliveryAddress $address): bool
+    {
+        return $this->repository->saveModel(
+            $address->getEshopModel()
+        );
+    }
+
+    /**
      * @throws DeliveryAddressNotFound
      * @throws InvalidLogin
      */
@@ -115,15 +125,5 @@ final class Address
     private function isSameUser(DeliveryAddress $deliveryAddress): bool
     {
         return (string) $deliveryAddress->userId() === (string) $this->authenticationService->getUserId();
-    }
-
-    /**
-     * @return true
-     */
-    public function store(DeliveryAddress $address): bool
-    {
-        return $this->repository->saveModel(
-            $address->getEshopModel()
-        );
     }
 }

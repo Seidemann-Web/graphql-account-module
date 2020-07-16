@@ -18,8 +18,6 @@ final class DeliveryAddressTest extends TokenTestCase
 
     private const DIFFERENT_PASSWORD = 'useruser';
 
-    private const DIFFERENT_USER_OXID = '_45ad3b5380202966df6ff128e9eecaq';
-
     /**
      * @var array
      */
@@ -47,13 +45,13 @@ final class DeliveryAddressTest extends TokenTestCase
     {
         $result = $this->query(
             'mutation {
-                deliveryAddressAdd(deliveryAddress: {
+                customerDeliveryAddressAdd(deliveryAddress: {
                     salutation: "MR",
-                    firstname: "Max",
-                    lastname: "Mustermann"
+                    firstName: "Max",
+                    lastName: "Mustermann"
                 })
                 {
-                   firstname
+                   firstName
                 }
             }'
         );
@@ -67,8 +65,8 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $inputFields =  [
             'salutation'     => 'MR',
-            'firstname'      => 'Marc',
-            'lastname'       => 'Muster',
+            'firstName'      => 'Marc',
+            'lastName'       => 'Muster',
             'company'        => 'No GmbH',
             'additionalInfo' => 'private delivery',
             'street'         => 'Bertoldstrasse',
@@ -88,14 +86,14 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                deliveryAddressAdd(deliveryAddress: {' .
+                customerDeliveryAddressAdd(deliveryAddress: {' .
                 $queryPart .
                 '})
                 {
                     id
                     salutation
-                    firstname
-                    lastname
+                    firstName
+                    lastName
                     company
                     additionalInfo
                     street
@@ -113,7 +111,7 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $this->assertResponseStatus(200, $result);
 
-        $deliveryAddress = $result['body']['data']['deliveryAddressAdd'];
+        $deliveryAddress = $result['body']['data']['customerDeliveryAddressAdd'];
 
         $countryId = $inputFields['countryId'];
         unset($inputFields['countryId']);
@@ -160,7 +158,7 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                deliveryAddressAdd(deliveryAddress: {' .
+                customerDeliveryAddressAdd(deliveryAddress: {' .
             '})
                 {
                     salutation
@@ -187,8 +185,8 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $inputFields =  [
             'salutation'     => 'MR',
-            'firstname'      => 'Marc',
-            'lastname'       => 'Muster',
+            'firstName'      => 'Marc',
+            'lastName'       => 'Muster',
             'company'        => 'No GmbH',
             'additionalInfo' => 'private delivery',
             'street'         => 'Bertoldstrasse',
@@ -208,11 +206,11 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                deliveryAddressAdd(deliveryAddress: {' .
+                customerDeliveryAddressAdd(deliveryAddress: {' .
             $queryPart .
             '})
                 {
-                    firstname
+                    firstName
                 }
             }'
         );
@@ -228,8 +226,8 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $inputFields =  [
             'salutation'     => 'dual',
-            'firstname'      => str_pad('?ö', 1000, '@'),
-            'lastname'       => 'öäöääöä',
+            'firstName'      => str_pad('?ö', 1000, '@'),
+            'lastName'       => 'öäöääöä',
             'company'        => '1234',
             'additionalInfo' => str_pad('x', 1000, 'y'),
             'street'         => str_pad('x', 1000, 'z'),
@@ -249,11 +247,11 @@ final class DeliveryAddressTest extends TokenTestCase
 
         $result = $this->query(
             'mutation {
-                deliveryAddressAdd(deliveryAddress: {' .
+                customerDeliveryAddressAdd(deliveryAddress: {' .
             $queryPart .
             '})
                 {
-                    firstname
+                    firstName
                 }
             }'
         );
