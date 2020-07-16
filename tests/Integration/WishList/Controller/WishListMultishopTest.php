@@ -54,16 +54,6 @@ final class WishListMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus(200, $result);
     }
 
-    private function wishListByOwnerQuery(string $ownerId): array
-    {
-        return $this->query('query {
-            wishListByOwnerId(ownerId: "' . $ownerId . '") {
-                id
-                public
-            }
-        }');
-    }
-
     public function dataProviderWishListPerShop()
     {
         return [
@@ -162,6 +152,16 @@ final class WishListMultiShopTest extends MultishopTestCase
         $products = $this->getWishListArticles();
         $this->assertCount(1, $products);
         $this->assertSame($productId, array_pop($products)->getId());
+    }
+
+    private function wishListByOwnerQuery(string $ownerId): array
+    {
+        return $this->query('query {
+            wishListByOwnerId(ownerId: "' . $ownerId . '") {
+                id
+                public
+            }
+        }');
     }
 
     private function addProductToWishListMutation(string $productId): array

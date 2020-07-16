@@ -107,13 +107,6 @@ final class InvoiceAddress implements DataType
         return (string) $this->customer->getFieldData('oxcity');
     }
 
-    public function countryId(): ID
-    {
-        return new ID(
-            $this->customer->getFieldData('oxcountryid')
-        );
-    }
-
     /**
      * @Field()
      */

@@ -138,15 +138,6 @@ final class AddressMultiShopTest extends MultishopTestCase
         ];
     }
 
-    private function deleteCustomerDeliveryAddressMutation(string $deliveryAddressId): array
-    {
-        return $this->query(
-            'mutation {
-                customerDeliveryAddressDelete(id: "' . $deliveryAddressId . '")
-            }'
-        );
-    }
-
     public function testCustomerInvoiceAddressSet(): void
     {
         $shopId = '2';
@@ -245,6 +236,15 @@ final class AddressMultiShopTest extends MultishopTestCase
                 'lastName'  => 'Dodo',
             ],
             $result['body']['data']['customerInvoiceAddressSet']
+        );
+    }
+
+    private function deleteCustomerDeliveryAddressMutation(string $deliveryAddressId): array
+    {
+        return $this->query(
+            'mutation {
+                customerDeliveryAddressDelete(id: "' . $deliveryAddressId . '")
+            }'
         );
     }
 

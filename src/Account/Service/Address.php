@@ -76,6 +76,17 @@ final class Address
         throw new InvalidLogin('Unauthorized');
     }
 
+    public function updateInvoiceAddress(InvoiceAddress $invoiceAddress): InvoiceAddress
+    {
+        if (!$id = (string) $this->authenticationService->getUserId()) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        $this->repository->saveModel($invoiceAddress->getEshopModel());
+
+        return $invoiceAddress;
+    }
+
     /**
      * @throws DeliveryAddressNotFound
      * @throws InvalidLogin
@@ -104,16 +115,5 @@ final class Address
     private function isSameUser(DeliveryAddress $deliveryAddress): bool
     {
         return (string) $deliveryAddress->userId() === (string) $this->authenticationService->getUserId();
-    }
-
-    public function updateInvoiceAddress(InvoiceAddress $invoiceAddress): InvoiceAddress
-    {
-        if (!$id = (string) $this->authenticationService->getUserId()) {
-            throw new InvalidLogin('Unauthorized');
-        }
-
-        $this->repository->saveModel($invoiceAddress->getEshopModel());
-
-        return $invoiceAddress;
     }
 }

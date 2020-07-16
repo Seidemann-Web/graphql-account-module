@@ -138,15 +138,6 @@ final class AddressTest extends TokenTestCase
         $this->assertResponseStatus(200, $result);
     }
 
-    private function deleteCustomerDeliveryAddressMutation(string $deliveryAddressId): array
-    {
-        return $this->query(
-            'mutation {
-                customerDeliveryAddressDelete(id: "' . $deliveryAddressId . '")
-            }'
-        );
-    }
-
     public function customerInvoiceAddressProvider(): array
     {
         return [
@@ -545,5 +536,14 @@ final class AddressTest extends TokenTestCase
 
         $this->assertResponseStatus(400, $result);
         $this->assertContains($expected, $result['body']['errors'][0]['message']);
+    }
+
+    private function deleteCustomerDeliveryAddressMutation(string $deliveryAddressId): array
+    {
+        return $this->query(
+            'mutation {
+                customerDeliveryAddressDelete(id: "' . $deliveryAddressId . '")
+            }'
+        );
     }
 }
