@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\Address as EshopAddressModel;
+use OxidEsales\Eshop\Application\Model\Country as EshopCountryModel;
 use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
 use OxidEsales\Eshop\Application\Model\RequiredFieldsValidator;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
@@ -55,9 +56,21 @@ final class AddressFactory
         $validator = oxNew(RequiredFieldsValidator::class);
         /** @var RequiredAddressFields */
         $requiredAddressFields = oxNew(RequiredAddressFields::class);
+        $requiredFields = $requiredAddressFields->getDeliveryFields();
         $validator->setRequiredFields(
-            $requiredAddressFields->getDeliveryFields()
+            $requiredFields
         );
+
+        if (in_array('oxaddress__oxcountryid', $requiredFields, true)) {
+            /** @var EshopCountryModel */
+            $country = oxNew(EshopCountryModel::class);
+
+            if (!$country->load((string) $countryId)) {
+                $address->assign([
+                    'oxcountryid' => null
+                ]);
+            }
+        }
 
         if (!$validator->validateFields($address)) {
             $invalidFields = array_map(

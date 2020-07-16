@@ -28,7 +28,7 @@ final class DeliveryAddressMissingFields extends Exception implements ClientAwar
 
     public function getCategory(): string
     {
-        return ErrorCategories::REQUESTERROR;
+        return 'validation';
     }
 
     /**
