@@ -30,7 +30,7 @@ final class AddressMultiShopTest extends MultishopTestCase
                 'expected' => [
                     [
                         'id'           => self::DELIVERY_ADDRESS_SHOP_1,
-                        'firstname'    => 'Marc',
+                        'firstName'    => 'Marc',
                         'street'       => 'Hauptstr',
                         'streetNumber' => '13',
                     ],
@@ -47,7 +47,7 @@ final class AddressMultiShopTest extends MultishopTestCase
                 'expected' => [
                     [
                         'id'           => self::DELIVERY_ADDRESS_SHOP_2,
-                        'firstname'    => 'Marc2',
+                        'firstName'    => 'Marc2',
                         'street'       => 'Hauptstr2',
                         'streetNumber' => '2',
                     ],
