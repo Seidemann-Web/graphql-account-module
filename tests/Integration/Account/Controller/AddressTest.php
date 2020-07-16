@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
+use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class AddressTest extends TokenTestCase
@@ -16,6 +17,32 @@ final class AddressTest extends TokenTestCase
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
+
+    private const DIFFERENT_USERNAME = 'differentuser@oxid-esales.com';
+
+    private const DIFFERENT_PASSWORD = 'useruser';
+
+    /**
+     * @var array
+     */
+    private $defaultMustFillFields;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->defaultMustFillFields = EshopRegistry::getConfig()->getConfigParam('aMustFillFields');
+    }
+
+    /**
+     * Tear down.
+     */
+    protected function tearDown(): void
+    {
+        EshopRegistry::getConfig()->setConfigParam('aMustFillFields', $this->defaultMustFillFields);
+
+        parent::tearDown();
+    }
 
     public function testDeliveryAddressesForNotLoggedInUser(): void
     {
@@ -129,12 +156,11 @@ final class AddressTest extends TokenTestCase
                     streetNumber: "' . $invoiceData['streetNumber'] . '"
                     zipCode: "' . $invoiceData['zipCode'] . '"
                     city: "' . $invoiceData['city'] . '"
-                    countryID: "' . $invoiceData['country']['id'] . '"
+                    countryId: "' . $invoiceData['country']['id'] . '"
                     vatID: "' . $invoiceData['vatID'] . '"
                     phone: "' . $invoiceData['phone'] . '"
                     mobile: "' . $invoiceData['mobile'] . '"
                     fax: "' . $invoiceData['fax'] . '"
-                    creationDate: "2020-07-14"
                 }
             ){
                 salutation
@@ -228,8 +254,7 @@ final class AddressTest extends TokenTestCase
                     streetNumber: "' . $invoiceData['streetNumber'] . '"
                     zipCode: "' . $invoiceData['zipCode'] . '"
                     city: "' . $invoiceData['city'] . '"
-                    countryID: "' . $invoiceData['country']['id'] . '"
-                    creationDate: "2020-07-14"
+                    countryId: "' . $invoiceData['country']['id'] . '"
                 }
             ){
                 salutation
@@ -275,12 +300,11 @@ final class AddressTest extends TokenTestCase
                     streetNumber: "' . $invoiceData['streetNumber'] . '"
                     zipCode: "' . $invoiceData['zipCode'] . '"
                     city: "Invoice ' . $invoiceData['city'] . '"
-                    countryID: "a7c40f631fc920687.' . $invoiceData['country']['id'] . '"
+                    countryId: "a7c40f631fc920687.' . $invoiceData['country']['id'] . '"
                     vatID: "' . $invoiceData['vatID'] . '"
                     phone: "' . $invoiceData['phone'] . '"
                     mobile: "' . $invoiceData['mobile'] . '"
                     fax: "' . $invoiceData['fax'] . '"
-                    creationDate: "2020-07-14"
                 }
             ){
                 salutation
@@ -386,8 +410,7 @@ final class AddressTest extends TokenTestCase
                     streetNumber: "' . $invoiceData['streetNumber'] . '"
                     zipCode: "' . $invoiceData['zipCode'] . '"
                     city: "' . $invoiceData['city'] . '"
-                    countryID: "' . $invoiceData['country']['id'] . '"
-                    creationDate: "2020-07-14"
+                    countryId: "' . $invoiceData['country']['id'] . '"
                 }
             ){
                 salutation
@@ -410,5 +433,59 @@ final class AddressTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus($expectedStatus, $result);
+    }
+
+    public function providerRequiredFields()
+    {
+        return [
+            'set1' => [
+                'fields' => [
+                    'oxuser__oxfname',
+                    'oxuser__oxlname',
+                    'oxuser__oxstreet',
+                    'oxuser__oxstreetnr',
+                    'oxuser__oxzip',
+                    'oxuser__oxcity',
+                    'oxuser__oxcountryid',
+                ],
+            ],
+            'set2' => [
+                'fields' => [
+                    'oxuser__oxfname',
+                    'oxuser__oxlname',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerRequiredFields
+     */
+    public function testAddDeliveryAddressForLoggedInUserMissingInput(array $mustFillFields): void
+    {
+        EshopRegistry::getConfig()->setConfigParam('aMustFillFields', $mustFillFields);
+        $this->prepareToken(self::DIFFERENT_USERNAME, self::DIFFERENT_PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                customerInvoiceAddressSet(invoiceAddress: {' .
+            '})
+                {
+                    salutation
+                }
+            }'
+        );
+
+        $expected = [];
+
+        foreach ($mustFillFields as $field) {
+            $tmp             = explode('__', $field);
+            $name            = ltrim($tmp[1], 'ox');
+            $expected[$name] = $name;
+        }
+        $expected = rtrim(implode(', ', $expected), ', ');
+
+        $this->assertResponseStatus(400, $result);
+        $this->assertContains($expected, $result['body']['errors'][0]['message']);
     }
 }

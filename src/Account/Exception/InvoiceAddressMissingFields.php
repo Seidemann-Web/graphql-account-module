@@ -11,7 +11,6 @@ namespace OxidEsales\GraphQL\Account\Account\Exception;
 
 use Exception;
 use GraphQL\Error\ClientAware;
-use OxidEsales\GraphQL\Base\Exception\ErrorCategories;
 use OxidEsales\GraphQL\Base\Exception\HttpErrorInterface;
 
 final class InvoiceAddressMissingFields extends Exception implements ClientAware, HttpErrorInterface
@@ -28,7 +27,7 @@ final class InvoiceAddressMissingFields extends Exception implements ClientAware
 
     public function getCategory(): string
     {
-        return ErrorCategories::REQUESTERROR;
+        return 'validation';
     }
 
     /**

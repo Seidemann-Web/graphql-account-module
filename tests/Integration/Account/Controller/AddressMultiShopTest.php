@@ -94,11 +94,10 @@ final class AddressMultiShopTest extends MultishopTestCase
                 streetNumber: "999"
                 zipCode: "10000"
                 city: "Any City"
-                countryID: "a7c40f631fc920687.20179984"
+                countryId: "a7c40f631fc920687.20179984"
                 phone: "123456"
                 mobile: "12345678"
                 fax: "555"
-                creationDate: "2022-10-10"
             }){
                 salutation
                 firstname
@@ -112,7 +111,6 @@ final class AddressMultiShopTest extends MultishopTestCase
                 phone
                 mobile
                 fax
-                created
               }
         }');
 
@@ -131,7 +129,6 @@ final class AddressMultiShopTest extends MultishopTestCase
             'phone'          => '123456',
             'mobile'         => '12345678',
             'fax'            => '555',
-            'created'        => '2022-10-10T00:00:00+02:00',
         ], $result['body']['data']['customerInvoiceAddressSet']);
     }
 }
