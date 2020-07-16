@@ -7,12 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Shared\Service;
+namespace OxidEsales\GraphQL\Account\Basket\Service;
 
-use OxidEsales\GraphQL\Account\Shared\DataType\BasketItem as BasketItemDataType;
-use OxidEsales\GraphQL\Account\Shared\DataType\BasketItemFilterList;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketItem as BasketItemDataType;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketItemFilterList;
 use OxidEsales\GraphQL\Base\DataType\PaginationFilter;
-use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class BasketItem
@@ -20,15 +19,10 @@ final class BasketItem
     /** @var Repository */
     private $repository;
 
-    /** @var Authorization */
-    private $authorizationService;
-
     public function __construct(
-        Repository $repository,
-        Authorization $authorizationService
+        Repository $repository
     ) {
         $this->repository           = $repository;
-        $this->authorizationService = $authorizationService;
     }
 
     /**

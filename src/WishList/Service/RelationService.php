@@ -11,9 +11,9 @@ namespace OxidEsales\GraphQL\Account\WishList\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\Customer;
 use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
-use OxidEsales\GraphQL\Account\Shared\DataType\BasketItem;
-use OxidEsales\GraphQL\Account\Shared\DataType\BasketItemFilterList;
-use OxidEsales\GraphQL\Account\Shared\Service\BasketItem as BasketItemService;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketItem;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketItemFilterList;
+use OxidEsales\GraphQL\Account\Basket\Service\BasketItem as BasketItemService;
 use OxidEsales\GraphQL\Account\WishList\DataType\WishList;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Base\DataType\PaginationFilter;
