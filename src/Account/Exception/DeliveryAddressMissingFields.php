@@ -11,7 +11,6 @@ namespace OxidEsales\GraphQL\Account\Account\Exception;
 
 use Exception;
 use GraphQL\Error\ClientAware;
-use OxidEsales\GraphQL\Base\Exception\ErrorCategories;
 use OxidEsales\GraphQL\Base\Exception\HttpErrorInterface;
 
 final class DeliveryAddressMissingFields extends Exception implements ClientAware, HttpErrorInterface

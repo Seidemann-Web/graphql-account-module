@@ -56,7 +56,7 @@ final class AddressFactory
         $validator = oxNew(RequiredFieldsValidator::class);
         /** @var RequiredAddressFields */
         $requiredAddressFields = oxNew(RequiredAddressFields::class);
-        $requiredFields = $requiredAddressFields->getDeliveryFields();
+        $requiredFields        = $requiredAddressFields->getDeliveryFields();
         $validator->setRequiredFields(
             $requiredFields
         );
@@ -67,7 +67,7 @@ final class AddressFactory
 
             if (!$country->load((string) $countryId)) {
                 $address->assign([
-                    'oxcountryid' => null
+                    'oxcountryid' => null,
                 ]);
             }
         }

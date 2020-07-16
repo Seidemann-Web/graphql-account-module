@@ -21,11 +21,24 @@ final class DeliveryAddressTest extends TokenTestCase
     private const DIFFERENT_USER_OXID = '_45ad3b5380202966df6ff128e9eecaq';
 
     /**
+     * @var array
+     */
+    private $defaultMustFillFields;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->defaultMustFillFields = EshopRegistry::getConfig()->getConfigParam('aMustFillFields');
+    }
+
+    /**
      * Tear down.
      */
     protected function tearDown(): void
     {
         $this->cleanUpTable('oxaddress', 'oxuserid');
+        EshopRegistry::getConfig()->setConfigParam('aMustFillFields', $this->defaultMustFillFields);
 
         parent::tearDown();
     }
