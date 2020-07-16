@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Shared\DataType;
+namespace OxidEsales\GraphQL\Account\Basket\DataType;
 
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\FilterList;

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Shared\DataType;
+namespace OxidEsales\GraphQL\Account\Basket\DataType;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -38,15 +38,17 @@ final class BasketItem implements DataType
     /**
      * @Field()
      */
-    public function getId(): ID
+    public function id(): ID
     {
-        return new ID($this->basketItem->getId());
+        return new ID(
+            $this->basketItem->getId()
+        );
     }
 
     /**
      * @Field()
      */
-    public function getAmount(): int
+    public function amount(): int
     {
         return (int) $this->basketItem->getFieldData('oxamount');
     }
@@ -54,7 +56,7 @@ final class BasketItem implements DataType
     /**
      * @Field()
      */
-    public function getLastUpdateDate(): DateTimeInterface
+    public function lastUpdateDate(): DateTimeInterface
     {
         return new DateTimeImmutable(
             (string) $this->basketItem->getFieldData('oxtimestamp')

@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Shared\Service;
+namespace OxidEsales\GraphQL\Account\Basket\Service;
 
-use OxidEsales\GraphQL\Account\Shared\DataType\BasketItem;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketItem;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
 use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
