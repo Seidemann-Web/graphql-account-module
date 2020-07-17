@@ -11,9 +11,11 @@ namespace OxidEsales\GraphQL\Account\Basket\Service;
 
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
+use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
+use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class Basket
@@ -24,18 +26,57 @@ final class Basket
     /** @var Authentication */
     private $authenticationService;
 
+    /** @var Authorization */
+    private $authorizationService;
+
     public function __construct(
         Repository $repository,
-        Authentication $authenticationService
+        Authentication $authenticationService,
+        Authorization $authorizationService
     ) {
-        $this->repository              = $repository;
-        $this->authenticationService   = $authenticationService;
+        $this->repository            = $repository;
+        $this->authenticationService = $authenticationService;
+        $this->authorizationService  = $authorizationService;
+    }
+
+    /**
+     * @throws BasketNotFound
+     * @throws InvalidToken
+     */
+    public function basket(string $id): BasketDataType
+    {
+        $basket = $this->getBasket($id);
+
+        if ($basket->public() === false && !$this->isSameUser($basket)) {
+            throw new InvalidToken('Basket is private.');
+        }
+
+        return $basket;
+    }
+
+    /**
+     * @throws BasketNotFound
+     * @throws InvalidToken
+     */
+    public function remove(string $id): bool
+    {
+        $basket = $this->getBasket($id);
+
+        //user can remove only his own baskets unless otherwise authorized
+        if (
+            $this->authorizationService->isAllowed('DELETE_BASKET')
+            || $this->isSameUser($basket)
+        ) {
+            return $this->repository->delete($basket->getEshopModel());
+        }
+
+        throw new InvalidLogin('Unauthorized');
     }
 
     /**
      * @throws BasketNotFound
      */
-    public function basket(string $id): BasketDataType
+    private function getBasket(string $id): BasketDataType
     {
         try {
             /** @var BasketDataType $basket */
@@ -46,10 +87,6 @@ final class Basket
             );
         } catch (NotFound $e) {
             throw BasketNotFound::byId($id);
-        }
-
-        if ($basket->public() === false && !$this->isSameUser($basket)) {
-            throw new InvalidToken('Basket is private.');
         }
 
         return $basket;

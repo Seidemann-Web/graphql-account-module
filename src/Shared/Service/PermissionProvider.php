@@ -24,6 +24,7 @@ final class PermissionProvider implements PermissionProviderInterface
                 'DELETE_REVIEW',
                 'VIEW_INACTIVE_COUNTRY',
                 'DELETE_DELIVERY_ADDRESS',
+                'DELETE_BASKET',
             ],
             'malladmin' => [
                 'VIEW_WISHED_PRICES',
@@ -33,6 +34,7 @@ final class PermissionProvider implements PermissionProviderInterface
                 'DELETE_REVIEW',
                 'VIEW_INACTIVE_COUNTRY',
                 'DELETE_DELIVERY_ADDRESS',
+                'DELETE_BASKET',
             ],
         ];
     }
