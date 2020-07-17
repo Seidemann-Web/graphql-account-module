@@ -14,6 +14,7 @@ use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as AccountRepository;
 use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddress as InvoiceAddressService;
+use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
@@ -110,5 +111,23 @@ final class RelationService
         $wishList = $customer->getEshopModel()->getBasket(WishListService::SHOP_WISH_LIST_NAME);
 
         return new WishListDataType($wishList);
+    }
+
+    /**
+     * @Field()
+     */
+    public function getBasket(CustomerDataType $customer, string $title): BasketDataType
+    {
+        return $this->accountRepository->basket($customer, $title);
+    }
+
+    /**
+     * @Field()
+     *
+     * @return BasketDataType[]
+     */
+    public function getBaskets(CustomerDataType $customer): array
+    {
+        return $this->accountRepository->baskets($customer);
     }
 }
