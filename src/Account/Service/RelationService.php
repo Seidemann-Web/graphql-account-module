@@ -124,7 +124,7 @@ final class RelationService
      */
     public function getBasket(CustomerDataType $customer, string $title): BasketDataType
     {
-        return $this->basketRepository->basket($customer, $title);
+        return $this->basketRepository->getCustomerBasketByTitle($customer, $title);
     }
 
     /**
@@ -134,6 +134,6 @@ final class RelationService
      */
     public function getBaskets(CustomerDataType $customer): array
     {
-        return $this->basketRepository->baskets($customer);
+        return $this->basketRepository->getCustomerBaskets($customer);
     }
 }

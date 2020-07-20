@@ -29,7 +29,7 @@ final class Repository
         $this->basketService       = $basketService;
     }
 
-    public function basket(CustomerDataType $customer, string $title): BasketDataType
+    public function getCustomerBasketByTitle(CustomerDataType $customer, string $title): BasketDataType
     {
         $basket = $customer->getEshopModel()->getBasket($title);
 
@@ -41,7 +41,7 @@ final class Repository
      *
      * @return BasketDataType[]
      */
-    public function baskets(CustomerDataType $customer): array
+    public function getCustomerBaskets(CustomerDataType $customer): array
     {
         $baskets   = [];
         $basketIds = $this->getCustomerBasketIds($customer->getId());
