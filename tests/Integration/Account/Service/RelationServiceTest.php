@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Service;
 
+use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class RelationServiceTest extends TokenTestCase
@@ -18,6 +19,19 @@ final class RelationServiceTest extends TokenTestCase
     private const PASSWORD = 'useruser';
 
     private const CUSTOMER_ID = 'e7af1c3b786fd02906ccd75698f4e6b9';
+
+    private const EXISTING_USERNAME = 'existinguser@oxid-esales.com';
+
+    private const EXISTING_CUSTOMER_ID = '9119cc8cd9593c214be93ee558235f3c';
+
+    // TODO: Check whether this constant exists in basket classes and use it instead
+    private const BASKET_WISH_LIST = 'wishlist';
+
+    private const BASKET_NOTICE_LIST = 'noticelist';
+
+    private const BASKET_SAVED_BASKET = 'savedbasket';
+
+    private const PRODUCT_ID = 'dc5ffdf380e15674b56dd562a7cb6aec';
 
     public function testGetInvoiceAddressRelation(): void
     {
@@ -68,6 +82,74 @@ final class RelationServiceTest extends TokenTestCase
         $this->assertSame('Muster', $deliveryAddress2['lastName']);
     }
 
+    public function testGetEmptyBasketRelation(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->queryBasketRelation(self::BASKET_WISH_LIST);
+
+        $this->assertResponseStatus(200, $result);
+
+        $customer = $result['body']['data']['customer'];
+        $this->assertSame(self::USERNAME, $customer['email']);
+
+        $basket = $customer['basket'];
+        $this->assertTrue($basket['public']);
+        $this->assertEmpty($basket['items']);
+    }
+
+    public function testGetBasketRelation(): void
+    {
+        $this->setGETRequestParameter('lang', '1');
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+        // TODO: Use basketAddProduct mutation
+        $this->updateBasketProduct(self::CUSTOMER_ID, self::BASKET_WISH_LIST, self::PRODUCT_ID, 1);
+
+        $result = $this->queryBasketRelation(self::BASKET_WISH_LIST);
+
+        $this->assertResponseStatus(200, $result);
+
+        $customer = $result['body']['data']['customer'];
+        $this->assertSame(self::USERNAME, $customer['email']);
+
+        $basket = $customer['basket'];
+        $this->assertTrue($basket['public']);
+        $this->assertNotEmpty($basket['items']);
+        $this->assertSame('Kuyichi leather belt JEVER', $basket['items'][0]['product']['title']);
+
+        // TODO: Use basketRemoveProduct mutation
+        $this->updateBasketProduct(self::CUSTOMER_ID, self::BASKET_WISH_LIST, self::PRODUCT_ID, 0);
+    }
+
+    public function testGetBasketsRelation(): void
+    {
+        $this->prepareToken(self::EXISTING_USERNAME, self::PASSWORD);
+        // TODO: Use basketAddProduct mutation
+        $this->updateBasketProduct(self::EXISTING_CUSTOMER_ID, self::BASKET_WISH_LIST, self::PRODUCT_ID, 1);
+        $this->updateBasketProduct(self::EXISTING_CUSTOMER_ID, self::BASKET_NOTICE_LIST, self::PRODUCT_ID, 1);
+        $this->updateBasketProduct(self::EXISTING_CUSTOMER_ID, self::BASKET_SAVED_BASKET, self::PRODUCT_ID, 1);
+
+        $result = $this->queryBasketsRelation();
+        $this->assertResponseStatus(200, $result);
+
+        $customer = $result['body']['data']['customer'];
+        $this->assertSame(self::EXISTING_USERNAME, $customer['email']);
+
+        $baskets = $customer['baskets'];
+        $this->assertCount(3, $baskets);
+
+        // TODO: Use basketRemoveProduct mutation
+        $this->updateBasketProduct(self::EXISTING_CUSTOMER_ID, self::BASKET_WISH_LIST, self::PRODUCT_ID, 0);
+        $this->updateBasketProduct(self::EXISTING_CUSTOMER_ID, self::BASKET_NOTICE_LIST, self::PRODUCT_ID, 0);
+        $this->updateBasketProduct(self::EXISTING_CUSTOMER_ID, self::BASKET_SAVED_BASKET, self::PRODUCT_ID, 0);
+
+        $result = $this->queryBasketsRelation();
+        $this->assertResponseStatus(200, $result);
+
+        $baskets = $result['body']['data']['customer']['baskets'];
+        $this->assertCount(0, $baskets);
+    }
+
     private function queryInvoiceAddressRelation(): array
     {
         return $this->query('query {
@@ -102,5 +184,53 @@ final class RelationServiceTest extends TokenTestCase
                 }
             }
         }');
+    }
+
+    private function queryBasketRelation(string $title): array
+    {
+        return $this->query('query {
+            customer {
+                email
+                basket(title: "' . $title . '") {
+                    public
+                    items(pagination: {limit: 10, offset: 0}) {
+                        product {
+                            title
+                        }
+                    }
+                }
+            }
+        }');
+    }
+
+    private function queryBasketsRelation(): array
+    {
+        return $this->query('query {
+            customer {
+                email
+                baskets {
+                    public
+                    items(pagination: {limit: 10, offset: 0}) {
+                        product {
+                            title
+                        }
+                    }
+                }
+            }
+        }');
+    }
+
+    private function updateBasketProduct(string $customerId, string $name, string $productId, int $amount): void
+    {
+        $customer = oxNew(EshopUser::class);
+        $customer->load($customerId);
+        $basket = $customer->getBasket($name);
+        $basket->addItemToBasket($productId, $amount, null, true);
+
+        $itemCount = $basket->getItemCount(true);
+
+        if ($itemCount == 0) {
+            $basket->delete();
+        }
     }
 }

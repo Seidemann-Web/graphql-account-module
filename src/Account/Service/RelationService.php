@@ -14,7 +14,9 @@ use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as AccountRepository;
 use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddress as InvoiceAddressService;
+use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
+use OxidEsales\GraphQL\Account\Basket\Infrastructure\Repository as BasketRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
@@ -44,16 +46,21 @@ final class RelationService
     /** @var InvoiceAddressService */
     private $invoiceAddressService;
 
+    /** @var BasketRepository */
+    private $basketRepository;
+
     public function __construct(
         ReviewService $reviewService,
         NewsletterStatusService $newsletterStatusService,
         AccountRepository $accountRepository,
-        InvoiceAddressService $invoiceAddressService
+        InvoiceAddressService $invoiceAddressService,
+        BasketRepository $basketRepository
     ) {
         $this->reviewService           = $reviewService;
         $this->newsletterStatusService = $newsletterStatusService;
         $this->accountRepository       = $accountRepository;
         $this->invoiceAddressService   = $invoiceAddressService;
+        $this->basketRepository        = $basketRepository;
     }
 
     /**
@@ -110,5 +117,23 @@ final class RelationService
         $wishList = $customer->getEshopModel()->getBasket(WishListService::SHOP_WISH_LIST_NAME);
 
         return new WishListDataType($wishList);
+    }
+
+    /**
+     * @Field()
+     */
+    public function getBasket(CustomerDataType $customer, string $title): BasketDataType
+    {
+        return $this->basketRepository->getCustomerBasketByTitle($customer, $title);
+    }
+
+    /**
+     * @Field()
+     *
+     * @return BasketDataType[]
+     */
+    public function getBaskets(CustomerDataType $customer): array
+    {
+        return $this->basketRepository->getCustomerBaskets($customer);
     }
 }
