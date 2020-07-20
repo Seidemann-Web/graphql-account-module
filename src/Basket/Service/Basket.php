@@ -9,13 +9,16 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\Service;
 
+use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner as BasketOwnerDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
+use OxidEsales\GraphQL\Base\Service\Legacy;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class Basket
@@ -29,14 +32,19 @@ final class Basket
     /** @var Authorization */
     private $authorizationService;
 
+    /** @var Legacy */
+    private $legacyService;
+
     public function __construct(
         Repository $repository,
         Authentication $authenticationService,
-        Authorization $authorizationService
+        Authorization $authorizationService,
+        Legacy $legacyService
     ) {
         $this->repository            = $repository;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
+        $this->legacyService         = $legacyService;
     }
 
     /**
@@ -95,5 +103,26 @@ final class Basket
     private function isSameUser(BasketDataType $basket): bool
     {
         return (string) $basket->getUserId() === (string) $this->authenticationService->getUserId();
+    }
+
+    /**
+     * @throws CustomerNotFound
+     */
+    public function basketOwner(string $id): BasketOwnerDataType
+    {
+        $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
+
+        try {
+            /** @var BasketOwnerDataType $customer */
+            $customer = $this->repository->getById(
+                $id,
+                BasketOwnerDataType::class,
+                $ignoreSubShop
+            );
+        } catch (NotFound $e) {
+            throw CustomerNotFound::byId($id);
+        }
+
+        return $customer;
     }
 }

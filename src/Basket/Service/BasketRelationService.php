@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\Service;
 
-use OxidEsales\GraphQL\Account\Account\DataType\Customer;
-use OxidEsales\GraphQL\Account\Account\Service\Customer as CustomerService;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketItem;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketItemFilterList;
+use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner;
+use OxidEsales\GraphQL\Account\Basket\Service\Basket as BasketService;
 use OxidEsales\GraphQL\Account\Basket\Service\BasketItem as BasketItemService;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Base\DataType\PaginationFilter;
@@ -28,23 +28,23 @@ final class BasketRelationService
     /** @var BasketItemService */
     private $basketItemService;
 
-    /** @var CustomerService */
-    private $customerService;
+    /** @var BasketService */
+    private $basketService;
 
     public function __construct(
         BasketItemService $basketItemService,
-        CustomerService $customerService
+        BasketService $basketService
     ) {
         $this->basketItemService  = $basketItemService;
-        $this->customerService    = $customerService;
+        $this->basketService      = $basketService;
     }
 
     /**
      * @Field()
      */
-    public function customer(Basket $basket): Customer
+    public function owner(Basket $basket): BasketOwner
     {
-        return $this->customerService->basketOwner((string) $basket->getUserId());
+        return $this->basketService->basketOwner((string) $basket->getUserId());
     }
 
     /**

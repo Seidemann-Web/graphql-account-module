@@ -398,7 +398,7 @@ final class WishListTest extends TokenTestCase
     {
         return $this->query('query {
             wishListByOwnerId(ownerId: "' . $ownerId . '") {
-                customer {
+                owner {
                     firstName
                 }
                 id
