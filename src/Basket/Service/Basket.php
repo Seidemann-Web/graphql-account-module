@@ -13,6 +13,7 @@ use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner as BasketOwnerDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
+use OxidEsales\GraphQL\Account\Basket\Infrastructure\Basket as BasketInfraService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
@@ -35,16 +36,21 @@ final class Basket
     /** @var Legacy */
     private $legacyService;
 
+    /** @var BasketInfraService */
+    private $basketInfraService;
+
     public function __construct(
         Repository $repository,
         Authentication $authenticationService,
         Authorization $authorizationService,
-        Legacy $legacyService
+        Legacy $legacyService,
+        BasketInfraService $basketInfraService
     ) {
         $this->repository            = $repository;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
         $this->legacyService         = $legacyService;
+        $this->basketInfraService    = $basketInfraService;
     }
 
     /**
@@ -100,6 +106,17 @@ final class Basket
         }
 
         return $customer;
+    }
+
+    public function addProduct(string $basketId, string $productId, float $amount): BasketDataType
+    {
+        $basket = $this->getBasket($basketId);
+
+        if ($this->isSameUser($basket)) {
+            $this->basketInfraService->addProduct($basket, $productId, $amount);
+        }
+
+        return $basket;
     }
 
     /**

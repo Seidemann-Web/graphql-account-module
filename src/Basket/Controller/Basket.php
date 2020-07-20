@@ -36,6 +36,14 @@ final class Basket
 
     /**
      * @Mutation()
+     */
+    public function basketAddProduct(string $basketId, string $productId, float $amount): BasketDataType
+    {
+        return $this->basketService->addProduct($basketId, $productId, $amount);
+    }
+
+    /**
+     * @Mutation()
      * @Logged
      */
     public function basketRemove(string $id): bool

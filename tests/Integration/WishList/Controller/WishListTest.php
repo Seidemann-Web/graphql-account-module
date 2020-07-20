@@ -56,19 +56,6 @@ final class WishListTest extends TokenTestCase
         $this->assertSame('Product was not found by id: not_a_product', $result['body']['errors'][0]['message']);
     }
 
-    public function testAddProductToWishListNoToken(): void
-    {
-        $result = $this->query('
-            mutation{
-                wishListAddProduct(productId: "' . self::PRODUCT_ID . '") {
-                    id
-                }
-            }
-        ');
-
-        $this->assertResponseStatus(400, $result);
-    }
-
     public function testMakeWishListPrivateWithToken(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);

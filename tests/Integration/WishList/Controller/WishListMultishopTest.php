@@ -71,46 +71,6 @@ final class WishListMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderWishListPerShop
      */
-    public function testAddProductToWishListPerShop(string $shopId, string $productId): void
-    {
-        $this->assignUserToShop((int) $shopId);
-
-        EshopRegistry::getConfig()->setShopId($shopId);
-        $this->setGETRequestParameter('shp', $shopId);
-        $this->getWishList()->delete();
-
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-
-        $result = $this->addProductToWishListMutation($productId);
-
-        $this->assertResponseStatus(200, $result);
-
-        $products = $this->getWishListArticles();
-        $this->assertSame($productId, array_pop($products)->getId());
-    }
-
-    public function testAddProductToWishListForMallUserFromOtherSubshop(): void
-    {
-        $this->assignUserToShop(1);
-
-        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
-        EshopRegistry::getConfig()->setShopId(2);
-        $this->setGETRequestParameter('shp', '2');
-        $this->getWishList()->delete();
-
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-
-        $result = $this->addProductToWishListMutation(self::SHOP_2_PRODUCT_ID);
-
-        $this->assertResponseStatus(200, $result);
-
-        $products = $this->getWishListArticles();
-        $this->assertSame(self::SHOP_2_PRODUCT_ID, array_pop($products)->getId());
-    }
-
-    /**
-     * @dataProvider dataProviderWishListPerShop
-     */
     public function testRemoveProductFromWishListPerShop(string $shopId, string $productId): void
     {
         $this->assignUserToShop((int) $shopId);
