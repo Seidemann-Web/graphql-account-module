@@ -16,6 +16,7 @@ use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as AccountRepos
 use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddress as InvoiceAddressService;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
+use OxidEsales\GraphQL\Account\Basket\Infrastructure\Repository as BasketRepository;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
@@ -45,16 +46,21 @@ final class RelationService
     /** @var InvoiceAddressService */
     private $invoiceAddressService;
 
+    /** @var BasketRepository */
+    private $basketRepository;
+
     public function __construct(
         ReviewService $reviewService,
         NewsletterStatusService $newsletterStatusService,
         AccountRepository $accountRepository,
-        InvoiceAddressService $invoiceAddressService
+        InvoiceAddressService $invoiceAddressService,
+        BasketRepository $basketRepository
     ) {
         $this->reviewService           = $reviewService;
         $this->newsletterStatusService = $newsletterStatusService;
         $this->accountRepository       = $accountRepository;
         $this->invoiceAddressService   = $invoiceAddressService;
+        $this->basketRepository        = $basketRepository;
     }
 
     /**
@@ -118,7 +124,7 @@ final class RelationService
      */
     public function getBasket(CustomerDataType $customer, string $title): BasketDataType
     {
-        return $this->accountRepository->basket($customer, $title);
+        return $this->basketRepository->basket($customer, $title);
     }
 
     /**
@@ -128,6 +134,6 @@ final class RelationService
      */
     public function getBaskets(CustomerDataType $customer): array
     {
-        return $this->accountRepository->baskets($customer);
+        return $this->basketRepository->baskets($customer);
     }
 }
