@@ -61,3 +61,6 @@ REPLACE INTO `oxuserbasketitems` (`OXID`, `OXBASKETID`, `OXARTID`, `OXAMOUNT`, `
 ('_test_wish_list_item_2', '_test_wish_list_private', '_test_product_for_wish_list', 1, 'N;', ''),
 ('_test_basket_item_1', '_test_basket_public', '_test_product_for_basket', 1, 'N;', ''),
 ('_test_basket_item_2', '_test_basket_private', '_test_product_for_basket', 1, 'N;', '');
+
+INSERT INTO `oxuserbaskets` (`OXID`, `OXUSERID`, `OXTITLE`, `OXTIMESTAMP`, `OXPUBLIC`, `OXUPDATE`) VALUES
+('test_basket',	'e7af1c3b786fd02906ccd75698f4e6b9',	'savedbasket',	'2020-07-20 10:40:36',	0,	1595234436);

@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\Basket\Service;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner as BasketOwnerDataType;
+use OxidEsales\GraphQL\Account\Basket\Exception\BasketAccessForbidden;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
 use OxidEsales\GraphQL\Account\Basket\Infrastructure\Basket as BasketInfraService;
 use OxidEsales\GraphQL\Account\Basket\Infrastructure\Repository as BasketRepository;
@@ -67,7 +68,9 @@ final class Basket
     {
         $basket = $this->basketRepository->getBasketById($id);
 
-        if ($basket->public() === false && !$this->isSameUser($basket)) {
+        if ($basket->public() === false &&
+            !$basket->belongsToUser($this->authenticationService->getUserId())
+        ) {
             throw new InvalidToken('Basket is private.');
         }
 
@@ -85,7 +88,7 @@ final class Basket
         //user can remove only his own baskets unless otherwise authorized
         if (
             $this->authorizationService->isAllowed('DELETE_BASKET')
-            || $this->isSameUser($basket)
+            || $basket->belongsToUser($this->authenticationService->getUserId())
         ) {
             return $this->repository->delete($basket->getEshopModel());
         }
@@ -118,7 +121,7 @@ final class Basket
     {
         $basket = $this->basketRepository->getBasketById($basketId);
 
-        if (!$this->isSameUser($basket)) {
+        if (!$basket->belongsToUser($this->authenticationService->getUserId())) {
             throw new InvalidLogin('Unauthorized');
         }
 
@@ -140,8 +143,33 @@ final class Basket
         return $this->repository->saveModel($basket->getEshopModel());
     }
 
-    private function isSameUser(BasketDataType $basket): bool
+    /**
+     * @throws BasketAccessForbidden
+     */
+    public function makePublic(string $basketId): BasketDataType
     {
-        return (string) $basket->getUserId() === (string) $this->authenticationService->getUserId();
+        $basket = $this->basketRepository->getBasketById($basketId);
+
+        if (!$basket->belongsToUser($this->authenticationService->getUserId())) {
+            throw BasketAccessForbidden::byAuthenticatedUser();
+        }
+        $this->basketInfraService->makePublic($basket);
+
+        return $basket;
+    }
+
+    /**
+     * @throws BasketAccessForbidden
+     */
+    public function makePrivate(string $basketId): BasketDataType
+    {
+        $basket = $this->basketRepository->getBasketById($basketId);
+
+        if (!$basket->belongsToUser($this->authenticationService->getUserId())) {
+            throw BasketAccessForbidden::byAuthenticatedUser();
+        }
+        $this->basketInfraService->makePrivate($basket);
+
+        return $basket;
     }
 }

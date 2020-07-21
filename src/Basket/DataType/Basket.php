@@ -102,6 +102,11 @@ final class Basket implements DataType
         );
     }
 
+    public function belongsToUser(string $userId): bool
+    {
+        return (string) $this->getUserId() === $userId;
+    }
+
     /**
      * @return class-string
      */

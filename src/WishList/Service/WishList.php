@@ -63,26 +63,6 @@ final class WishList
         $this->productService          = $productService;
     }
 
-    public function makePrivate(): WishListDataType
-    {
-        /** @var CustomerDataType $customer */
-        $customer = $this->customerService->customer($this->authenticationService->getUserId());
-        $wishList = $customer->getWishList();
-        $wishList->setPublic(false);
-
-        return $wishList;
-    }
-
-    public function makePublic(): WishListDataType
-    {
-        /** @var CustomerDataType $customer */
-        $customer = $this->customerService->customer($this->authenticationService->getUserId());
-        $wishList = $customer->getWishList();
-        $wishList->setPublic(true);
-
-        return $wishList;
-    }
-
     /**
      * @throws WishListNotFound
      */

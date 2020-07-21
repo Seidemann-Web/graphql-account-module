@@ -62,4 +62,22 @@ final class Basket
     {
         return $this->basketService->remove($id);
     }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     */
+    public function basketMakePublic(string $id): BasketDataType
+    {
+        return $this->basketService->makePublic($id);
+    }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     */
+    public function basketMakePrivate(string $id): BasketDataType
+    {
+        return $this->basketService->makePrivate($id);
+    }
 }

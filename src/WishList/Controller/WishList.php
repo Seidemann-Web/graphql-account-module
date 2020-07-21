@@ -31,24 +31,6 @@ final class WishList
     }
 
     /**
-     * @Mutation()
-     * @Logged()
-     */
-    public function wishListMakePrivate(): WishListDataType
-    {
-        return $this->wishListService->makePrivate();
-    }
-
-    /**
-     * @Mutation()
-     * @Logged()
-     */
-    public function wishListMakePublic(): WishListDataType
-    {
-        return $this->wishListService->makePublic();
-    }
-
-    /**
      * @Query()
      */
     public function wishList(string $id): WishListDataType

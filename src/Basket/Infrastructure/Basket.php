@@ -30,4 +30,24 @@ final class Basket
 
         return $this->repository->saveModel($model);
     }
+
+    public function makePublic(BasketDataType $basket): bool
+    {
+        $model = $basket->getEshopModel();
+        $model->assign([
+            'oxuserbaskets__oxpublic' => 1,
+        ]);
+
+        return $this->repository->saveModel($model);
+    }
+
+    public function makePrivate(BasketDataType $basket): bool
+    {
+        $model = $basket->getEshopModel();
+        $model->assign([
+            'oxuserbaskets__oxpublic' => 0,
+        ]);
+
+        return $this->repository->saveModel($model);
+    }
 }

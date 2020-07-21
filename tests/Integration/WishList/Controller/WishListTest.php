@@ -46,30 +46,6 @@ final class WishListTest extends TokenTestCase
 
     private const OWNER_ID_WITHOUT_WISH_LIST = 'c0ea0473445326f4b43724e3b76547a5';
 
-    public function testMakeWishListPrivateWithToken(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->query(
-            'mutation{
-                 wishListMakePrivate {
-                    id
-                    public
-                 }
-            }'
-        );
-
-        $this->assertResponseStatus(200, $result);
-
-        $this->assertEquals(
-            [
-                'id'     => self::PRIVATE_WISHLIST_ID,
-                'public' => false,
-            ],
-            $result['body']['data']['wishListMakePrivate']
-        );
-    }
-
     public function testGetPublicWishList(): void
     {
         $result = $this->query(
@@ -169,19 +145,6 @@ final class WishListTest extends TokenTestCase
         $this->assertResponseStatus(404, $result);
     }
 
-    public function testMakeWishListPrivateWithoutToken(): void
-    {
-        $result = $this->query(
-            'mutation{
-                 wishListMakePrivate {
-                    id
-                 }
-            }'
-        );
-
-        $this->assertResponseStatus(400, $result);
-    }
-
     public function testRemoveProductFromWishListWithoutToken(): void
     {
         $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
@@ -192,47 +155,6 @@ final class WishListTest extends TokenTestCase
         $this->setAuthToken('');
         $result = $this->removeProductFromWishListMutation(self::PRODUCT_ID);
         $this->assertResponseStatus(400, $result);
-    }
-
-    public function makeWishListPublicProvider(): array
-    {
-        return [
-            [
-                'userHasToken'     => false,
-                'expectedStatus'   => 400,
-                'expectedWishList' => null,
-            ],
-            [
-                'userHasToken'     => true,
-                'expectedStatus'   => 200,
-                'expectedWishList' => ['public' => true],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider makeWishListPublicProvider
-     *
-     * @param mixed $expectedWishList
-     */
-    public function testMakeWishListPublic(bool $userHasToken, int $expectedStatus, $expectedWishList): void
-    {
-        if ($userHasToken) {
-            $this->prepareToken(self::USERNAME, self::PASSWORD);
-        }
-
-        $result = $this->query('
-            mutation {
-                wishListMakePublic {
-                    public
-                }
-            }
-        ');
-
-        $this->assertResponseStatus($expectedStatus, $result);
-        $actualWishList = $result['body']['data']['wishListMakePublic'] ?? null;
-
-        $this->assertEquals($expectedWishList, $actualWishList);
     }
 
     public function testGetOwnPrivateWishList(): void
