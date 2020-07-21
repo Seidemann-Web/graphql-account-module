@@ -170,31 +170,6 @@ final class BasketTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
     }
 
-    private function basketCreateMutation(string $title): array
-    {
-        return $this->query('mutation {
-            basketCreate(basket: {title: "' . $title . '"}) {
-                owner {
-                    firstName
-                }
-                items(pagination: {limit: 10, offset: 0}) {
-                    product {
-                        title
-                    }
-                }
-                id
-                public
-            }
-        }');
-    }
-
-    private function basketRemoveMutation(string $basketId): array
-    {
-        return $this->query('mutation {
-            basketRemove(id: "' . $basketId . '")
-        }');
-    }
-
     public function testAddProductToBasketNoToken(): void
     {
         $result = $this->query('
@@ -274,5 +249,30 @@ final class BasketTest extends TokenTestCase
             ],
             $result['body']['data']['basketAddProduct']
         );
+    }
+
+    private function basketCreateMutation(string $title): array
+    {
+        return $this->query('mutation {
+            basketCreate(basket: {title: "' . $title . '"}) {
+                owner {
+                    firstName
+                }
+                items(pagination: {limit: 10, offset: 0}) {
+                    product {
+                        title
+                    }
+                }
+                id
+                public
+            }
+        }');
+    }
+
+    private function basketRemoveMutation(string $basketId): array
+    {
+        return $this->query('mutation {
+            basketRemove(id: "' . $basketId . '")
+        }');
     }
 }

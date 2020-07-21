@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Basket\Controller;
 
 use OxidEsales\Eshop\Application\Model\User as EshopUser;
-use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasket;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
