@@ -82,6 +82,27 @@ final class Basket
     }
 
     /**
+     * @throws CustomerNotFound
+     */
+    public function basketOwner(string $id): BasketOwnerDataType
+    {
+        $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
+
+        try {
+            /** @var BasketOwnerDataType $customer */
+            $customer = $this->repository->getById(
+                $id,
+                BasketOwnerDataType::class,
+                $ignoreSubShop
+            );
+        } catch (NotFound $e) {
+            throw CustomerNotFound::byId($id);
+        }
+
+        return $customer;
+    }
+
+    /**
      * @throws BasketNotFound
      */
     private function getBasket(string $id): BasketDataType
@@ -103,26 +124,5 @@ final class Basket
     private function isSameUser(BasketDataType $basket): bool
     {
         return (string) $basket->getUserId() === (string) $this->authenticationService->getUserId();
-    }
-
-    /**
-     * @throws CustomerNotFound
-     */
-    public function basketOwner(string $id): BasketOwnerDataType
-    {
-        $ignoreSubShop = (bool) $this->legacyService->getConfigParam('blMallUsers');
-
-        try {
-            /** @var BasketOwnerDataType $customer */
-            $customer = $this->repository->getById(
-                $id,
-                BasketOwnerDataType::class,
-                $ignoreSubShop
-            );
-        } catch (NotFound $e) {
-            throw CustomerNotFound::byId($id);
-        }
-
-        return $customer;
     }
 }
