@@ -9,16 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Basket\Controller;
 
-use OxidEsales\Eshop\Application\Model\User as EshopUser;
-use OxidEsales\Eshop\Application\Model\UserBasket as EshopUserBasket;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
 final class BasketRemoveMultishopTest extends MultishopTestCase
 {
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
-
-    private const OTHER_USER_OXID = '245ad3b5380202966df6ff128e9eecaq';
 
     private const OTHER_PASSWORD = 'useruser';
 
@@ -29,6 +25,9 @@ final class BasketRemoveMultishopTest extends MultishopTestCase
     private const PUBLIC_BASKET = '_test_basket_public'; //owned by shop1 user
 
     private const PRIVATE_BASKET = '_test_basket_private'; //owned by otheruser
+
+    // TODO: Check whether this constant exists in basket classes and use it instead
+    private const BASKET_NOTICE_LIST = 'noticelist';
 
     public function testRemoveNotOwnedBasketFromDifferentShop(): void
     {
@@ -50,31 +49,49 @@ final class BasketRemoveMultishopTest extends MultishopTestCase
         $this->assertResponseStatus(400, $result);
     }
 
+    public function testRemoveOwnedBasketFromDifferentShop(): void
+    {
+        EshopRegistry::getConfig()->setShopId('1');
+        $this->setGETRequestParameter('shp', '1');
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->createBasket(self::BASKET_NOTICE_LIST, 'false');
+        $this->assertResponseStatus(200, $result);
+        $basketId = $result['body']['data']['basketCreate']['id'];
+
+        EshopRegistry::getConfig()->setShopId('2');
+        $this->setGETRequestParameter('shp', '2');
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->removeBasket($basketId);
+        $this->assertResponseStatus(401, $result);
+
+        EshopRegistry::getConfig()->setShopId('1');
+        $this->setGETRequestParameter('shp', '1');
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->removeBasket($basketId);
+        $this->assertResponseStatus(200, $result);
+    }
+
     public function testRemoveBasketFromDifferentShopWithTokenForMallUser(): void
     {
-        $this->markTestIncomplete('TODO: finish during roundtrip testing create/remove'); //TODO
-
         EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
         EshopRegistry::getConfig()->setShopId('2');
         $this->setGETRequestParameter('shp', '2');
 
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
-        $result = $this->removeBasket(self::PRIVATE_BASKET);
+        $result = $this->createBasket(self::BASKET_NOTICE_LIST, 'false');
+        $this->assertResponseStatus(200, $result);
+        $basketId = $result['body']['data']['basketCreate']['id'];
+
+        $result = $this->removeBasket($basketId);
         $this->assertResponseStatus(200, $result);
         $this->assertTrue($result['body']['data']['basketRemove']);
-    }
 
-    private function assignUserToShop(int $shopid): void
-    {
-        $user = oxNew(EshopUser::class);
-        $user->load(self::OTHER_USER_OXID);
-        $user->assign(
-            [
-                'oxshopid' => $shopid,
-            ]
-        );
-        $user->save();
+        $result = $this->queryBasket($basketId);
+        $this->assertResponseStatus(404, $result);
     }
 
     private function removeBasket(string $id): array
@@ -86,11 +103,25 @@ final class BasketRemoveMultishopTest extends MultishopTestCase
         );
     }
 
-    private function getBasket(): EshopUserBasket
+    private function createBasket(string $title, string $public = 'true'): array
     {
-        $user = oxNew(EshopUser::class);
-        $user->load(self::OTHER_USER_OXID);
+        return $this->query(
+            'mutation {
+                basketCreate(basket: {title: "' . $title . '", public: ' . $public . '}) {
+                    id
+                }
+            }'
+        );
+    }
 
-        return $user->getBasket(self::PRIVATE_BASKET);
+    private function queryBasket(string $id): array
+    {
+        return $this->query(
+            'query {
+                basket(id: "' . $id . '"){
+                    id
+                }
+            }'
+        );
     }
 }

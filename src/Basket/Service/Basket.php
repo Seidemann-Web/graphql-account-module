@@ -13,6 +13,7 @@ use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner as BasketOwnerDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
+use OxidEsales\GraphQL\Account\Basket\Infrastructure\Repository as BasketRepository;
 use OxidEsales\GraphQL\Account\Basket\Infrastructure\Basket as BasketInfraService;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
@@ -26,6 +27,9 @@ final class Basket
 {
     /** @var Repository */
     private $repository;
+
+    /** @var BasketRepository */
+    private $basketRepository;
 
     /** @var Authentication */
     private $authenticationService;
@@ -41,12 +45,14 @@ final class Basket
 
     public function __construct(
         Repository $repository,
+        BasketRepository $basketRepository,
         Authentication $authenticationService,
         Authorization $authorizationService,
         Legacy $legacyService,
         BasketInfraService $basketInfraService
     ) {
         $this->repository            = $repository;
+        $this->basketRepository      = $basketRepository;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
         $this->legacyService         = $legacyService;
@@ -59,7 +65,7 @@ final class Basket
      */
     public function basket(string $id): BasketDataType
     {
-        $basket = $this->getBasket($id);
+        $basket = $this->basketRepository->getBasketById($id);
 
         if ($basket->public() === false && !$this->isSameUser($basket)) {
             throw new InvalidToken('Basket is private.');
@@ -74,7 +80,7 @@ final class Basket
      */
     public function remove(string $id): bool
     {
-        $basket = $this->getBasket($id);
+        $basket = $this->basketRepository->getBasketById($id);
 
         //user can remove only his own baskets unless otherwise authorized
         if (
@@ -110,7 +116,7 @@ final class Basket
 
     public function addProduct(string $basketId, string $productId, float $amount): BasketDataType
     {
-        $basket = $this->getBasket($basketId);
+        $basket = $this->basketRepository->getBasketById($basketId);
 
         if (!$this->isSameUser($basket)) {
             throw new InvalidLogin('Unauthorized');
@@ -122,22 +128,16 @@ final class Basket
     }
 
     /**
-     * @throws BasketNotFound
+     * @throws InvalidLogin
+     * @throws InvalidToken
      */
-    private function getBasket(string $id): BasketDataType
+    public function store(BasketDataType $basket): bool
     {
-        try {
-            /** @var BasketDataType $basket */
-            $basket = $this->repository->getById(
-                $id,
-                BasketDataType::class,
-                false
-            );
-        } catch (NotFound $e) {
-            throw BasketNotFound::byId($id);
+        if (!$this->authenticationService->isLogged()) {
+            throw new InvalidLogin('Unauthenticated');
         }
 
-        return $basket;
+        return $this->repository->saveModel($basket->getEshopModel());
     }
 
     private function isSameUser(BasketDataType $basket): bool

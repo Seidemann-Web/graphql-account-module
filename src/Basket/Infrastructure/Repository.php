@@ -15,25 +15,52 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
-use OxidEsales\GraphQL\Account\Basket\Service\Basket as BasketService;
+use OxidEsales\GraphQL\Base\Exception\NotFound;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository as CatalogueRepository;
 use TheCodingMachine\GraphQLite\Types\ID;
 
 final class Repository
 {
-    /** @var BasketService */
-    private $basketService;
+    /** @var CatalogueRepository */
+    private $catalogueRepository;
 
     public function __construct(
-        BasketService $basketService
+        CatalogueRepository $catalogueRepository
     ) {
-        $this->basketService       = $basketService;
+        $this->catalogueRepository = $catalogueRepository;
     }
 
+    /**
+     * @throws BasketNotFound
+     */
+    public function getBasketById(string $id): BasketDataType
+    {
+        try {
+            /** @var BasketDataType $basket */
+            $basket = $this->catalogueRepository->getById(
+                $id,
+                BasketDataType::class,
+                false
+            );
+        } catch (NotFound $e) {
+            throw BasketNotFound::byId($id);
+        }
+
+        return $basket;
+    }
+
+    /**
+     * @throws BasketNotFound
+     */
     public function getCustomerBasketByTitle(CustomerDataType $customer, string $title): BasketDataType
     {
         $basket = $customer->getEshopModel()->getBasket($title);
 
-        return $this->basketService->basket($basket->getId());
+        if ($basket->isNewBasket()) {
+            throw BasketNotFound::byTitle($title);
+        }
+
+        return $this->getBasketById($basket->getId());
     }
 
     /**
@@ -51,7 +78,7 @@ final class Repository
         }
 
         foreach ($basketIds as $basketId) {
-            $baskets[] = $this->basketService->basket($basketId);
+            $baskets[] = $this->getBasketById($basketId);
         }
 
         return $baskets;
