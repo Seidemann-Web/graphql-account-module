@@ -36,6 +36,7 @@ final class Basket
 
     /**
      * @Mutation()
+     * @Logged()
      */
     public function basketAddProduct(string $basketId, string $productId, float $amount): BasketDataType
     {

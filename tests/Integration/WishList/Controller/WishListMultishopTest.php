@@ -73,6 +73,8 @@ final class WishListMultiShopTest extends MultishopTestCase
      */
     public function testRemoveProductFromWishListPerShop(string $shopId, string $productId): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->assignUserToShop((int) $shopId);
 
         EshopRegistry::getConfig()->setShopId($shopId);
@@ -95,6 +97,8 @@ final class WishListMultiShopTest extends MultishopTestCase
      */
     public function testRemoveProductFromWishListFromOtherSubshop(string $shopId, string $productId): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->assignUserToShop((int) $shopId);
 
         EshopRegistry::getConfig()->setShopId($shopId);
@@ -122,17 +126,6 @@ final class WishListMultiShopTest extends MultishopTestCase
                 public
             }
         }');
-    }
-
-    private function addProductToWishListMutation(string $productId): array
-    {
-        return $this->query(
-            'mutation{
-                 wishListAddProduct(productId: "' . $productId . '"){
-                id
-              }
-            }'
-        );
     }
 
     private function removeProductFromWishListMutation(string $productId): array

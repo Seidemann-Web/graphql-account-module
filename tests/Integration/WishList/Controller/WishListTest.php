@@ -46,16 +46,6 @@ final class WishListTest extends TokenTestCase
 
     private const OWNER_ID_WITHOUT_WISH_LIST = 'c0ea0473445326f4b43724e3b76547a5';
 
-    public function testAddInvalidProductToWishList(): void
-    {
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-
-        $result = $this->addProductToWishListMutation('not_a_product');
-
-        $this->assertResponseStatus(404, $result);
-        $this->assertSame('Product was not found by id: not_a_product', $result['body']['errors'][0]['message']);
-    }
-
     public function testMakeWishListPrivateWithToken(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
@@ -194,6 +184,8 @@ final class WishListTest extends TokenTestCase
 
     public function testRemoveProductFromWishListWithoutToken(): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
         $this->addProductToWishListMutation(self::PRODUCT_ID);
 
@@ -291,6 +283,8 @@ final class WishListTest extends TokenTestCase
 
     public function testRemoveProductFromWishList(): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
         $this->addProductToWishListMutation(self::PRODUCT_ID);
 
@@ -305,6 +299,8 @@ final class WishListTest extends TokenTestCase
 
     public function testRemoveMultipleProductsFromWishList(): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
         $this->addProductToWishListMutation(self::PRODUCT_ID);
         $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
@@ -319,6 +315,8 @@ final class WishListTest extends TokenTestCase
 
     public function testRemoveProductWhichIsNotPartOfUsersWishList(): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
         $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
 
@@ -331,6 +329,8 @@ final class WishListTest extends TokenTestCase
 
     public function testRemoveNonExistingProductFromWishList(): void
     {
+        $this->markTestIncomplete('TODO: Remove test on refactoring remove mutation'); //TODO
+
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
         $this->addProductToWishListMutation(self::OTHER_PRODUCT_ID);
 
@@ -340,17 +340,6 @@ final class WishListTest extends TokenTestCase
         $products = $this->getWishListArticles();
         $this->assertCount(2, $products);
         $this->assertSame(self::OTHER_PRODUCT_ID, array_pop($products)->getId());
-    }
-
-    private function addProductToWishListMutation(string $productId = self::PRODUCT_ID): array
-    {
-        return $this->query('
-            mutation{
-                wishListAddProduct(productId: "' . $productId . '") {
-                    id
-                }
-            }
-        ');
     }
 
     private function removeProductFromWishListMutation(string $productId = self::PRODUCT_ID): array

@@ -112,9 +112,11 @@ final class Basket
     {
         $basket = $this->getBasket($basketId);
 
-        if ($this->isSameUser($basket)) {
-            $this->basketInfraService->addProduct($basket, $productId, $amount);
+        if (!$this->isSameUser($basket)) {
+            throw new InvalidLogin('Unauthorized');
         }
+
+        $this->basketInfraService->addProduct($basket, $productId, $amount);
 
         return $basket;
     }

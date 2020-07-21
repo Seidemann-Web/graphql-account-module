@@ -131,7 +131,7 @@ final class BasketTest extends TokenTestCase
             }
         ');
 
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(400, $result);
     }
 
     public function testAddProductToBasketWrongBasketId(): void

@@ -63,19 +63,6 @@ final class WishList
         $this->productService          = $productService;
     }
 
-    public function addProduct(string $productId): WishListDataType
-    {
-        $this->assertProductId($productId);
-        /** @var CustomerDataType $customer */
-        $customer = $this->customerService->customer($this->authenticationService->getUserId());
-
-        /** @var EshopUserBasketModel $wishListBasket */
-        $wishListBasket = $customer->getEshopModel()->getBasket(self::SHOP_WISH_LIST_NAME);
-        $wishListBasket->addItemToBasket($productId, 1);
-
-        return new WishListDataType($wishListBasket);
-    }
-
     public function makePrivate(): WishListDataType
     {
         /** @var CustomerDataType $customer */
