@@ -27,7 +27,16 @@ final class BasketTest extends TokenTestCase
 
     private const OTHER_PASSWORD = 'useruser';
 
+    private const DIFFERENT_USERNAME = 'differentuser@oxid-esales.com';
+
     private const PRODUCT = '_test_product_for_basket';
+
+    // TODO: Check whether these constants exist in basket classes and use it instead
+    private const BASKET_WISH_LIST = 'wishlist';
+
+    private const BASKET_NOTICE_LIST = 'noticelist';
+
+    private const BASKET_SAVED_BASKET = 'savedbasket';
 
     public function testGetPublicBasket(): void
     {
@@ -113,5 +122,74 @@ final class BasketTest extends TokenTestCase
         );
 
         $this->assertResponseStatus(403, $result);
+    }
+
+    /**
+     * @dataProvider basketCreateDataProvider
+     */
+    public function testBasketCreateMutation(string $title): void
+    {
+        $this->prepareToken(self::DIFFERENT_USERNAME, self::PASSWORD);
+
+        $result = $this->basketCreateMutation($title);
+        $this->assertResponseStatus(200, $result);
+
+        $basket = $result['body']['data']['basketCreate'];
+        $this->assertSame(self::DIFFERENT_USERNAME, $basket['customer']['email']);
+        $this->assertNotEmpty($basket['id']);
+        $this->assertTrue($basket['public']);
+        $this->assertEmpty($basket['items']);
+
+        $result = $this->basketRemoveMutation($basket['id']);
+        $this->assertResponseStatus(200, $result);
+    }
+
+    public function basketCreateDataProvider(): array
+    {
+        return [
+            [self::BASKET_WISH_LIST],
+            [self::BASKET_NOTICE_LIST],
+            [self::BASKET_SAVED_BASKET],
+            ['non-existing-list'],
+        ];
+    }
+
+    public function testCreateExistingBasketMutation(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->basketCreateMutation(self::BASKET_WISH_LIST);
+        $this->assertResponseStatus(400, $result);
+    }
+
+    public function testCreateBasketMutationWithoutToken(): void
+    {
+        $result = $this->basketCreateMutation(self::BASKET_WISH_LIST);
+        $this->assertResponseStatus(400, $result);
+    }
+
+    private function basketCreateMutation(string $title): array
+    {
+        return $this->query('mutation {
+            basketCreate(basket: {title: "' . $title . '"}) {
+                customer {
+                    email
+                }
+                items(pagination: {limit: 10, offset: 0}) {
+                    product {
+                        title
+                    }
+                }
+                id
+                public
+            }
+        }');
+    }
+
+    private function basketRemoveMutation(string $basketId): array
+    {
+        return $this->query('mutation {
+            basketRemove(id: "' . $basketId . '")
+        }');
     }
 }

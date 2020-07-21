@@ -36,7 +36,18 @@ final class Basket
 
     /**
      * @Mutation()
-     * @Logged
+     * @Logged()
+     */
+    public function basketCreate(BasketDataType $basket): BasketDataType
+    {
+        $this->basketService->store($basket);
+
+        return $basket;
+    }
+
+    /**
+     * @Mutation()
+     * @Logged()
      */
     public function basketRemove(string $id): bool
     {
