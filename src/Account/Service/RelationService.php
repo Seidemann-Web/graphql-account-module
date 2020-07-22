@@ -15,14 +15,12 @@ use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddress
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as AccountRepository;
 use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddress as InvoiceAddressService;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
-use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
 use OxidEsales\GraphQL\Account\Basket\Service\Basket as BasketService;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Service\NewsletterStatus as NewsletterStatusService;
 use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
 use OxidEsales\GraphQL\Account\Review\Service\Review as ReviewService;
-use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
@@ -110,13 +108,6 @@ final class RelationService
     public function invoiceAddress(): InvoiceAddressDataType
     {
         return $this->invoiceAddressService->customerInvoiceAddress();
-    }
-
-    public function getWishList(CustomerDataType $customer): WishListDataType
-    {
-        $wishList = $customer->getEshopModel()->getBasket(WishListService::SHOP_WISH_LIST_NAME);
-
-        return new WishListDataType($wishList);
     }
 
     /**
