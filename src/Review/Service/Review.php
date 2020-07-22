@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Review\Service;
 
 use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
 use OxidEsales\GraphQL\Account\Review\Exception\ReviewNotFound;
+use OxidEsales\GraphQL\Account\Review\Infrastructure\Repository as ReviewRepository;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
@@ -23,6 +24,9 @@ final class Review
 {
     /** @var Repository */
     private $repository;
+
+    /** @var ReviewRepository */
+    private $reviewRepository;
 
     /** @var ReviewService */
     private $reviewService;
@@ -38,12 +42,14 @@ final class Review
 
     public function __construct(
         Repository $repository,
+        ReviewRepository $reviewRepository,
         ReviewService $reviewService,
         Authentication $authenticationService,
         Authorization $authorizationService,
         Legacy $legacyService
     ) {
         $this->repository            = $repository;
+        $this->reviewRepository      = $reviewRepository;
         $this->reviewService         = $reviewService;
         $this->authenticationService = $authenticationService;
         $this->authorizationService  = $authorizationService;
@@ -71,8 +77,8 @@ final class Review
             throw new InvalidLogin('Unauthorized');
         }
 
-        return $this->repository->delete(
-            $review->getEshopModel()
+        return $this->reviewRepository->delete(
+            $review
         );
     }
 
