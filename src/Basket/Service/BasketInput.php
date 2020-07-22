@@ -70,7 +70,7 @@ final class BasketInput
         $customer = $this->customerService->customer($this->authentication->getUserId());
 
         try {
-            $this->basketRepository->getCustomerBasketByTitle($customer, $title);
+            $this->basketRepository->customerBasketByTitle($customer, $title);
         } catch (BasketNotFound $e) {
             return false;
         }

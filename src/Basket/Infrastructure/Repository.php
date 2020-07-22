@@ -10,24 +10,32 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Basket\Infrastructure;
 
 use Doctrine\DBAL\FetchMode;
+use OxidEsales\Eshop\Application\Model\UserBasket as UserBasketEshopModel;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketNotFound;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
-use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository as CatalogueRepository;
+use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository as SharedRepository;
+use PDO;
 use TheCodingMachine\GraphQLite\Types\ID;
+use function getViewName;
 
 final class Repository
 {
-    /** @var CatalogueRepository */
-    private $catalogueRepository;
+    /** @var SharedRepository */
+    private $sharedRepository;
+
+    /** @var QueryBuilderFactoryInterface */
+    private $queryBuilderFactory;
 
     public function __construct(
-        CatalogueRepository $catalogueRepository
+        SharedRepository $sharedRepository,
+        QueryBuilderFactoryInterface $queryBuilderFactory
     ) {
-        $this->catalogueRepository = $catalogueRepository;
+        $this->sharedRepository    = $sharedRepository;
+        $this->queryBuilderFactory = $queryBuilderFactory;
     }
 
     /**
@@ -37,7 +45,7 @@ final class Repository
     {
         try {
             /** @var BasketDataType $basket */
-            $basket = $this->catalogueRepository->getById(
+            $basket = $this->sharedRepository->getById(
                 $id,
                 BasketDataType::class,
                 false
@@ -52,15 +60,18 @@ final class Repository
     /**
      * @throws BasketNotFound
      */
-    public function getCustomerBasketByTitle(CustomerDataType $customer, string $title): BasketDataType
+    public function customerBasketByTitle(CustomerDataType $customer, string $title): BasketDataType
     {
-        $basket = $customer->getEshopModel()->getBasket($title);
+        $model = $customer->getEshopModel()->getBasket($title);
 
-        if ($basket->isNewBasket()) {
-            throw BasketNotFound::byTitle($title);
+        if (!$model->getId()) {
+            throw BasketNotFound::byOwnerAndTitle(
+                (string) $customer->getId(),
+                $title
+            );
         }
 
-        return $this->getBasketById($basket->getId());
+        return new BasketDataType($model);
     }
 
     /**
@@ -68,7 +79,7 @@ final class Repository
      *
      * @return BasketDataType[]
      */
-    public function getCustomerBaskets(CustomerDataType $customer): array
+    public function customerBaskets(CustomerDataType $customer): array
     {
         $baskets   = [];
         $basketIds = $this->getCustomerBasketIds($customer->getId());
@@ -78,7 +89,44 @@ final class Repository
         }
 
         foreach ($basketIds as $basketId) {
-            $baskets[] = $this->getBasketById($basketId);
+            $baskets[] = $this->sharedRepository->getById(
+                $basketId,
+                BasketDataType::class,
+                false
+            );
+        }
+
+        return $baskets;
+    }
+
+    /**
+     * @return BasketDataType[]
+     */
+    public function publicBasketsByOwnerNameOrEmail(string $search): array
+    {
+        $baskets = [];
+
+        $queryBuilder = $this->queryBuilderFactory->create();
+        $queryBuilder->select('userbaskets.*')
+                     ->from(getViewName('oxuserbaskets'), 'userbaskets')
+                     ->innerJoin('userbaskets', getViewName('oxuser'), 'users', 'users.oxid = userbaskets.oxuserid')
+                     ->where('userbaskets.oxpublic = 1')
+                     ->andWhere('(users.oxusername = :search OR users.oxlname = :search)')
+                     ->setParameters([
+                         ':search' => $search,
+                     ]);
+
+        $queryBuilder->getConnection()->setFetchMode(PDO::FETCH_ASSOC);
+        /** @var \Doctrine\DBAL\Statement $result */
+        $result = $queryBuilder->execute();
+
+        /** @var UserBasketEshopModel */
+        $model = oxNew(UserBasketEshopModel::class);
+
+        foreach ($result as $row) {
+            $newModel = clone $model;
+            $newModel->assign($row);
+            $baskets[] = new BasketDataType($newModel);
         }
 
         return $baskets;
@@ -87,9 +135,9 @@ final class Repository
     private function getCustomerBasketIds(ID $customerId): ?array
     {
         $queryBuilder = ContainerFactory::getInstance()
-        ->getContainer()
-        ->get(QueryBuilderFactoryInterface::class)
-        ->create();
+            ->getContainer()
+            ->get(QueryBuilderFactoryInterface::class)
+            ->create();
 
         return $queryBuilder
             ->select('oxid')

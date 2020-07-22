@@ -29,4 +29,9 @@ final class BasketNotFound extends NotFound
     {
         return new self(sprintf('Basket was not found by title: %s', $title));
     }
+
+    public static function byOwnerAndTitle(string $userId, string $title): self
+    {
+        return new self(sprintf('Basket "%s" not found for user "%s"', $title, $userId));
+    }
 }

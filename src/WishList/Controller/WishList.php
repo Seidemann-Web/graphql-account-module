@@ -9,12 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishList\Controller;
 
-use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as WishListDataType;
-use OxidEsales\GraphQL\Account\WishList\Exception\WishListNotFound;
 use OxidEsales\GraphQL\Account\WishList\Service\WishList as WishListService;
-use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
-use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
@@ -36,19 +32,6 @@ final class WishList
     public function wishList(string $id): WishListDataType
     {
         return $this->wishListService->wishList($id);
-    }
-
-    /**
-     * @Query()
-     *
-     * @throws CustomerNotFound
-     * @throws InvalidLogin
-     * @throws InvalidToken
-     * @throws WishListNotFound
-     */
-    public function wishListByOwnerId(string $ownerId): WishListDataType
-    {
-        return $this->wishListService->wishListByOwnerId($ownerId);
     }
 
     /**

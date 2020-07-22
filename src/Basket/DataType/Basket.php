@@ -47,6 +47,7 @@ final class Basket implements DataType
     }
 
     /**
+     * @Field()
      * Beware of the following values with special meaning
      * - wishList
      * - noticeList

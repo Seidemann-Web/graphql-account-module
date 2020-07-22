@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\Service;
 
+use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\BasketOwner as BasketOwnerDataType;
@@ -75,6 +76,19 @@ final class Basket
         }
 
         return $basket;
+    }
+
+    public function basketByOwnerAndTitle(CustomerDataType $customer, string $title): BasketDataType
+    {
+        return $this->basketRepository->customerBasketByTitle($customer, $title);
+    }
+
+    /**
+     * @return BasketDataType[]
+     */
+    public function basketsByOwner(CustomerDataType $customer): array
+    {
+        return $this->basketRepository->customerBaskets($customer);
     }
 
     /**
@@ -144,6 +158,14 @@ final class Basket
     }
 
     /**
+     * @return BasketDataType[]
+     */
+    public function publicBasketsByOwnerNameOrEmail(string $owner): array
+    {
+        return $this->basketRepository->publicBasketsByOwnerNameOrEmail($owner);
+    }
+
+    /**
      * @throws BasketAccessForbidden
      */
     public function makePublic(string $basketId): BasketDataType
@@ -169,6 +191,25 @@ final class Basket
             throw BasketAccessForbidden::byAuthenticatedUser();
         }
         $this->basketInfraService->makePrivate($basket);
+
+        return $basket;
+    }
+
+    /**
+     * @throws BasketNotFound
+     */
+    private function getBasket(string $id): BasketDataType
+    {
+        try {
+            /** @var BasketDataType $basket */
+            $basket = $this->repository->getById(
+                $id,
+                BasketDataType::class,
+                false
+            );
+        } catch (NotFound $e) {
+            throw BasketNotFound::byId($id);
+        }
 
         return $basket;
     }

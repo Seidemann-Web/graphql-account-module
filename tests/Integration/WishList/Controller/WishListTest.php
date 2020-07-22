@@ -157,50 +157,20 @@ final class WishListTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
     }
 
-    public function testGetOwnPrivateWishList(): void
+    public function makeWishListPublicProvider(): array
     {
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-
-        $result = $this->wishListByOwnerQuery(self::OTHER_USERNAME_ID);
-        $this->assertResponseStatus(200, $result);
-    }
-
-    public function testGetPublicWishListByOwnerId(): void
-    {
-        $this->prepareToken();
-
-        $result = $this->wishListByOwnerQuery(self::USERNAME_ID);
-        $this->assertResponseStatus(200, $result);
-    }
-
-    public function testGetPrivateWishListByOwnerId(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->wishListByOwnerQuery(self::OTHER_USERNAME_ID);
-        $this->assertResponseStatus(404, $result);
-    }
-
-    public function testGetPublicWishListByOwnerIdWithoutToken(): void
-    {
-        $result = $this->wishListByOwnerQuery(self::OTHER_USERNAME_ID);
-        $this->assertResponseStatus(401, $result);
-    }
-
-    public function testGetWishListByNonExistingOwnerId(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->wishListByOwnerQuery('non-existing-owner');
-        $this->assertResponseStatus(404, $result);
-    }
-
-    public function testGetWishListByOwnerIdWithoutWishList(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->wishListByOwnerQuery(self::OWNER_ID_WITHOUT_WISH_LIST);
-        $this->assertResponseStatus(404, $result);
+        return [
+            [
+                'userHasToken'     => false,
+                'expectedStatus'   => 400,
+                'expectedWishList' => null,
+            ],
+            [
+                'userHasToken'     => true,
+                'expectedStatus'   => 200,
+                'expectedWishList' => ['public' => true],
+            ],
+        ];
     }
 
     public function testRemoveProductFromWishList(): void
@@ -290,20 +260,5 @@ final class WishListTest extends TokenTestCase
     private function getWishListArticles(): array
     {
         return $this->getWishList()->getArticles();
-    }
-
-    private function wishListByOwnerQuery(string $ownerId): array
-    {
-        return $this->query('query {
-            wishListByOwnerId(ownerId: "' . $ownerId . '") {
-                owner {
-                    firstName
-                }
-                id
-                public
-                creationDate
-                lastUpdateDate
-            }
-        }');
     }
 }
