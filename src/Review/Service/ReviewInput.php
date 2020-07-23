@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Review\Service;
 
 use OxidEsales\Eshop\Application\Model\Review as ReviewEshopModel;
-use OxidEsales\GraphQL\Account\Rating\Exception\RatingOutOfBounds;
+use OxidEsales\GraphQL\Account\Review\Exception\RatingOutOfBounds;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
