@@ -144,6 +144,19 @@ final class Basket
         return $basket;
     }
 
+    public function removeProduct(string $basketId, string $productId, float $amount): BasketDataType
+    {
+        $basket = $this->basketRepository->getBasketById($basketId);
+
+        if (!$basket->belongsToUser($this->authenticationService->getUserId())) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        $this->basketInfraService->removeProduct($basket, $productId, $amount);
+
+        return $basket;
+    }
+
     /**
      * @throws InvalidLogin
      * @throws InvalidToken

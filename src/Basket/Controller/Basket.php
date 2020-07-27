@@ -47,6 +47,15 @@ final class Basket
      * @Mutation()
      * @Logged()
      */
+    public function basketRemoveProduct(string $basketId, string $productId, int $amount): BasketDataType
+    {
+        return $this->basketService->removeProduct($basketId, $productId, $amount);
+    }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     */
     public function basketCreate(BasketDataType $basket): BasketDataType
     {
         $this->basketService->store($basket);
