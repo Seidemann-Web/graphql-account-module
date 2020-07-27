@@ -17,6 +17,8 @@ final class CountryTest extends TokenTestCase
 
     private const INACTIVE_COUNTRY  = 'a7c40f633038cd578.22975442';
 
+    private const COUNTRY_WITH_STATES  = '8f241f11096877ac0.98748826';
+
     public function testGetSingleActiveCountry(): void
     {
         $result = $this->query('query {
@@ -24,6 +26,9 @@ final class CountryTest extends TokenTestCase
                 id
                 active
                 title
+                states {
+                    id
+                }
             }
         }');
 
@@ -37,6 +42,7 @@ final class CountryTest extends TokenTestCase
                 'id'     => self::ACTIVE_COUNTRY,
                 'active' => true,
                 'title'  => 'Deutschland',
+                'states' => [],
             ],
             $result['body']['data']['country']
         );
@@ -181,6 +187,136 @@ final class CountryTest extends TokenTestCase
         $this->assertCount(
             0,
             $result['body']['data']['countries']
+        );
+    }
+
+    public function testGetStates(): void
+    {
+        $result = $this->query('query {
+            country (id: "' . self::COUNTRY_WITH_STATES . '") {
+                states {
+                    id
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(
+            200,
+            $result
+        );
+
+        $states = $result['body']['data']['country']['states'];
+
+        $this->assertContains(
+            [
+                'id'     => 'KY',
+                'title'  => 'Kentucky',
+            ],
+            $states
+        );
+
+        $this->assertContains(
+            [
+                'id'     => 'PA',
+                'title'  => 'Pennsylvania',
+            ],
+            $states
+        );
+    }
+
+    public function testGetCountriesStates(): void
+    {
+        $result = $this->query('query {
+            countries {
+                states {
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(
+            200,
+            $result
+        );
+
+        $this->assertGreaterThan(
+            1,
+            $result['body']['data']['countries']
+        );
+
+        $this->assertGreaterThan(
+            62,
+            $result['body']['data']['countries'][0]['states']
+        );
+    }
+
+    public function testCountryStatesMultilanguage(): void
+    {
+        $this->setGETRequestParameter('lang', '2');
+
+        $result = $this->query('query {
+            country (id: "' . self::COUNTRY_WITH_STATES . '") {
+                states {
+                    id
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(
+            200,
+            $result
+        );
+
+        $states = $result['body']['data']['country']['states'];
+
+        $this->assertContains(
+            [
+                'id'     => 'AS',
+                'title'  => 'Amerikanisch-Samoa',
+            ],
+            $states
+        );
+
+        $this->assertContains(
+            [
+                'id'     => 'VI',
+                'title'  => 'Jungferninseln',
+            ],
+            $states
+        );
+    }
+
+    public function testGetCountriesStatesMultilanguage(): void
+    {
+        $this->setGETRequestParameter('lang', '2');
+
+        $result = $this->query('query {
+            countries {
+                states {
+                    id
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(
+            200,
+            $result
+        );
+
+        $this->assertGreaterThan(
+            1,
+            $result['body']['data']['countries']
+        );
+
+        $this->assertContains(
+            [
+                'id'    => 'MP',
+                'title' => 'Nördlichen Marianen',
+            ],
+            $result['body']['data']['countries'][0]['states']
         );
     }
 }
