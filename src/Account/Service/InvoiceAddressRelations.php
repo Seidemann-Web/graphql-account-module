@@ -11,7 +11,10 @@ namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
 use OxidEsales\GraphQL\Account\Country\DataType\Country;
+use OxidEsales\GraphQL\Account\Country\DataType\State;
+use OxidEsales\GraphQL\Account\Country\Exception\StateNotFound;
 use OxidEsales\GraphQL\Account\Country\Service\Country as CountryService;
+use OxidEsales\GraphQL\Account\Country\Service\State as StateService;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 
@@ -23,10 +26,15 @@ final class InvoiceAddressRelations
     /** @var CountryService */
     private $countryService;
 
+    /** @var StateService */
+    private $stateService;
+
     public function __construct(
-        CountryService $countryService
+        CountryService $countryService,
+        StateService $stateService
     ) {
         $this->countryService = $countryService;
+        $this->stateService   = $stateService;
     }
 
     /**
@@ -37,5 +45,19 @@ final class InvoiceAddressRelations
         return $this->countryService->country(
             (string) $invoiceAddress->countryId()
         );
+    }
+
+    /**
+     * @Field()
+     */
+    public function state(InvoiceAddress $invoiceAddress): ?State
+    {
+        try {
+            return $this->stateService->state(
+                (string) $invoiceAddress->stateId()
+            );
+        } catch (StateNotFound $e) {
+            return null;
+        }
     }
 }

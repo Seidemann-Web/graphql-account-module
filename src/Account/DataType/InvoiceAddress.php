@@ -166,6 +166,13 @@ final class InvoiceAddress implements DataType
         );
     }
 
+    public function stateId(): ID
+    {
+        return new ID(
+            $this->customer->getFieldData('oxstateid')
+        );
+    }
+
     public static function getModelClass(): string
     {
         return EshopUserModel::class;

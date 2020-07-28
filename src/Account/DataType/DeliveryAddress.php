@@ -157,6 +157,13 @@ final class DeliveryAddress implements DataType
         );
     }
 
+    public function stateId(): ID
+    {
+        return new ID(
+            $this->address->getFieldData('oxstateid')
+        );
+    }
+
     public static function getModelClass(): string
     {
         return EshopAddressModel::class;

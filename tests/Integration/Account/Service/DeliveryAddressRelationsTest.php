@@ -17,6 +17,8 @@ final class DeliveryAddressRelationsTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
+    private const US_USERNAME = 'existinguser@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
 
     private const COUNTRY_ID = 'a7c40f631fc920687.20179984'; //Germany
@@ -65,6 +67,30 @@ final class DeliveryAddressRelationsTest extends TokenTestCase
         $this->assertResponseStatus(200, $result);
 
         $this->setCountryActiveStatus(self::COUNTRY_ID, 1);
+    }
+
+    public function testGetStateRelation(): void
+    {
+        $this->setGETRequestParameter('lang', '1');
+        $this->prepareToken(self::US_USERNAME, self::PASSWORD);
+
+        $result = $this->query('query {
+            customerDeliveryAddresses {
+                state {
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $deliveryAddresses = $result['body']['data']['customerDeliveryAddresses'];
+        $this->assertCount(1, $deliveryAddresses);
+
+        [$deliveryAddress] = $deliveryAddresses;
+
+        $this->assertNotEmpty($deliveryAddress['state']);
+        $this->assertSame('Arizona', $deliveryAddress['state']['title']);
     }
 
     private function queryCountryRelation(): array

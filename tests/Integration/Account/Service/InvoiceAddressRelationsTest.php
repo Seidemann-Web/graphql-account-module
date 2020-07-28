@@ -17,6 +17,8 @@ final class InvoiceAddressRelationsTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
+    private const US_USERNAME = 'existinguser@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
 
     private const COUNTRY_ID = 'a7c40f631fc920687.20179984'; //Germany
@@ -58,6 +60,26 @@ final class InvoiceAddressRelationsTest extends TokenTestCase
         $this->assertResponseStatus(200, $result);
 
         $this->setCountryActiveStatus(self::COUNTRY_ID, 1);
+    }
+
+    public function testStateRelation(): void
+    {
+        $this->setGETRequestParameter('lang', '1');
+        $this->prepareToken(self::US_USERNAME, self::PASSWORD);
+
+        $result = $this->query('query {
+            customerInvoiceAddress {
+                state {
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $invoiceAddress = $result['body']['data']['customerInvoiceAddress'];
+        $this->assertNotEmpty($invoiceAddress['state']);
+        $this->assertSame('Arizona', $invoiceAddress['state']['title']);
     }
 
     private function queryCountryRelation(): array
