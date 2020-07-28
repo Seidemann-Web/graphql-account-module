@@ -21,7 +21,6 @@ final class NamespaceMapper implements NamespaceMapperInterface
             '\\OxidEsales\\GraphQL\\Account\\WishedPrice\\Controller'      => __DIR__ . '/../../WishedPrice/Controller/',
             '\\OxidEsales\\GraphQL\\Account\\Account\\Controller'          => __DIR__ . '/../../Account/Controller/',
             '\\OxidEsales\\GraphQL\\Account\\NewsletterStatus\\Controller' => __DIR__ . '/../../NewsletterStatus/Controller/',
-            '\\OxidEsales\\GraphQL\\Account\\WishList\\Controller'         => __DIR__ . '/../../WishList/Controller/',
             '\\OxidEsales\\GraphQL\\Account\\Country\\Controller'          => __DIR__ . '/../../Country/Controller/',
             '\\OxidEsales\\GraphQL\\Account\\Basket\\Controller'           => __DIR__ . '/../../Basket/Controller/',
         ];
@@ -42,8 +41,6 @@ final class NamespaceMapper implements NamespaceMapperInterface
             '\\OxidEsales\\GraphQL\\Account\\NewsletterStatus\\DataType'        => __DIR__ . '/../../NewsletterStatus/DataType/',
             '\\OxidEsales\\GraphQL\\Account\\NewsletterStatus\\Service'         => __DIR__ . '/../../NewsletterStatus/Service/',
             '\\OxidEsales\\GraphQL\\Account\\NewsletterStatus\\Infrastructure'  => __DIR__ . '/../../NewsletterStatus/Infrastructure/',
-            '\\OxidEsales\\GraphQL\\Account\\WishList\\DataType'                => __DIR__ . '/../../WishList/DataType/',
-            '\\OxidEsales\\GraphQL\\Account\\WishList\\Service'                 => __DIR__ . '/../../WishList/Service/',
             '\\OxidEsales\\GraphQL\\Account\\Country\\DataType'                 => __DIR__ . '/../../Country/DataType/',
             '\\OxidEsales\\GraphQL\\Account\\Country\\Service'                  => __DIR__ . '/../../Country/Service/',
             '\\OxidEsales\\GraphQL\\Account\\Basket\\DataType'                  => __DIR__ . '/../../Basket/DataType/',
