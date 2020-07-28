@@ -27,7 +27,7 @@ final class BasketAddProductTest extends TokenTestCase
     public function testAddProductToBasketNoToken(): void
     {
         $result = $this->query('
-            mutation{
+            mutation {
                 basketAddProduct(
                     basketId: "' . self::PUBLIC_BASKET . '"
                     productId: "' . self::PRODUCT_ID . '"
@@ -46,7 +46,7 @@ final class BasketAddProductTest extends TokenTestCase
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query('
-            mutation{
+            mutation {
                 basketAddProduct(
                     basketId: "non_existing_basket_id"
                     productId: "' . self::PRODUCT_ID . '"
@@ -65,7 +65,7 @@ final class BasketAddProductTest extends TokenTestCase
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query('
-            mutation{
+            mutation {
                 basketAddProduct(
                     basketId: "' . self::PUBLIC_BASKET . '"
                     productId: "' . self::PRODUCT_ID . '"
