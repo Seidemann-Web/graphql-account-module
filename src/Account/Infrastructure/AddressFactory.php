@@ -13,6 +13,8 @@ use OxidEsales\Eshop\Application\Model\Address as EshopAddressModel;
 use OxidEsales\Eshop\Application\Model\Country as EshopCountryModel;
 use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
 use OxidEsales\Eshop\Application\Model\RequiredFieldsValidator;
+use OxidEsales\Eshop\Application\Model\State as EshopStateModel;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\DeliveryAddressMissingFields;
 use TheCodingMachine\GraphQLite\Types\ID;
@@ -31,6 +33,7 @@ final class AddressFactory
         ?string $zipCode = null,
         ?string $city = null,
         ?ID $countryId = null,
+        ?ID $stateId = null,
         ?string $phone = null,
         ?string $fax = null
     ): DeliveryAddressDataType {
@@ -48,6 +51,7 @@ final class AddressFactory
             'oxzip'       => $zipCode,
             'oxcity'      => $city,
             'oxcountryid' => (string) $countryId,
+            'oxstateid'   => (string) $stateId,
             'oxfon'       => $phone,
             'oxfax'       => $fax,
         ]);
@@ -61,14 +65,27 @@ final class AddressFactory
             $requiredFields
         );
 
-        if (in_array('oxaddress__oxcountryid', $requiredFields, true)) {
-            /** @var EshopCountryModel */
-            $country = oxNew(EshopCountryModel::class);
+        $externalFields = [
+            'oxcountryid' => [
+                'class' => EshopCountryModel::class,
+                'id'    => (string) $countryId,
+            ],
+            'oxstateid' => [
+                'class' => EshopStateModel::class,
+                'id'    => (string) $stateId,
+            ],
+        ];
 
-            if (!$country->load((string) $countryId)) {
-                $address->assign([
-                    'oxcountryid' => null,
-                ]);
+        foreach ($externalFields as $field => ['class' => $class, 'id' => $id]) {
+            if (in_array('oxaddress__' . $field, $requiredFields, true)) {
+                /** @var BaseModel */
+                $object = oxNew($class);
+
+                if (!$object->load($id)) {
+                    $address->assign([
+                        $field => null,
+                    ]);
+                }
             }
         }
 

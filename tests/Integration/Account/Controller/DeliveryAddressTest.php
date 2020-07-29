@@ -218,6 +218,7 @@ final class DeliveryAddressTest extends TokenTestCase
             'zipCode'        => '79098',
             'city'           => 'Freiburg',
             'countryId'      => 'a7c40f631fc920687.20179984',
+            'stateId'        => 'NY',
             'phone'          => '1234',
             'fax'            => '4321',
         ];
@@ -249,6 +250,9 @@ final class DeliveryAddressTest extends TokenTestCase
                     country {
                         id
                     }
+                    state {
+                        id
+                    }
                 }
             }'
         );
@@ -260,10 +264,23 @@ final class DeliveryAddressTest extends TokenTestCase
         $countryId = $inputFields['countryId'];
         unset($inputFields['countryId']);
 
+        $stateId = null;
+
+        if (isset($inputFields['stateId'])) {
+            $stateId = $inputFields['stateId'];
+            unset($inputFields['stateId']);
+        }
+
         foreach ($inputFields as $key => $value) {
             $this->assertSame($value, $deliveryAddress[$key]);
         }
+
         $this->assertSame($countryId, $deliveryAddress['country']['id']);
+
+        if ($stateId) {
+            $this->assertSame($stateId, $deliveryAddress['state']['id']);
+        }
+
         $this->assertNotEmpty($deliveryAddress['id']);
 
         return $deliveryAddress['id'];

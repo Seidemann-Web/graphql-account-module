@@ -45,6 +45,7 @@ final class DeliveryAddressInput
         ?string $zipCode = null,
         ?string $city = null,
         ?ID $countryId = null,
+        ?ID $stateId = null,
         ?string $phone = null,
         ?string $fax = null
     ): DeliveryAddressDataType {
@@ -60,6 +61,7 @@ final class DeliveryAddressInput
             $zipCode,
             $city,
             $countryId,
+            $stateId,
             $phone,
             $fax
         );
