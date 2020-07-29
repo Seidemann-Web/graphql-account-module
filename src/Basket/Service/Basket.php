@@ -215,23 +215,4 @@ final class Basket
 
         return $basket;
     }
-
-    /**
-     * @throws BasketNotFound
-     */
-    private function getBasket(string $id): BasketDataType
-    {
-        try {
-            /** @var BasketDataType $basket */
-            $basket = $this->repository->getById(
-                $id,
-                BasketDataType::class,
-                false
-            );
-        } catch (NotFound $e) {
-            throw BasketNotFound::byId($id);
-        }
-
-        return $basket;
-    }
 }

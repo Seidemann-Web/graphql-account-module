@@ -66,14 +66,6 @@ final class Basket implements DataType
         return (bool) $this->basket->getFieldData('oxpublic');
     }
 
-    public function setPublic(bool $public): void
-    {
-        $value = $public ? 1 : 0;
-
-        $this->basket->assign(['oxpublic' => $value]);
-        $this->basket->save();
-    }
-
     /**
      * @Field()
      */
