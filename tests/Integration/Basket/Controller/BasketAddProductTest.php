@@ -24,19 +24,13 @@ final class BasketAddProductTest extends TokenTestCase
 
     private const PRODUCT_ID = 'dc5ffdf380e15674b56dd562a7cb6aec';
 
+    private const PRIVATE_BASKET = '_test_basket_private';
+
+    private const PRODUCT_FOR_PRIVATE_BASKET = '_test_product_for_wish_list';
+
     public function testAddProductToBasketNoToken(): void
     {
-        $result = $this->query('
-            mutation {
-                basketAddProduct(
-                    basketId: "' . self::PUBLIC_BASKET . '"
-                    productId: "' . self::PRODUCT_ID . '"
-                    amount: 1
-                ) {
-                    id
-                }
-            }
-        ');
+        $result = $this->basketAddProductMutation(self::PUBLIC_BASKET, self::PRODUCT_ID);
 
         $this->assertResponseStatus(400, $result);
     }
@@ -45,17 +39,7 @@ final class BasketAddProductTest extends TokenTestCase
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query('
-            mutation {
-                basketAddProduct(
-                    basketId: "non_existing_basket_id"
-                    productId: "' . self::PRODUCT_ID . '"
-                    amount: 1
-                ) {
-                    id
-                }
-            }
-        ');
+        $result = $this->basketAddProductMutation('non_existing_basket_id', self::PRODUCT_ID);
 
         $this->assertResponseStatus(404, $result);
     }
@@ -64,23 +48,7 @@ final class BasketAddProductTest extends TokenTestCase
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query('
-            mutation {
-                basketAddProduct(
-                    basketId: "' . self::PUBLIC_BASKET . '"
-                    productId: "' . self::PRODUCT_ID . '"
-                    amount: 2
-                ) {
-                    id
-                    items {
-                        product {
-                            id
-                        }
-                        amount
-                    }
-                }
-            }
-        ');
+        $result = $this->basketAddProductMutation(self::PUBLIC_BASKET, self::PRODUCT_ID, 2);
 
         $this->assertResponseStatus(200, $result);
 
@@ -109,12 +77,27 @@ final class BasketAddProductTest extends TokenTestCase
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query('
+        $result = $this->basketAddProductMutation(self::PUBLIC_BASKET, 'non_existing_product');
+
+        $this->assertResponseStatus(404, $result);
+    }
+
+    public function testAddProductToSomeoneElseBasket(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+        $result = $this->basketAddProductMutation(self::PRIVATE_BASKET, self::PRODUCT_FOR_PRIVATE_BASKET);
+
+        $this->assertResponseStatus(401, $result);
+    }
+
+    private function basketAddProductMutation(string $basketId, string $productId, int $amount = 1): array
+    {
+        return $this->query('
             mutation {
                 basketAddProduct(
-                    basketId: "' . self::PUBLIC_BASKET . '"
-                    productId: "non_existing_product"
-                    amount: 2
+                    basketId: "' . $basketId . '",
+                    productId: "' . $productId . '",
+                    amount: ' . $amount . '
                 ) {
                     id
                     items {
@@ -126,7 +109,5 @@ final class BasketAddProductTest extends TokenTestCase
                 }
             }
         ');
-
-        $this->assertResponseStatus(404, $result);
     }
 }
