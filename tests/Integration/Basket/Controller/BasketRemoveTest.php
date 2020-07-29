@@ -13,8 +13,6 @@ use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class BasketRemoveTest extends TokenTestCase
 {
-    private const PUBLIC_BASKET = '_test_basket_public';
-
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
@@ -25,70 +23,89 @@ final class BasketRemoveTest extends TokenTestCase
 
     public function testRemoveBasketNoToken(): void
     {
-        $result = $this->query(
-            'mutation{
-                basketRemove(id: "' . self::PUBLIC_BASKET . '")
-            }'
-        );
+        $basketId = $this->createBasket();
+
+        $result = $this->basketRemoveMutation($basketId);
 
         $this->assertResponseStatus(400, $result);
+
+        $this->deleteBasket($basketId);
     }
 
     public function testRemoveBasketNotFound(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query(
-            'mutation{
-                basketRemove(id: "this_is_no_saved_basket_id")
-            }'
-        );
+        $result = $this->basketRemoveMutation('this_is_no_saved_basket_id');
 
         $this->assertResponseStatus(404, $result);
     }
 
     public function testRemoveBasketOfOtherCustomer(): void
     {
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $basketId = $this->createBasket();
 
-        $result = $this->query(
-            'mutation{
-                basketRemove(id: "' . self::PUBLIC_BASKET . '")
-            }'
-        );
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $result = $this->basketRemoveMutation($basketId);
 
         $this->assertResponseStatus(401, $result);
+
+        $this->deleteBasket($basketId);
     }
 
     public function testRemoveBasketWithToken(): void
     {
-        $this->markTestIncomplete('TODO: finish during roundtrip testing create/remove'); //TODO
+        $basketId = $this->createBasket();
 
         $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->query(
-            'mutation{
-                basketRemove(id: "' . self::PUBLIC_BASKET . '")
-            }'
-        );
+        $result = $this->basketRemoveMutation($basketId);
 
         $this->assertResponseStatus(200, $result);
         $this->assertTrue($result['body']['data']['basketRemove']);
+
+        $this->deleteBasket($basketId);
     }
 
     public function testRemoveBasketWithAdminToken(): void
     {
-        $this->markTestIncomplete('TODO: finish during roundtrip testing create/remove'); //TODO
+        $basketId = $this->createBasket();
 
         $this->prepareToken();
-
-        $result = $this->query(
-            'mutation{
-                basketRemove(id: "' . self::PUBLIC_BASKET . '")
-            }'
-        );
+        $result = $this->basketRemoveMutation($basketId);
 
         $this->assertResponseStatus(200, $result);
         $this->assertTrue($result['body']['data']['basketRemove']);
+
+        $this->deleteBasket($basketId);
+    }
+
+    private function createBasket(): string
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('mutation {
+            basketCreate(basket: {title: "new-basket-list"}) {
+                id
+            }
+        }');
+
+        $this->setAuthToken('');
+
+        return $result['body']['data']['basketCreate']['id'];
+    }
+
+    private function deleteBasket(string $basketId): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+        $this->basketRemoveMutation($basketId);
+    }
+
+    private function basketRemoveMutation(string $basketId): array
+    {
+        return $this->query(
+            'mutation {
+                basketRemove(id: "' . $basketId . '")
+            }'
+        );
     }
 }
