@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\Infrastructure;
 
+use OxidEsales\Eshop\Application\Model\UserBasket as BasketModel;
 use OxidEsales\Eshop\Application\Model\UserBasketItem as BasketItemModel;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
 use OxidEsales\GraphQL\Account\Basket\Exception\BasketItemNotFound;
@@ -37,16 +38,15 @@ final class Basket
     {
         $model = $basket->getEshopModel();
 
-        /** @var BasketItemModel @basketItem */
-        $basketItem = $model->getItem($productId, []);
-
-        if ($basketItem->getArticle($productId) == false) {
+        if (!$this->checkIfProductIsPresentInBasket($basket->getEshopModel(), $productId)) {
             throw BasketItemNotFound::byId($productId, $model->getId());
         }
 
+        /** @var BasketItemModel @basketItem */
+        $basketItem      = $model->getItem($productId, []);
         $amountRemaining = (float) $basketItem->getFieldData('oxamount') - $amount;
 
-        if ($amountRemaining <= 0) {
+        if ($amountRemaining <= 0 || $amount == 0) {
             $amountRemaining = 0;
         }
 
@@ -73,5 +73,22 @@ final class Basket
         ]);
 
         return $this->repository->saveModel($model);
+    }
+
+    private function checkIfProductIsPresentInBasket(BasketModel $model, string $productId): bool
+    {
+        $present     = false;
+        $basketItems = $model->getItems();
+        /** @var BasketItemModel $item */
+        foreach ($basketItems as $item) {
+            $id      = $item->getFieldData('oxartid');
+            $present = ($id === $productId);
+
+            if ($present) {
+                break;
+            }
+        }
+
+        return $present;
     }
 }
