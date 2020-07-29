@@ -12,7 +12,9 @@ namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 use OxidEsales\Eshop\Application\Model\Country as EshopCountryModel;
 use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
 use OxidEsales\Eshop\Application\Model\RequiredFieldsValidator;
+use OxidEsales\Eshop\Application\Model\State as EshopStateModel;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\InvoiceAddressMissingFields;
@@ -32,6 +34,7 @@ final class InvoiceAddressFactory
         ?string $zipCode = null,
         ?string $city = null,
         ?ID $countryId = null,
+        ?ID $stateId = null,
         ?string $vatID = null,
         ?string $phone = null,
         ?string $mobile = null,
@@ -51,7 +54,8 @@ final class InvoiceAddressFactory
                 'oxstreetnr'  => $streetNumber,
                 'oxzip'       => $zipCode,
                 'oxcity'      => $city,
-                'oxcountryid' => $countryId,
+                'oxcountryid' => (string) $countryId,
+                'oxstateid'   => (string) $stateId,
                 'oxustid'     => $vatID ?: $customer->getFieldData('oxustid'),
                 'oxprivphone' => $phone ?: $customer->getFieldData('oxprivphone'),
                 'oxmobfone'   => $mobile ?: $customer->getFieldData('oxmobfone'),
@@ -69,14 +73,27 @@ final class InvoiceAddressFactory
             $requiredFields
         );
 
-        if (in_array('oxaddress__oxcountryid', $requiredFields, true)) {
-            /** @var EshopCountryModel */
-            $country = oxNew(EshopCountryModel::class);
+        $externalFields = [
+            'oxcountryid' => [
+                'class' => EshopCountryModel::class,
+                'id'    => (string) $countryId,
+            ],
+            'oxstateid' => [
+                'class' => EshopStateModel::class,
+                'id'    => (string) $stateId,
+            ],
+        ];
 
-            if (!$country->load((string) $countryId)) {
-                $customer->assign([
-                    'oxcountryid' => null,
-                ]);
+        foreach ($externalFields as $field => ['class' => $class, 'id' => $id]) {
+            if (in_array('oxaddress__' . $field, $requiredFields, true)) {
+                /** @var BaseModel */
+                $object = oxNew($class);
+
+                if (!$object->load($id)) {
+                    $customer->assign([
+                        $field => null,
+                    ]);
+                }
             }
         }
 

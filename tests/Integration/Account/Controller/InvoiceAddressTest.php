@@ -104,8 +104,8 @@ final class InvoiceAddressTest extends TokenTestCase
                     'salutation'     => 'Mrs.',
                     'firstName'      => 'First',
                     'lastName'       => 'Last',
-                    'company'        => '',
-                    'additionalInfo' => '',
+                    'company'        => 'Invoice Company',
+                    'additionalInfo' => 'Invoice address additional info',
                     'street'         => 'Invoice street',
                     'streetNumber'   => '123',
                     'zipCode'        => '3210',
@@ -114,10 +114,10 @@ final class InvoiceAddressTest extends TokenTestCase
                         'id'    => 'a7c40f631fc920687.20179984',
                         'title' => 'Deutschland',
                     ],
-                    'vatID'  => '',
+                    'vatID'  => '0987654321',
                     'phone'  => '',
                     'mobile' => '',
-                    'fax'    => '',
+                    'fax'    => '12345678900',
                 ],
             ],
             [
@@ -125,8 +125,8 @@ final class InvoiceAddressTest extends TokenTestCase
                     'salutation'     => 'Mr.',
                     'firstName'      => 'Invoice First',
                     'lastName'       => 'Invoice Last',
-                    'company'        => '',
-                    'additionalInfo' => '',
+                    'company'        => 'Invoice Company',
+                    'additionalInfo' => 'Invoice address additional info',
                     'street'         => 'Another invoice street',
                     'streetNumber'   => '123',
                     'zipCode'        => '3210',
@@ -135,10 +135,10 @@ final class InvoiceAddressTest extends TokenTestCase
                         'id'    => 'a7c40f6321c6f6109.43859248',
                         'title' => 'Schweiz',
                     ],
-                    'vatID'  => '',
+                    'vatID'  => '0987654321',
                     'phone'  => '',
                     'mobile' => '',
-                    'fax'    => '',
+                    'fax'    => '12345678900',
                 ],
             ],
         ];
@@ -187,7 +187,22 @@ final class InvoiceAddressTest extends TokenTestCase
         $this->assertResponseStatus(200, $result);
 
         $actual = $result['body']['data']['customerInvoiceAddressSet'];
-        $this->assertEquals($invoiceData, $actual);
+
+        $setFields = [
+            'salutation',
+            'firstName',
+            'lastName',
+            'street',
+            'streetNumber',
+            'zipCode',
+            'city',
+        ];
+
+        foreach ($setFields as $setField) {
+            $this->assertSame($invoiceData[$setField], $actual[$setField]);
+        }
+
+        $this->assertSame($invoiceData['country']['id'], $actual['country']['id']);
     }
 
     public function customerInvoiceAddressValidationFailProvider(): array
@@ -309,14 +324,11 @@ final class InvoiceAddressTest extends TokenTestCase
                     'streetNumber'   => '123',
                     'zipCode'        => '3210',
                     'city'           => 'Invoice city',
-                    'country'        => [
-                        'id'    => 'a7c40f6321c6f6109.43859248',
-                        'title' => 'Schweiz',
-                    ],
-                    'vatID'  => '',
-                    'phone'  => '',
-                    'mobile' => '',
-                    'fax'    => '',
+                    'countryId'      => 'a7c40f6321c6f6109.43859248',
+                    'vatID'          => '',
+                    'phone'          => '',
+                    'mobile'         => '',
+                    'fax'            => '',
                 ],
             ],
             [
@@ -330,14 +342,28 @@ final class InvoiceAddressTest extends TokenTestCase
                     'streetNumber'   => '123',
                     'zipCode'        => '3210',
                     'city'           => 'Another invoice city',
-                    'country'        => [
-                        'id'    => 'a7c40f631fc920687.20179984',
-                        'title' => 'Deutschland',
-                    ],
-                    'vatID'  => '0987654321',
-                    'phone'  => '1234567890',
-                    'mobile' => '01234567890',
-                    'fax'    => '12345678900',
+                    'countryId'      => 'a7c40f631fc920687.20179984',
+                    'vatID'          => '0987654321',
+                    'phone'          => '1234567890',
+                    'mobile'         => '01234567890',
+                    'fax'            => '12345678900',
+                ],
+            ],
+            [
+                [
+                    'salutation'     => 'MS',
+                    'firstName'      => 'Dorothy',
+                    'lastName'       => 'Marlowe',
+                    'company'        => 'Invoice Company',
+                    'additionalInfo' => 'private delivery',
+                    'street'         => 'Moonlight Drive',
+                    'streetNumber'   => '41',
+                    'zipCode'        => '08401',
+                    'city'           => 'Atlantic City',
+                    'countryId'      => '8f241f11096877ac0.98748826',
+                    'stateId'        => 'NJ',
+                    'phone'          => '1234',
+                    'fax'            => '4321',
                 ],
             ],
         ];
@@ -348,24 +374,17 @@ final class InvoiceAddressTest extends TokenTestCase
      */
     public function testCustomerInvoiceAddressSetNotLoggedIn(array $invoiceData): void
     {
+        $queryPart = '';
+
+        foreach ($invoiceData as $key => $value) {
+            $queryPart .= $key . ': "' . $value . '",' . PHP_EOL;
+        }
+
         $result = $this->query('mutation {
             customerInvoiceAddressSet (
-                invoiceAddress {
-                    salutation: "' . $invoiceData['salutation'] . '"
-                    firstName: "' . $invoiceData['firstName'] . '"
-                    lastName: "' . $invoiceData['lastName'] . '"
-                    company: "Invoice ' . $invoiceData['company'] . '"
-                    additionalInfo: "Invoice address additional ' . $invoiceData['additionalInfo'] . '"
-                    street: "Invoice ' . $invoiceData['street'] . '"
-                    streetNumber: "' . $invoiceData['streetNumber'] . '"
-                    zipCode: "' . $invoiceData['zipCode'] . '"
-                    city: "Invoice ' . $invoiceData['city'] . '"
-                    countryId: "a7c40f631fc920687.' . $invoiceData['country']['id'] . '"
-                    vatID: "' . $invoiceData['vatID'] . '"
-                    phone: "' . $invoiceData['phone'] . '"
-                    mobile: "' . $invoiceData['mobile'] . '"
-                    fax: "' . $invoiceData['fax'] . '"
-                }
+                invoiceAddress: {' .
+                               $queryPart
+                               . '}
             ){
                 salutation
                 firstName
@@ -393,28 +412,21 @@ final class InvoiceAddressTest extends TokenTestCase
     /**
      * @dataProvider customerInvoiceAddressProvider
      */
-    public function testCustomerInvoiceAddressSet(array $invoiceData): void
+    public function testCustomerInvoiceAddressSet(array $inputFields): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
+        $queryPart = '';
+
+        foreach ($inputFields as $key => $value) {
+            $queryPart .= $key . ': "' . $value . '",' . PHP_EOL;
+        }
+
         $result = $this->query('mutation {
             customerInvoiceAddressSet (
-                invoiceAddress: {
-                    salutation: "' . $invoiceData['salutation'] . '"
-                    firstName: "' . $invoiceData['firstName'] . '"
-                    lastName: "' . $invoiceData['lastName'] . '"
-                    company: "' . $invoiceData['company'] . '"
-                    additionalInfo: "' . $invoiceData['additionalInfo'] . '"
-                    street: "' . $invoiceData['street'] . '"
-                    streetNumber: "' . $invoiceData['streetNumber'] . '"
-                    zipCode: "' . $invoiceData['zipCode'] . '"
-                    city: "' . $invoiceData['city'] . '"
-                    countryId: "' . $invoiceData['country']['id'] . '"
-                    vatID: "' . $invoiceData['vatID'] . '"
-                    phone: "' . $invoiceData['phone'] . '"
-                    mobile: "' . $invoiceData['mobile'] . '"
-                    fax: "' . $invoiceData['fax'] . '"
-                }
+                invoiceAddress: {' .
+                               $queryPart
+                               . '}
             ){
                 salutation
                 firstName
@@ -427,7 +439,9 @@ final class InvoiceAddressTest extends TokenTestCase
                 city
                 country {
                     id
-                    title
+                }
+                state {
+                    id
                 }
                 vatID
                 phone
@@ -438,8 +452,27 @@ final class InvoiceAddressTest extends TokenTestCase
 
         $this->assertResponseStatus(200, $result);
 
-        $actual = $result['body']['data']['customerInvoiceAddressSet'];
-        $this->assertEquals($invoiceData, $actual);
+        $invoiceAddress = $result['body']['data']['customerInvoiceAddressSet'];
+
+        $countryId = $inputFields['countryId'];
+        unset($inputFields['countryId']);
+
+        $stateId = null;
+
+        if (isset($inputFields['stateId'])) {
+            $stateId = $inputFields['stateId'];
+            unset($inputFields['stateId']);
+        }
+
+        foreach ($inputFields as $key => $value) {
+            $this->assertSame($value, $invoiceAddress[$key]);
+        }
+
+        $this->assertSame($countryId, $invoiceAddress['country']['id']);
+
+        if ($stateId) {
+            $this->assertSame($stateId, $invoiceAddress['state']['id']);
+        }
     }
 
     public function providerRequiredFields()
