@@ -23,6 +23,7 @@ use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Base\Service\Legacy;
+use OxidEsales\GraphQL\Catalogue\Product\Service\Product as ProductService;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class Basket
@@ -45,13 +46,17 @@ final class Basket
     /** @var BasketInfraService */
     private $basketInfraService;
 
+    /** @var ProductService */
+    private $productService;
+
     public function __construct(
         Repository $repository,
         BasketRepository $basketRepository,
         Authentication $authenticationService,
         Authorization $authorizationService,
         Legacy $legacyService,
-        BasketInfraService $basketInfraService
+        BasketInfraService $basketInfraService,
+        ProductService $productService
     ) {
         $this->repository            = $repository;
         $this->basketRepository      = $basketRepository;
@@ -59,6 +64,7 @@ final class Basket
         $this->authorizationService  = $authorizationService;
         $this->legacyService         = $legacyService;
         $this->basketInfraService    = $basketInfraService;
+        $this->productService        = $productService;
     }
 
     /**
@@ -138,6 +144,8 @@ final class Basket
         if (!$basket->belongsToUser($this->authenticationService->getUserId())) {
             throw new InvalidLogin('Unauthorized');
         }
+
+        $this->productService->product($productId);
 
         $this->basketInfraService->addProduct($basket, $productId, $amount);
 

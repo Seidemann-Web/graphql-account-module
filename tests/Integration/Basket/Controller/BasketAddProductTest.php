@@ -104,4 +104,29 @@ final class BasketAddProductTest extends TokenTestCase
             $result['body']['data']['basketAddProduct']
         );
     }
+
+    public function testAddNonExistingProductToBasket(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query('
+            mutation {
+                basketAddProduct(
+                    basketId: "' . self::PUBLIC_BASKET . '"
+                    productId: "non_existing_product"
+                    amount: 2
+                ) {
+                    id
+                    items {
+                        product {
+                            id
+                        }
+                        amount
+                    }
+                }
+            }
+        ');
+
+        $this->assertResponseStatus(404, $result);
+    }
 }

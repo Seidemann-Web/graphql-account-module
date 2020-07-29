@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Basket\Controller;
 
-use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
-use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
+use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
-final class BasketAddProductMultishopTest extends TokenTestCase
+final class BasketAddProductMultishopTest extends MultishopTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
@@ -56,7 +55,6 @@ final class BasketAddProductMultishopTest extends TokenTestCase
     {
         EshopRegistry::getConfig()->setShopId($shopId);
         $this->setGETRequestParameter('shp', $shopId);
-        $this->assignUserToShop((int) $shopId);
 
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
@@ -106,7 +104,6 @@ final class BasketAddProductMultishopTest extends TokenTestCase
         EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
         EshopRegistry::getConfig()->setShopId(2);
         $this->setGETRequestParameter('shp', '2');
-        $this->assignUserToShop(1);
 
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
@@ -149,17 +146,5 @@ final class BasketAddProductMultishopTest extends TokenTestCase
             ],
             $result['body']['data']['basketAddProduct']
         );
-    }
-
-    private function assignUserToShop(int $shopId): void
-    {
-        $user = oxNew(EshopUser::class);
-        $user->load(self::OTHER_USER_OXID);
-        $user->assign(
-            [
-                'oxshopid' => $shopId,
-            ]
-        );
-        $user->save();
     }
 }
