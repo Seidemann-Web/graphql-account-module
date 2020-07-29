@@ -18,8 +18,6 @@ final class BasketAddProductMultishopTest extends MultishopTestCase
 
     private const PASSWORD = 'useruser';
 
-    private const OTHER_USER_OXID = '245ad3b5380202966df6ff128e9eecaq';
-
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
     private const OTHER_PASSWORD = 'useruser';

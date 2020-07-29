@@ -47,13 +47,11 @@ REPLACE INTO `oxaddress` (`OXID`, `OXUSERID`, `OXFNAME`, `OXLNAME`, `OXSTREET`, 
 ('test_delivery_address',	'e7af1c3b786fd02906ccd75698f4e6b9',	'Marc',	'Muster',	'Hauptstr',	'13',	'Freiburg',	'Germany',	'a7c40f631fc920687.20179984',	'79098',	'MR',	'2020-07-14 14:12:48'),
 ('test_delivery_address_2',	'e7af1c3b786fd02906ccd75698f4e6b9',	'Marc',	'Muster',	'Hauptstr2',	'132',	'Freiburg',	'Austria',	'a7c40f6320aeb2ec2.72885259',	'79098',	'MR',	'2020-07-14 14:44:06');
 
-REPLACE INTO `oxuserbaskets` (`OXID`, `OXUSERID`, `OXTITLE`, `OXTIMESTAMP`, `OXPUBLIC`, `OXUPDATE`) VALUES
-('test_make_wishlist_private',	'e7af1c3b786fd02906ccd75698f4e6b9',	'wishlist',	'2020-06-30 15:03:20',	1,	1593522181);
-
 REPLACE INTO `oxuserbaskets` (`OXID`, `OXUSERID`, `OXTITLE`, `OXPUBLIC`) VALUES
 ('_test_wish_list_public', 'e7af1c3b786fd02906ccd75698f4e6b9', 'wishlist', true),
-('_test_wish_list_private', '245ad3b5380202966df6ff128e9eecaq', 'wishlist', false),
+('test_make_wishlist_private',	'e7af1c3b786fd02906ccd75698f4e6b9',	'wishlist',	true),
 ('_test_basket_public', 'e7af1c3b786fd02906ccd75698f4e6b9', 'buy_these', true),
+('_test_wish_list_private', '245ad3b5380202966df6ff128e9eecaq', 'wishlist', false),
 ('_test_basket_private', '245ad3b5380202966df6ff128e9eecaq', 'buy_these_later', false);
 
 REPLACE INTO `oxuserbasketitems` (`OXID`, `OXBASKETID`, `OXARTID`, `OXAMOUNT`, `OXSELLIST`, `OXPERSPARAM`) VALUES
