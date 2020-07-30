@@ -168,6 +168,24 @@ final class DeliveryAddressMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus(404, $result);
     }
 
+    public function testDeliveryAddressDeletionFromOtherSubshopForMallUser(): void
+    {
+        $this->ensureShop(1);
+        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
+
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+        $result    = $this->executeMutation();
+        $addressId = $result['body']['data']['customerDeliveryAddressAdd']['id'];
+
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+
+        $result = $this->deleteCustomerDeliveryAddressMutation($addressId);
+
+        $this->assertResponseStatus(200, $result);
+    }
+
     private function executeMutation(): array
     {
         $inputFields =  [
