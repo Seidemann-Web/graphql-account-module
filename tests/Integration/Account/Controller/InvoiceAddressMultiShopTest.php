@@ -13,130 +13,17 @@ use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\MultishopTestCase;
 
-final class AddressMultiShopTest extends MultishopTestCase
+final class InvoiceAddressMultiShopTest extends MultishopTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
-
-    private const DELIVERY_ADDRESS_SHOP_1 = 'test_delivery_address';
-
-    private const DELIVERY_ADDRESS_SHOP_2 = 'test_delivery_address_shop_2';
 
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
     private const OTHER_USER_PASSWORD = 'useruser';
 
     private const OTHER_USER_OXID = '245ad3b5380202966df6ff128e9eecaq';
-
-    public function deliveryAddressesDataProviderPerShop()
-    {
-        return [
-            'shop_1' => [
-                'shopid'   => '1',
-                'expected' => [
-                    [
-                        'id'           => self::DELIVERY_ADDRESS_SHOP_1,
-                        'firstName'    => 'Marc',
-                        'street'       => 'Hauptstr',
-                        'streetNumber' => '13',
-                    ],
-                    [
-                        'id'           => 'test_delivery_address_2',
-                        'firstName'    => 'Marc',
-                        'street'       => 'Hauptstr2',
-                        'streetNumber' => '132',
-                    ],
-                ],
-            ],
-            'shop_2' => [
-                'shopid'   => '2',
-                'expected' => [
-                    [
-                        'id'           => self::DELIVERY_ADDRESS_SHOP_2,
-                        'firstName'    => 'Marc2',
-                        'street'       => 'Hauptstr2',
-                        'streetNumber' => '2',
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider deliveryAddressesDataProviderPerShop
-     *
-     * @param string $shopId
-     * @param array  $expected
-     */
-    public function testGetDeliveryAddressesForLoggedInUser($shopId, $expected): void
-    {
-        EshopRegistry::getConfig()->setShopId($shopId);
-        $this->setGETRequestParameter('shp', $shopId);
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->query('query {
-            customerDeliveryAddresses {
-                id
-                firstName
-                street
-                streetNumber
-            }
-        }');
-
-        $this->assertResponseStatus(200, $result);
-
-        $this->assertSame(
-            $expected,
-            $result['body']['data']['customerDeliveryAddresses']
-        );
-    }
-
-    /**
-     * @dataProvider deliveryAddressDeletionProvider
-     */
-    public function testDeliveryAddressDeletionPerShop(string $shopId, string $deliveryAddressId): void
-    {
-        EshopRegistry::getConfig()->setShopId($shopId);
-        $this->setGETRequestParameter('shp', $shopId);
-
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->deleteCustomerDeliveryAddressMutation($deliveryAddressId);
-
-        $this->assertResponseStatus(200, $result);
-    }
-
-    public function deliveryAddressDeletionProvider(): array
-    {
-        return [
-            ['1', self::DELIVERY_ADDRESS_SHOP_1],
-            ['2', self::DELIVERY_ADDRESS_SHOP_2],
-        ];
-    }
-
-    /**
-     * @dataProvider deliveryAddressDeletionPerDifferentShopProvider
-     */
-    public function testDeliveryAddressDeletionFromShop1ToShop2(string $shopId, string $deliveryAddressId): void
-    {
-        EshopRegistry::getConfig()->setShopId($shopId);
-        $this->setGETRequestParameter('shp', $shopId);
-
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->deleteCustomerDeliveryAddressMutation($deliveryAddressId);
-
-        $this->assertResponseStatus(404, $result);
-    }
-
-    public function deliveryAddressDeletionPerDifferentShopProvider(): array
-    {
-        return [
-            ['1', self::DELIVERY_ADDRESS_SHOP_2],
-            ['2', self::DELIVERY_ADDRESS_SHOP_1],
-        ];
-    }
 
     public function testCustomerInvoiceAddressSet(): void
     {
@@ -236,15 +123,6 @@ final class AddressMultiShopTest extends MultishopTestCase
                 'lastName'  => 'Dodo',
             ],
             $result['body']['data']['customerInvoiceAddressSet']
-        );
-    }
-
-    private function deleteCustomerDeliveryAddressMutation(string $deliveryAddressId): array
-    {
-        return $this->query(
-            'mutation {
-                customerDeliveryAddressDelete(id: "' . $deliveryAddressId . '")
-            }'
         );
     }
 
