@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Infrastructure;
 
+use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
 use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
@@ -21,10 +22,15 @@ final class Repository
     /** @var QueryBuilderFactoryInterface */
     private $queryBuilderFactory;
 
+    /** @var RatingEshopModel */
+    private $eshopRatingModel;
+
     public function __construct(
-        QueryBuilderFactoryInterface $queryBuilderFactory
+        QueryBuilderFactoryInterface $queryBuilderFactory,
+        EshopRatingModel $eshopRatingModel
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
+        $this->eshopRatingModel    = $eshopRatingModel;
     }
 
     /**
@@ -42,6 +48,21 @@ final class Repository
         return true;
     }
 
+    public function saveRating(ReviewDataType $review): bool
+    {
+        $this->eshopRatingModel->assign(
+            [
+                'oxuserid'   => $review->getReviewerId(),
+                'oxobjectid' => $review->getObjectId(),
+                'oxrating'   => $review->getRating(),
+                'oxtype'     => 'oxarticle',
+            ]
+        );
+        $this->eshopRatingModel->save();
+
+        return true;
+    }
+
     /**
      * Sadly there is no relation between oxratings and oxreviews table but the
      * oxuserid, oxobject and oxrating values beeing identical ...
@@ -50,16 +71,18 @@ final class Repository
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder->select('ratings.*')
-                     ->from(getViewName('oxratings'), 'ratings')
-                     ->where('oxuserid = :userid')
-                     ->andWhere('oxobjectid = :object')
-                     ->andWhere('oxrating = :rating')
-                     ->setParameters([
-                         'userid' => $review->getReviewerId(),
-                         'object' => $review->getObjectId(),
-                         'rating' => $review->getRating(),
-                     ])
-                     ->setMaxResults(1);
+            ->from(getViewName('oxratings'), 'ratings')
+            ->where('oxuserid = :userid')
+            ->andWhere('oxobjectid = :object')
+            ->andWhere('oxrating = :rating')
+            ->setParameters(
+                [
+                    'userid' => $review->getReviewerId(),
+                    'object' => $review->getObjectId(),
+                    'rating' => $review->getRating(),
+                ]
+            )
+            ->setMaxResults(1);
         /** @var \Doctrine\DBAL\Statement $result */
         $result = $queryBuilder->execute();
 

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Review\Service;
 
 use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
+use OxidEsales\GraphQL\Account\Review\Exception\ReviewAlreadyExists;
 use OxidEsales\GraphQL\Account\Review\Exception\ReviewNotFound;
 use OxidEsales\GraphQL\Account\Review\Infrastructure\Repository as ReviewRepository;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -87,6 +88,15 @@ final class Review
      */
     public function save(ReviewDataType $review): bool
     {
+        $reviewAndRatingList = $review->getEshopModel()->getReviewAndRatingListByUserId($this->authenticationService->getUserId());
+
+        foreach ($reviewAndRatingList as $reviewAndRating) {
+            if ($reviewAndRating->getObjectId() == $review->getObjectId()) {
+                throw ReviewAlreadyExists::byObjectId($review->getObjectId());
+            }
+        }
+        $this->reviewRepository->saveRating($review);
+
         return $this->repository->saveModel(
             $review->getEshopModel()
         );
