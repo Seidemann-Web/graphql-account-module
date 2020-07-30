@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Basket\Infrastructure;
 
 use Doctrine\DBAL\FetchMode;
 use OxidEsales\Eshop\Application\Model\UserBasket as UserBasketEshopModel;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Basket\DataType\Basket as BasketDataType;
@@ -84,10 +84,6 @@ final class Repository
         $baskets   = [];
         $basketIds = $this->getCustomerBasketIds($customer->getId());
 
-        if (!is_array($basketIds)) {
-            return $baskets;
-        }
-
         foreach ($basketIds as $basketId) {
             $baskets[] = $this->sharedRepository->getById(
                 $basketId,
@@ -116,6 +112,11 @@ final class Repository
                          ':search' => $search,
                      ]);
 
+        if (!EshopRegistry::getConfig()->getConfigParam('blMallUsers')) {
+            $queryBuilder->andWhere('(users.oxshopid = :shopId)')
+                         ->setParameter(':shopId', EshopRegistry::getConfig()->getShopId());
+        }
+
         $queryBuilder->getConnection()->setFetchMode(PDO::FETCH_ASSOC);
         /** @var \Doctrine\DBAL\Statement $result */
         $result = $queryBuilder->execute();
@@ -132,19 +133,18 @@ final class Repository
         return $baskets;
     }
 
-    private function getCustomerBasketIds(ID $customerId): ?array
+    private function getCustomerBasketIds(ID $customerId): array
     {
-        $queryBuilder = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(QueryBuilderFactoryInterface::class)
-            ->create();
+        $queryBuilder = $this->queryBuilderFactory->create();
 
-        return $queryBuilder
+        /** @var \Doctrine\DBAL\Driver\Statement $execute */
+        $execute =  $queryBuilder
             ->select('oxid')
-            ->from('oxuserbaskets')
+            ->from(getViewName('oxuserbaskets'), 'userbaskets')
             ->where('oxuserid = :customerId')
             ->setParameter(':customerId', $customerId)
-            ->execute()
-            ->fetchAll(FetchMode::COLUMN);
+            ->execute();
+
+        return $execute->fetchAll(FetchMode::COLUMN);
     }
 }

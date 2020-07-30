@@ -31,8 +31,6 @@ final class BasketTest extends TokenTestCase
 
     private const PRODUCT = '_test_product_for_basket';
 
-    private const PRODUCT_ID = 'dc5ffdf380e15674b56dd562a7cb6aec';
-
     // TODO: Check whether these constants exist in basket classes and use it instead
     private const BASKET_WISH_LIST = 'wishlist';
 
@@ -144,6 +142,16 @@ final class BasketTest extends TokenTestCase
 
         $result = $this->basketRemoveMutation($basket['id']);
         $this->assertResponseStatus(200, $result);
+
+        $result = $this->query(
+            'query{
+                basket(id: "' . $basket['id'] . '") {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
     }
 
     public function basketCreateDataProvider(): array
@@ -168,87 +176,6 @@ final class BasketTest extends TokenTestCase
     {
         $result = $this->basketCreateMutation(self::BASKET_WISH_LIST);
         $this->assertResponseStatus(400, $result);
-    }
-
-    public function testAddProductToBasketNoToken(): void
-    {
-        $result = $this->query('
-            mutation{
-                basketAddProduct(
-                    basketId: "' . self::PUBLIC_BASKET . '"
-                    productId: "' . self::PRODUCT_ID . '"
-                    amount: 1
-                ) {
-                    id
-                }
-            }
-        ');
-
-        $this->assertResponseStatus(400, $result);
-    }
-
-    public function testAddProductToBasketWrongBasketId(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->query('
-            mutation{
-                basketAddProduct(
-                    basketId: "non_existing_basket_id"
-                    productId: "' . self::PRODUCT_ID . '"
-                    amount: 1
-                ) {
-                    id
-                }
-            }
-        ');
-
-        $this->assertResponseStatus(404, $result);
-    }
-
-    public function testAddProductToBasket(): void
-    {
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->query('
-            mutation{
-                basketAddProduct(
-                    basketId: "' . self::PUBLIC_BASKET . '"
-                    productId: "' . self::PRODUCT_ID . '"
-                    amount: 2
-                ) {
-                    id
-                    items {
-                        product {
-                            id
-                        }
-                        amount
-                    }
-                }
-            }
-        ');
-
-        $this->assertResponseStatus(200, $result);
-
-        $this->assertSame(
-            [
-                'id'    => self::PUBLIC_BASKET,
-                'items' => [
-                    [
-                        'product' => [
-                            'id' => self::PRODUCT_ID,
-                        ],
-                        'amount' => 2,
-                    ], [
-                        'product' => [
-                            'id' => self::PRODUCT,
-                        ],
-                        'amount' => 1,
-                    ],
-                ],
-            ],
-            $result['body']['data']['basketAddProduct']
-        );
     }
 
     private function basketCreateMutation(string $title): array

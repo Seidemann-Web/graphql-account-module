@@ -13,8 +13,6 @@ use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class BasketMakePublicTest extends TokenTestCase
 {
-    private const TEST_BASKET = 'test_basket';
-
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
@@ -23,26 +21,49 @@ final class BasketMakePublicTest extends TokenTestCase
 
     private const OTHER_PASSWORD = 'admin';
 
-    public function setUpBeforeTestSuite(): void
+    private $basketId;
+
+    public function setUp(): void
     {
+        parent::setUp();
+
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $this->query(
-            'mutation{
-                basketMakePrivate(id: "' . self::TEST_BASKET . '"){
-                    public
+        $result = $this->query(
+            'mutation {
+                basketCreate(basket: {
+                    title: "test_basket",
+                    public: false
+                }) {
+                    id
                 }
             }'
         );
 
-        parent::setUpBeforeTestSuite();
+        $this->basketId = $result['body']['data']['basketCreate']['id'];
+    }
+
+    public function tearDown(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $this->query(
+            'mutation {
+                basketRemove(id: "' . $this->basketId . '")
+            }'
+        );
+
+        parent::tearDown();
     }
 
     public function testMakePublicBasketNoToken(): void
     {
+        //Reset token set in setUp method
+        $this->setAuthToken('');
+
         $result = $this->query(
-            'mutation{
-                basketMakePublic(id: "' . self::TEST_BASKET . '"){
+            'mutation {
+                basketMakePublic(id: "' . $this->basketId . '"){
                     public
                 }
             }'
@@ -56,7 +77,7 @@ final class BasketMakePublicTest extends TokenTestCase
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query(
-            'mutation{
+            'mutation {
                 basketMakePublic(id: "this_is_no_saved_basket_id"){
                     public
                 }
@@ -71,8 +92,8 @@ final class BasketMakePublicTest extends TokenTestCase
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
         $result = $this->query(
-            'mutation{
-                basketMakePublic(id: "' . self::TEST_BASKET . '"){
+            'mutation {
+                basketMakePublic(id: "' . $this->basketId . '"){
                     public
                 }
             }'
@@ -83,19 +104,17 @@ final class BasketMakePublicTest extends TokenTestCase
 
     public function testMakePublicBasketWithToken(): void
     {
-        $this->markTestIncomplete('TODO: finish during roundtrip testing create/remove. remove fixture'); //TODO
-
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query(
-            'mutation{
-                basketMakePublic(id: "' . self::TEST_BASKET . '"){
+            'mutation {
+                basketMakePublic(id: "' . $this->basketId . '"){
                     public
                 }
             }'
         );
 
         $this->assertResponseStatus(200, $result);
-        $this->assertTrue($result['body']['data']['basket']['public']);
+        $this->assertTrue($result['body']['data']['basketMakePublic']['public']);
     }
 }

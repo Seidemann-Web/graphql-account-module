@@ -21,10 +21,6 @@ final class BasketMultishopTest extends MultishopTestCase
 
     private const OTHER_PASSWORD = 'useruser';
 
-    private const SHOP_1_PRODUCT_ID = '_test_product_wished_price_3_';
-
-    private const SHOP_2_PRODUCT_ID = '_test_product_5_';
-
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
@@ -120,6 +116,9 @@ final class BasketMultishopTest extends MultishopTestCase
         $this->setGETRequestParameter('shp', '2');
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
+        $result = $this->createBasket(self::BASKET_NOTICE_LIST, 'false');
+        $this->assertResponseStatus(400, $result);
+
         $result = $this->queryBasket($basketId);
         $this->assertResponseStatus(200, $result);
 
@@ -127,131 +126,13 @@ final class BasketMultishopTest extends MultishopTestCase
         $this->assertResponseStatus(200, $result);
     }
 
-    public function dataProviderAddProductToBasketPerShop()
-    {
-        return [
-            'shop_1' => [
-                'shopid'    => '1',
-                'basketId'  => self::PUBLIC_BASKET,
-                'productId' => self::SHOP_1_PRODUCT_ID,
-            ],
-            'shop_2' => [
-                'shopid'    => '2',
-                'basketId'  => '_test_shop2_basket_public',
-                'productId' => self::SHOP_2_PRODUCT_ID,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider dataProviderAddProductToBasketPerShop
-     */
-    public function testAddProductToBasketPerShop(string $shopId, string $basketId, string $productId): void
-    {
-        EshopRegistry::getConfig()->setShopId($shopId);
-        $this->setGETRequestParameter('shp', $shopId);
-        $this->assignUserToShop((int) $shopId);
-
-        $this->prepareToken(self::USERNAME, self::PASSWORD);
-
-        $result = $this->query(
-            'mutation {
-                 basketAddProduct(
-                    basketId: "' . $basketId . '"
-                    productId: "' . $productId . '"
-                    amount: 2
-                 ) {
-                    id
-                    items {
-                        product {
-                            id
-                        }
-                        amount
-                    }
-                }
-            }'
-        );
-
-        $this->assertResponseStatus(200, $result);
-
-        $this->assertSame(
-            [
-                'id'    => $basketId,
-                'items' => [
-                    [
-                        'product' => [
-                            'id' => $productId,
-                        ],
-                        'amount' => 2,
-                    ], [
-                        'product' => [
-                            'id' => '_test_product_for_basket',
-                        ],
-                        'amount' => 1,
-                    ],
-                ],
-            ],
-            $result['body']['data']['basketAddProduct']
-        );
-    }
-
-    public function testAddProductToBasketFromOtherSubshop(): void
-    {
-        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
-        EshopRegistry::getConfig()->setShopId(2);
-        $this->setGETRequestParameter('shp', '2');
-        $this->assignUserToShop(1);
-
-        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
-
-        $result = $this->query(
-            'mutation {
-                 basketAddProduct(
-                    basketId: "' . self:: PRIVATE_BASKET . '"
-                    productId: "' . self::SHOP_2_PRODUCT_ID . '"
-                    amount: 2
-                 ) {
-                    id
-                    items {
-                        product {
-                            id
-                        }
-                        amount
-                    }
-                }
-            }'
-        );
-
-        $this->assertResponseStatus(200, $result);
-
-        $this->assertSame(
-            [
-                'id'    => self:: PRIVATE_BASKET,
-                'items' => [
-                    [
-                        'product' => [
-                            'id' => self::SHOP_2_PRODUCT_ID,
-                        ],
-                        'amount' => 2,
-                    ], [
-                        'product' => [
-                            'id' => '_test_product_for_basket',
-                        ],
-                        'amount' => 1,
-                    ],
-                ],
-            ],
-            $result['body']['data']['basketAddProduct']
-        );
-    }
-
-    private function assignUserToShop(int $shopid): void
+    private function assignUserToShop(int $shopId): void
     {
         $user = oxNew(EshopUser::class);
         $user->load(self::OTHER_USER_OXID);
         $user->assign(
             [
-                'oxshopid' => $shopid,
+                'oxshopid' => $shopId,
             ]
         );
         $user->save();
