@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Service;
 
-use OxidEsales\Eshop\Application\Controller\ReviewController;
 use OxidEsales\GraphQL\Account\Review\DataType\ReviewFilterList;
 use OxidEsales\GraphQL\Account\Review\Exception\ReviewAlreadyExists;
 use OxidEsales\GraphQL\Account\Review\Exception\ReviewNotFound;

@@ -9,13 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Infrastructure;
 
+use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
 use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use PDO;
 use function getViewName;
-use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
 
 final class Repository
 {
@@ -30,7 +30,7 @@ final class Repository
         EshopRatingModel $eshopRatingModel
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
-        $this->eshopRatingModel = $eshopRatingModel;
+        $this->eshopRatingModel    = $eshopRatingModel;
     }
 
     /**
@@ -55,7 +55,7 @@ final class Repository
                 'oxuserid'   => $review->getReviewerId(),
                 'oxobjectid' => $review->getObjectId(),
                 'oxrating'   => $review->getRating(),
-                'oxtype'     => 'oxarticle'
+                'oxtype'     => 'oxarticle',
             ]
         );
         $this->eshopRatingModel->save();
