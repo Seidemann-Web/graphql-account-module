@@ -142,6 +142,16 @@ final class BasketTest extends TokenTestCase
 
         $result = $this->basketRemoveMutation($basket['id']);
         $this->assertResponseStatus(200, $result);
+
+        $result = $this->query(
+            'query{
+                basket(id: "' . $basket['id'] . '") {
+                    id
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
     }
 
     public function basketCreateDataProvider(): array

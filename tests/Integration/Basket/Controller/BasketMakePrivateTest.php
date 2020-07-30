@@ -25,6 +25,8 @@ final class BasketMakePrivateTest extends TokenTestCase
 
     public function setUp(): void
     {
+        parent::setUp();
+
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->query(
@@ -39,8 +41,6 @@ final class BasketMakePrivateTest extends TokenTestCase
         );
 
         $this->basketId = $result['body']['data']['basketCreate']['id'];
-
-        parent::setUp();
     }
 
     public function tearDown(): void

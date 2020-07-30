@@ -116,6 +116,9 @@ final class BasketMultishopTest extends MultishopTestCase
         $this->setGETRequestParameter('shp', '2');
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
+        $result = $this->createBasket(self::BASKET_NOTICE_LIST, 'false');
+        $this->assertResponseStatus(400, $result);
+
         $result = $this->queryBasket($basketId);
         $this->assertResponseStatus(200, $result);
 
