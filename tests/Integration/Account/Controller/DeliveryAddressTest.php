@@ -217,7 +217,7 @@ final class DeliveryAddressTest extends TokenTestCase
             'streetNumber'   => '48',
             'zipCode'        => '79098',
             'city'           => 'Freiburg',
-            'countryId'      => 'a7c40f631fc920687.20179984',
+            'countryId'      => '8f241f11096877ac0.98748826',
             'stateId'        => 'NY',
             'phone'          => '1234',
             'fax'            => '4321',

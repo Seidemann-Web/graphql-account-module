@@ -9,35 +9,32 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Country\Service;
 
-use OxidEsales\GraphQL\Account\Country\DataType\Country as CountryDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\State as StateDataType;
+use OxidEsales\GraphQL\Account\Country\DataType\StateFilterList;
 use OxidEsales\GraphQL\Account\Country\Exception\StateNotFound;
-use OxidEsales\GraphQL\Account\Country\Infrastructure\Repository as StateRepository;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
 final class State
 {
-    /** @var StateRepository */
-    private $stateRepository;
-
     /** @var Repository */
     private $repository;
 
     public function __construct(
-        StateRepository $stateRepository,
         Repository $repository
     ) {
-        $this->stateRepository = $stateRepository;
         $this->repository      = $repository;
     }
 
     /**
      * @return StateDataType[]
      */
-    public function statesByCountry(CountryDataType $country): array
+    public function states(StateFilterList $filter): array
     {
-        return $this->stateRepository->statesByCountry($country);
+        return $this->repository->getByFilter(
+            $filter,
+            StateDataType::class
+        );
     }
 
     public function state(string $id): StateDataType

@@ -74,13 +74,7 @@ final class DeliveryAddressRelationsTest extends TokenTestCase
         $this->setGETRequestParameter('lang', '1');
         $this->prepareToken(self::US_USERNAME, self::PASSWORD);
 
-        $result = $this->query('query {
-            customerDeliveryAddresses {
-                state {
-                    title
-                }
-            }
-        }');
+        $result = $this->queryStateRelation();
 
         $this->assertResponseStatus(200, $result);
 
@@ -91,6 +85,21 @@ final class DeliveryAddressRelationsTest extends TokenTestCase
 
         $this->assertNotEmpty($deliveryAddress['state']);
         $this->assertSame('Arizona', $deliveryAddress['state']['title']);
+    }
+
+    public function testGetStateRelationAsNull(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->queryStateRelation();
+
+        $this->assertResponseStatus(200, $result);
+
+        $deliveryAddresses = $result['body']['data']['customerDeliveryAddresses'];
+        $this->assertCount(2, $deliveryAddresses);
+
+        [$deliveryAddress] = $deliveryAddresses;
+        $this->assertNull($deliveryAddress['state']);
     }
 
     private function queryCountryRelation(): array
@@ -117,5 +126,16 @@ final class DeliveryAddressRelationsTest extends TokenTestCase
             ->where('OXID = :OXID')
             ->setParameter(':OXID', $countryId)
             ->execute();
+    }
+
+    private function queryStateRelation(): array
+    {
+        return $this->query('query {
+            customerDeliveryAddresses {
+                state {
+                    title
+                }
+            }
+        }');
     }
 }
