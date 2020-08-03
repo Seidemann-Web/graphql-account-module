@@ -10,8 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\AddressFilterList;
-use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
-use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\DeliveryAddressNotFound;
 use OxidEsales\GraphQL\Base\DataType\StringFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -20,7 +19,7 @@ use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Authorization;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
-final class Address
+final class DeliveryAddress
 {
     /** @var Repository */
     private $repository;
@@ -42,7 +41,7 @@ final class Address
     }
 
     /**
-     * @return DeliveryAddress[]
+     * @return DeliveryAddressDataType[]
      */
     public function customerDeliveryAddresses(AddressFilterList $filterList): array
     {
@@ -52,7 +51,7 @@ final class Address
                     $this->authenticationService->getUserId()
                 )
             ),
-            DeliveryAddress::class
+            DeliveryAddressDataType::class
         );
     }
 
@@ -76,21 +75,10 @@ final class Address
         throw new InvalidLogin('Unauthorized');
     }
 
-    public function updateInvoiceAddress(InvoiceAddress $invoiceAddress): InvoiceAddress
-    {
-        if (!$id = (string) $this->authenticationService->getUserId()) {
-            throw new InvalidLogin('Unauthorized');
-        }
-
-        $this->repository->saveModel($invoiceAddress->getEshopModel());
-
-        return $invoiceAddress;
-    }
-
     /**
      * @return true
      */
-    public function store(DeliveryAddress $address): bool
+    public function store(DeliveryAddressDataType $address): bool
     {
         return $this->repository->saveModel(
             $address->getEshopModel()
@@ -101,7 +89,7 @@ final class Address
      * @throws DeliveryAddressNotFound
      * @throws InvalidLogin
      */
-    private function getDeliveryAddress(string $id): DeliveryAddress
+    private function getDeliveryAddress(string $id): DeliveryAddressDataType
     {
         /** Only logged in users can query delivery addresses */
         if (!$this->authenticationService->isLogged()) {
@@ -109,10 +97,10 @@ final class Address
         }
 
         try {
-            /** @var DeliveryAddress $deliveryAddress */
+            /** @var DeliveryAddressDataType $deliveryAddress */
             $deliveryAddress = $this->repository->getById(
                 $id,
-                DeliveryAddress::class,
+                DeliveryAddressDataType::class,
                 false
             );
         } catch (NotFound $e) {
@@ -122,7 +110,7 @@ final class Address
         return $deliveryAddress;
     }
 
-    private function isSameUser(DeliveryAddress $deliveryAddress): bool
+    private function isSameUser(DeliveryAddressDataType $deliveryAddress): bool
     {
         return (string) $deliveryAddress->userId() === (string) $this->authenticationService->getUserId();
     }
