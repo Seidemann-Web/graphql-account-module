@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
+use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
@@ -35,5 +36,16 @@ final class InvoiceAddress
             $this->authenticationService->getUserId(),
             InvoiceAddressDataType::class
         );
+    }
+
+    public function updateInvoiceAddress(InvoiceAddressDataType $invoiceAddress): InvoiceAddressDataType
+    {
+        if (!$id = (string) $this->authenticationService->getUserId()) {
+            throw new InvalidLogin('Unauthorized');
+        }
+
+        $this->repository->saveModel($invoiceAddress->getEshopModel());
+
+        return $invoiceAddress;
     }
 }

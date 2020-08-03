@@ -10,25 +10,25 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress as DeliveryAddressDataType;
-use OxidEsales\GraphQL\Account\Account\Infrastructure\AddressFactory;
+use OxidEsales\GraphQL\Account\Account\Infrastructure\DeliveryAddressFactory;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 use TheCodingMachine\GraphQLite\Types\ID;
 
 final class DeliveryAddressInput
 {
-    /** @var AddressFactory */
-    private $addressFactory;
+    /** @var DeliveryAddressFactory */
+    private $deliveryAddressFactory;
 
     /** @var Authentication */
     private $authenticationService;
 
     public function __construct(
-        AddressFactory $addressFactory,
+        DeliveryAddressFactory $deliveryAddressFactory,
         Authentication $authenticationService
     ) {
-        $this->addressFactory        = $addressFactory;
-        $this->authenticationService = $authenticationService;
+        $this->deliveryAddressFactory = $deliveryAddressFactory;
+        $this->authenticationService  = $authenticationService;
     }
 
     /**
@@ -49,7 +49,7 @@ final class DeliveryAddressInput
         ?string $phone = null,
         ?string $fax = null
     ): DeliveryAddressDataType {
-        return $this->addressFactory->createValidAddressType(
+        return $this->deliveryAddressFactory->createValidAddressType(
             $this->authenticationService->getUserId(),
             $salutation,
             $firstName,

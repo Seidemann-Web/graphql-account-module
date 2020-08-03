@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\Account\Controller;
 use OxidEsales\GraphQL\Account\Account\DataType\InvoiceAddress as InvoiceAddressDataType;
 use OxidEsales\GraphQL\Account\Account\Service\InvoiceAddress as InvoiceAddressService;
 use TheCodingMachine\GraphQLite\Annotations\Logged;
+use TheCodingMachine\GraphQLite\Annotations\Mutation;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
 final class InvoiceAddress
@@ -23,6 +24,16 @@ final class InvoiceAddress
         InvoiceAddressService $invoiceAddressService
     ) {
         $this->invoiceAddressService = $invoiceAddressService;
+    }
+
+    /**
+     * @Mutation()
+     * @Logged()
+     */
+    public function customerInvoiceAddressSet(
+        InvoiceAddressDataType $invoiceAddress
+    ): InvoiceAddressDataType {
+        return $this->invoiceAddressService->updateInvoiceAddress($invoiceAddress);
     }
 
     /**
