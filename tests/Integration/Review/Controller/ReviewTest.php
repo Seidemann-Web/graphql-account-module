@@ -195,7 +195,7 @@ final class ReviewTest extends TokenTestCase
         );
     }
 
-    //todo get reviews from user
+    //todo multilanguage review
     public function testUserReviews()
     {
         $this->prepareToken();
@@ -257,13 +257,8 @@ final class ReviewTest extends TokenTestCase
         //create
         $result = $this->query(sprintf($mutation, 5));
         $this->assertResponseStatus(200, $result);
-<<<<<<< Updated upstream
-        $rating = $result['body']['data']['reviewSet'];
-        $this->assertSame(5, $rating['rating']);
-=======
         $review = $result['body']['data']['reviewSet'];
         $this->assertSame(5, $review['rating']);
->>>>>>> Stashed changes
 
         //query, expected result: 3 ratings, average 3.0
         $result = $this->query($query);
@@ -276,11 +271,7 @@ final class ReviewTest extends TokenTestCase
         $reviewId = $review['id'];
         $result   = $this->query(
             'mutation {
-<<<<<<< Updated upstream
-                reviewDelete(id: "' . $ratingId . '")
-=======
                 reviewDelete(id: "' . $reviewId . '")
->>>>>>> Stashed changes
             }'
         );
         $this->assertResponseStatus(200, $result);
