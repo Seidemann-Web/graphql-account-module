@@ -102,8 +102,9 @@ final class ReviewMultiShopTest extends MultishopTestCase
 
         $result = $this->reviewSet(self::PRODUCT_ID_SHOP_1);
         $this->assertResponseStatus(200, $result);
-        $this->createdReviews[] = $result['body']['data']['reviewSet']['id'];
-        $result                 = $this->reviewSet(self::PRODUCT_ID_BOTH_SHOPS);
+        $reviewIdWithShop1Product = $result['body']['data']['reviewSet']['id'];
+        $this->createdReviews[]   = $reviewIdWithShop1Product;
+        $result                   = $this->reviewSet(self::PRODUCT_ID_BOTH_SHOPS);
         $this->assertResponseStatus(200, $result);
         $this->createdReviews[] = $result['body']['data']['reviewSet']['id'];
 
@@ -127,9 +128,11 @@ final class ReviewMultiShopTest extends MultishopTestCase
         $this->assertEquals(3, count($allReviews['body']['data']['customer']['reviews']));
 
         //Here we have the case, that one of the products is not available in the subshop
-        //The result is fine but we get a 404for missing product
         $allReviews = $this->getReviews(true);
-        $this->assertResponseStatus(404, $allReviews);
+        $this->assertResponseStatus(200, $allReviews);
+
+        $reviews = $this->restructureResult($allReviews['body']['data']['customer']['reviews']);
+        $this->assertNull($reviews[$reviewIdWithShop1Product]['product']);
     }
 
     private function reviewSet(string $productId): array
@@ -180,5 +183,16 @@ final class ReviewMultiShopTest extends MultishopTestCase
             }';
 
         return $this->query($query);
+    }
+
+    private function restructureResult(array $reviews): array
+    {
+        $result = [];
+
+        foreach ($reviews as $sub) {
+            $result[$sub['id']] = $sub['product'];
+        }
+
+        return $result;
     }
 }
