@@ -257,14 +257,13 @@ final class ReviewTest extends TokenTestCase
         //create
         $result = $this->query(sprintf($mutation, 5));
         $this->assertResponseStatus(200, $result);
-        $rating = $result['body']['data']['ratingSet'];
+        $rating = $result['body']['data']['reviewSet'];
         $this->assertSame(5, $rating['rating']);
 
         //query, expected result: 3 ratings, average 3.0
         $result = $this->query($query);
         $this->assertResponseStatus(200, $result);
         $productRating = $result['body']['data']['product']['rating'];
-        print_r($productRating);
         $this->assertEquals(3, $productRating['rating']);
         $this->assertSame(3, $productRating['count']);
 
@@ -272,14 +271,14 @@ final class ReviewTest extends TokenTestCase
         $ratingId = $rating['id'];
         $result   = $this->query(
             'mutation {
-                ratingDelete(id: "' . $ratingId . '")
+                reviewDelete(id: "' . $ratingId . '")
             }'
         );
         $this->assertResponseStatus(200, $result);
 
         //query, expected result: 2 ratings, average 2.0
         $result = $this->query($query);
-        $this->assertResponseStatus(200, $result);
+        $this->assertResponseStatus(200, $result); var_export($result);
         $productRating = $result['body']['data']['product']['rating'];
         $this->assertEquals(2, $productRating['rating']);
         $this->assertSame(2, $productRating['count']);
@@ -287,7 +286,7 @@ final class ReviewTest extends TokenTestCase
         //rate again
         $result = $this->query(sprintf($mutation, 4));
         $this->assertResponseStatus(200, $result);
-        $rating = $result['body']['data']['ratingSet']['rating'];
+        $rating = $result['body']['data']['reviewSet']['rating'];
         $this->assertSame(4, $rating);
 
         //query, expected result: 3 ratings, average 2.7
