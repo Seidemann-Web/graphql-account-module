@@ -195,28 +195,27 @@ final class ReviewTest extends TokenTestCase
         );
     }
 
-//    //todo get reviews from user
-//    public function testUserReviews()
-//    {
-//        $this->prepareToken();
-//
-//        $query = 'query{
-//            customer {
-//                reviews{
-//                    id
-//                    text
-//                    rating
-//                }
-//            }
-//        }';
-//
-//        $result = $this->query($query);
-//        $this->assertResponseStatus(200, $result);
-//        print_r($result);
-//        $productRating = $result['body']['data']['product']['rating'];
+    //todo get reviews from user
+    public function testUserReviews()
+    {
+        $this->prepareToken();
+
+        $query = 'query{
+            customer {
+                reviews{
+                    id
+                    text
+                    rating
+                }
+            }
+        }';
+
+        $result = $this->query($query);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['customer']['reviews'];
 //        $this->assertEquals(3, $productRating['rating']);
 //        $this->assertSame(3, $productRating['count']);
-//    }
+    }
 
     public function testProductAverageRating(): void
     {
@@ -239,6 +238,12 @@ final class ReviewTest extends TokenTestCase
                     rating
                     count
                 }
+                reviews {
+                    active
+                    id
+                    text
+                    rating
+                }
             }
         }';
 
@@ -259,6 +264,7 @@ final class ReviewTest extends TokenTestCase
         $result = $this->query($query);
         $this->assertResponseStatus(200, $result);
         $productRating = $result['body']['data']['product']['rating'];
+        print_r($productRating);
         $this->assertEquals(3, $productRating['rating']);
         $this->assertSame(3, $productRating['count']);
 
