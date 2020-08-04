@@ -171,10 +171,6 @@ final class Basket
      */
     public function store(BasketDataType $basket): bool
     {
-        if (!$this->authenticationService->isLogged()) {
-            throw new InvalidLogin('Unauthenticated');
-        }
-
         return $this->repository->saveModel($basket->getEshopModel());
     }
 

@@ -59,8 +59,7 @@ final class BasketOwnerRelationTest extends TokenTestCase
 
     private function deleteUser(string $userId): void
     {
-        $user = oxNew(EshopUser::class);
-        $user->load($userId);
-        $user->delete();
+        $db = self::getDb();
+        $db->execute("delete from oxuser where oxid = :oxid", ['oxid' => $userId]);
     }
 }

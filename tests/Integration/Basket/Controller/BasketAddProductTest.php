@@ -52,25 +52,22 @@ final class BasketAddProductTest extends TokenTestCase
 
         $this->assertResponseStatus(200, $result);
 
-        $this->assertSame(
+        $basketData = $result['body']['data']['basketAddProduct'];
+        $this->assertSame(self::PUBLIC_BASKET, $basketData['id']);
+        $this->assertSame([
             [
-                'id'    => self::PUBLIC_BASKET,
-                'items' => [
-                    [
-                        'product' => [
-                            'id' => self::PRODUCT_ID,
-                        ],
-                        'amount' => 2,
-                    ], [
-                        'product' => [
-                            'id' => self::PRODUCT,
-                        ],
-                        'amount' => 1,
-                    ],
+                'product' => [
+                    'id' => self::PRODUCT_ID,
                 ],
+                'amount' => 2,
+            ], [
+                'product' => [
+                    'id' => self::PRODUCT,
+                ],
+                'amount' => 1,
             ],
-            $result['body']['data']['basketAddProduct']
-        );
+        ], $basketData['items']);
+        $this->assertNotNull($basketData['lastUpdateDate']);
     }
 
     public function testAddNonExistingProductToBasket(): void
@@ -106,6 +103,7 @@ final class BasketAddProductTest extends TokenTestCase
                         }
                         amount
                     }
+                    lastUpdateDate
                 }
             }
         ');

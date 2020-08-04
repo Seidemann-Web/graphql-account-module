@@ -36,13 +36,4 @@ final class BasketItemFilterList extends FilterList
             'oxbasketid' => $this->basket,
         ];
     }
-
-    /**
-     * @Factory(name="BasketItemFilterList")
-     */
-    public static function createBasketItemFilterList(
-        ?IDFilter $basket = null
-    ): self {
-        return new self($basket);
-    }
 }
