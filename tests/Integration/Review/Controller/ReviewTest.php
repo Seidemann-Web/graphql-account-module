@@ -35,6 +35,8 @@ final class ReviewTest extends TokenTestCase
 
     private const REVIEW_TEXT = 'Some text, containing a review for this product.';
 
+    private const PRODUCT_WITH_AVERAGE_RATING = '_test_product_for_rating_avg';
+
     protected function setUp(): void
     {
         Registry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', true);
@@ -44,6 +46,7 @@ final class ReviewTest extends TokenTestCase
     protected function tearDown(): void
     {
         $this->cleanUpTable('oxreviews', 'oxid');
+        $this->cleanUpTable('oxratings', 'oxid');
         Registry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', false);
 
         parent::tearDown();
@@ -162,6 +165,136 @@ final class ReviewTest extends TokenTestCase
             'Product was not found by id: some_not_existing_product',
             $result['body']['errors'][0]['message']
         );
+    }
+
+    public function testSetMultipleReviewsForOneProduct(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'mutation {
+                reviewSet(review: {
+                    productId: "' . self::PRODUCTID . '",
+                    text: "' . self::TEXT . '",
+                    rating: 4
+                }){
+                    id
+                    product{
+                        id
+                    }
+                    text
+                    rating
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(404, $result);
+        $this->assertSame(
+            'Review for product with id: ' . self::PRODUCTID . ' already exists',
+            $result['body']['errors'][0]['message']
+        );
+    }
+
+    //todo multilanguage review
+    public function testUserReviews(): void
+    {
+        $this->prepareToken();
+
+        $query = 'query{
+            customer {
+                reviews{
+                    id
+                    text
+                    rating
+                }
+            }
+        }';
+
+        $result = $this->query($query);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['customer']['reviews'];
+        $this->assertEquals(3, $productRating['rating']);
+        $this->assertSame(3, $productRating['count']);
+    }
+
+    public function testProductAverageRating(): void
+    {
+        $this->prepareToken();
+
+        $mutation =  'mutation {
+            reviewSet(review: {
+                productId: "' . self::PRODUCT_WITH_AVERAGE_RATING . '",
+                text: "' . self::TEXT . '",
+                rating: %d,
+            }){
+                id
+                rating
+            }
+        }';
+
+        $query = 'query {
+            product(id: "' . self::PRODUCT_WITH_AVERAGE_RATING . '") {
+                rating {
+                    rating
+                    count
+                }
+                reviews {
+                    active
+                    id
+                    text
+                    rating
+                }
+            }
+        }';
+
+        //query, expected result: 2 ratings, average 2.0
+        $result = $this->query($query);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['product']['rating'];
+        $this->assertSame(2, $productRating['count']);
+        $this->assertEquals(2.0, $productRating['rating']);
+
+        //create
+        $result = $this->query(sprintf($mutation, 5));
+        $this->assertResponseStatus(200, $result);
+        $review = $result['body']['data']['reviewSet'];
+        $this->assertSame(5, $review['rating']);
+
+        //query, expected result: 3 ratings, average 3.0
+        $result = $this->query($query);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['product']['rating'];
+        $this->assertEquals(3, $productRating['rating']);
+        $this->assertSame(3, $productRating['count']);
+
+        //delete
+        $reviewId = $review['id'];
+        $result   = $this->query(
+            'mutation {
+                reviewDelete(id: "' . $reviewId . '")
+            }'
+        );
+        $this->assertResponseStatus(200, $result);
+
+        //query, expected result: 2 ratings, average 2.0
+        $result = $this->query($query);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['product']['rating'];
+        $this->assertEquals(2, $productRating['rating']);
+        $this->assertSame(2, $productRating['count']);
+
+        //rate again
+        $result = $this->query(sprintf($mutation, 4));
+        $this->assertResponseStatus(200, $result);
+        $rating = $result['body']['data']['reviewSet']['rating'];
+        $this->assertSame(4, $rating);
+
+        //query, expected result: 3 ratings, average 2.7
+        $result = $this->query($query);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['product']['rating'];
+        $this->assertSame(2.7, $productRating['rating']);
+        $this->assertSame(3, $productRating['count']);
     }
 
     public function deleteReviewDataProvider()

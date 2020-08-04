@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Infrastructure;
 
+use OxidEsales\Eshop\Application\Model\Article as EshopArticleModel;
 use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
 use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
@@ -25,12 +26,17 @@ final class Repository
     /** @var RatingEshopModel */
     private $eshopRatingModel;
 
+    /** @var EshopArticleModel */
+    private $eshopArticleModel;
+
     public function __construct(
         QueryBuilderFactoryInterface $queryBuilderFactory,
-        EshopRatingModel $eshopRatingModel
+        EshopRatingModel $eshopRatingModel,
+        EshopArticleModel $eshopArticleModel
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
         $this->eshopRatingModel    = $eshopRatingModel;
+        $this->eshopArticleModel   = $eshopArticleModel;
     }
 
     /**
@@ -59,6 +65,9 @@ final class Repository
             ]
         );
         $this->eshopRatingModel->save();
+
+        $this->eshopArticleModel->load($review->getObjectId());
+        $this->eshopArticleModel->addToRatingAverage($review->getRating());
 
         return true;
     }
