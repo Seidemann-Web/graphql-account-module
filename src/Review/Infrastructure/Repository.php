@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
 use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
+use OxidEsales\GraphQL\Catalogue\Product\Service\Product as ProductService;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use PDO;
 use function getViewName;
@@ -29,14 +30,17 @@ final class Repository
     /** @var EshopArticleModel */
     private $eshopArticleModel;
 
+    /** @var ProductService */
+    private $productService;
+
     public function __construct(
         QueryBuilderFactoryInterface $queryBuilderFactory,
         EshopRatingModel $eshopRatingModel,
-        EshopArticleModel $eshopArticleModel
+        ProductService $productService
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
         $this->eshopRatingModel    = $eshopRatingModel;
-        $this->eshopArticleModel   = $eshopArticleModel;
+        $this->productService      = $productService;
     }
 
     /**
@@ -66,8 +70,10 @@ final class Repository
         );
         $this->eshopRatingModel->save();
 
-        $this->eshopArticleModel->load($review->getObjectId());
-        $this->eshopArticleModel->addToRatingAverage($review->getRating());
+        $product = $this->productService->product(
+            (string) $review->getObjectId()
+        );
+        $product->getEshopModel()->addToRatingAverage($review->getRating());
 
         return true;
     }
