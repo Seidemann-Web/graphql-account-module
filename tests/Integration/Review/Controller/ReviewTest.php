@@ -213,8 +213,8 @@ final class ReviewTest extends TokenTestCase
         $result = $this->query($query);
         $this->assertResponseStatus(200, $result);
         $productRating = $result['body']['data']['customer']['reviews'];
-//        $this->assertEquals(3, $productRating['rating']);
-//        $this->assertSame(3, $productRating['count']);
+        $this->assertEquals(3, $productRating['rating']);
+        $this->assertSame(3, $productRating['count']);
     }
 
     public function testProductAverageRating(): void
@@ -257,8 +257,13 @@ final class ReviewTest extends TokenTestCase
         //create
         $result = $this->query(sprintf($mutation, 5));
         $this->assertResponseStatus(200, $result);
+<<<<<<< Updated upstream
         $rating = $result['body']['data']['reviewSet'];
         $this->assertSame(5, $rating['rating']);
+=======
+        $review = $result['body']['data']['reviewSet'];
+        $this->assertSame(5, $review['rating']);
+>>>>>>> Stashed changes
 
         //query, expected result: 3 ratings, average 3.0
         $result = $this->query($query);
@@ -268,10 +273,14 @@ final class ReviewTest extends TokenTestCase
         $this->assertSame(3, $productRating['count']);
 
         //delete
-        $ratingId = $rating['id'];
+        $reviewId = $review['id'];
         $result   = $this->query(
             'mutation {
+<<<<<<< Updated upstream
                 reviewDelete(id: "' . $ratingId . '")
+=======
+                reviewDelete(id: "' . $reviewId . '")
+>>>>>>> Stashed changes
             }'
         );
         $this->assertResponseStatus(200, $result);
