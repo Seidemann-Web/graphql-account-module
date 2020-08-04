@@ -67,19 +67,25 @@ final class InvoiceAddressRelationsTest extends TokenTestCase
         $this->setGETRequestParameter('lang', '1');
         $this->prepareToken(self::US_USERNAME, self::PASSWORD);
 
-        $result = $this->query('query {
-            customerInvoiceAddress {
-                state {
-                    title
-                }
-            }
-        }');
+        $result = $this->queryStateRelation();
 
         $this->assertResponseStatus(200, $result);
 
         $invoiceAddress = $result['body']['data']['customerInvoiceAddress'];
         $this->assertNotEmpty($invoiceAddress['state']);
         $this->assertSame('Arizona', $invoiceAddress['state']['title']);
+    }
+
+    public function testGetStateRelationAsNull(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->queryStateRelation();
+
+        $this->assertResponseStatus(200, $result);
+
+        $invoiceAddress = $result['body']['data']['customerInvoiceAddress'];
+        $this->assertNull($invoiceAddress['state']);
     }
 
     private function queryCountryRelation(): array
@@ -106,5 +112,16 @@ final class InvoiceAddressRelationsTest extends TokenTestCase
             ->where('OXID = :OXID')
             ->setParameter(':OXID', $countryId)
             ->execute();
+    }
+
+    private function queryStateRelation(): array
+    {
+        return $this->query('query {
+            customerInvoiceAddress {
+                state {
+                    title
+                }
+            }
+        }');
     }
 }
