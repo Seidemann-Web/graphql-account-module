@@ -119,7 +119,7 @@ final class ReviewMultiShopTest extends MultishopTestCase
         //review another product
         $result = $this->reviewSet(self::PRODUCT_ID_SHOP_2);
         $this->assertResponseStatus(200, $result);
-        $this->createdReviews[] = $result['body']['data']['reviewSet']['id'];q
+        $this->createdReviews[] = $result['body']['data']['reviewSet']['id'];
 
         //get reviews for subshop
         $allReviews = $this->getReviews(false);
