@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Review\Controller;
 
-use OxidEsales\Eshop\Application\Model\Review as EshopReviewModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
@@ -27,7 +26,7 @@ final class ReviewTest extends TokenTestCase
 
     private const TEXT = 'Best product ever';
 
-    private const REVIEW_TO_DELETE = 'review_to_delete';
+    private const TEST_DATA_REVIEW = '94415306f824dc1aa2fce0dc4f12783d';
 
     private const USERID = 'e7af1c3b786fd02906ccd75698f4e6b9';
 
@@ -229,87 +228,13 @@ final class ReviewTest extends TokenTestCase
         $this->assertSame(3, $productRating['count']);
     }
 
-    public function deleteReviewDataProvider()
+    public function testDeleteReviewWithoutToken(): void
     {
-        return [
-            [
-                'withUserToken' => true,
-                'expected'      => 200,
-            ],
-            [
-                'withUserToken' => false,
-                'expected'      => 400,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider deleteReviewDataProvider
-     */
-    public function testDeleteActiveReview(bool $withUserToken, int $expected): void
-    {
-        $review = oxNew(EshopReviewModel::class);
-        $review->assign([
-            'oxid'       => self::REVIEW_TO_DELETE,
-            'oxshopid'   => '1',
-            'oxuserid'   => self::USERID,
-            'oxtype'     => 'oxarticle',
-            'oxobjectid' => self::PRODUCT_ID,
-            'oxtext'     => self::REVIEW_TEXT,
-            'oxlang'     => '1',
-            'oxrating'   => 4,
-        ]);
-
-        $review->save();
-
-        if ($withUserToken) {
-            $this->prepareToken(self::USERNAME, self::PASSWORD);
-        }
-
         $result = $this->query('mutation {
-            reviewDelete(id: "' . self::REVIEW_TO_DELETE . '")
+            reviewDelete(id: "' . self::TEST_DATA_REVIEW . '")
         }');
 
-        $this->assertResponseStatus($expected, $result);
-
-        if ($expected === 200) {
-            $this->assertEquals(true, $result['body']['data']['reviewDelete']);
-        }
-    }
-
-    /**
-     * @dataProvider deleteReviewDataProvider
-     */
-    public function testDeleteInactiveReview(bool $withUserToken, int $expected): void
-    {
-        $review = oxNew(EshopReviewModel::class);
-        $review->assign([
-            'oxid'       => self::REVIEW_TO_DELETE,
-            'oxshopid'   => '1',
-            'oxuserid'   => self::USERID,
-            'oxtype'     => 'oxarticle',
-            'oxobjectid' => self::PRODUCT_ID,
-            'oxtext'     => self::REVIEW_TEXT,
-            'oxlang'     => '1',
-            'oxrating'   => 4,
-            'oxactive'   => false,
-        ]);
-
-        $review->save();
-
-        if ($withUserToken) {
-            $this->prepareToken(self::USERNAME, self::PASSWORD);
-        }
-
-        $result = $this->query('mutation {
-            reviewDelete(id: "' . self::REVIEW_TO_DELETE . '")
-        }');
-
-        $this->assertResponseStatus($expected, $result);
-
-        if ($expected === 200) {
-            $this->assertEquals(true, $result['body']['data']['reviewDelete']);
-        }
+        $this->assertResponseStatus(400, $result);
     }
 
     public function testDeleteReviewByOtherUser(): void
@@ -326,34 +251,6 @@ final class ReviewTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(401, $result);
-    }
-
-    public function testDeleteReviewByAdmin(): void
-    {
-        $review = oxNew(EshopReviewModel::class);
-        $review->assign([
-            'oxid'       => self::REVIEW_TO_DELETE,
-            'oxshopid'   => '1',
-            'oxuserid'   => self::USERID,
-            'oxtype'     => 'oxarticle',
-            'oxobjectid' => self::PRODUCT_ID,
-            'oxtext'     => self::REVIEW_TEXT,
-            'oxlang'     => '1',
-            'oxrating'   => 4,
-            'oxactive'   => false,
-        ]);
-
-        $review->save();
-
-        $this->prepareToken();
-
-        $result = $this->query('mutation {
-            reviewDelete(id: "' . self::REVIEW_TO_DELETE . '")
-        }');
-
-        $this->assertResponseStatus(200, $result);
-
-        $this->assertEquals(true, $result['body']['data']['reviewDelete']);
     }
 
     public function testDeleteNonExistentReview(): void
