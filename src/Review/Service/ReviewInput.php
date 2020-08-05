@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Review\Service;
 
 use OxidEsales\Eshop\Application\Model\Review as ReviewEshopModel;
 use OxidEsales\GraphQL\Account\Review\Exception\RatingOutOfBounds;
+use OxidEsales\GraphQL\Account\Review\Exception\ReviewInputInvalid;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
@@ -38,19 +39,23 @@ final class ReviewInput
     /**
      * @Factory
      */
-    public function fromUserInput(string $productId, string $text, int $rating): Review
+    public function fromUserInput(string $productId, ?string $text, ?int $rating): Review
     {
-        $this->assertRatingValue($rating);
         $this->assertProductIdValue($productId);
+        $this->assertRatingValue($rating);
+
+        if (null === $rating && empty($text)) {
+            throw ReviewInputInvalid::byWrongValue();
+        }
 
         /** @var ReviewEshopModel */
         $model = oxNew(ReviewEshopModel::class);
         $model->assign([
             'OXTYPE'     => 'oxarticle',
             'OXOBJECTID' => $productId,
-            'OXRATING'   => $rating,
+            'OXRATING'   => (string) $rating,
             'OXUSERID'   => $this->authentication->getUserId(),
-            'OXTEXT'     => $text,
+            'OXTEXT'     => (string) $text,
         ]);
 
         return new Review($model);
@@ -61,10 +66,10 @@ final class ReviewInput
      *
      * @return true
      */
-    private function assertRatingValue(int $review): bool
+    private function assertRatingValue(?int $rating): bool
     {
-        if ($review < 1 || $review > 5) {
-            throw RatingOutOfBounds::byWrongValue($review);
+        if (null !== $rating && ($rating < 1 || $rating > 5)) {
+            throw RatingOutOfBounds::byWrongValue($rating);
         }
 
         return true;
