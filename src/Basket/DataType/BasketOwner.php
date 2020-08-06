@@ -27,7 +27,7 @@ final class BasketOwner implements DataType
     ) {
         $this->owner = $owner;
     }
-    
+
     /**
      * @Field()
      */

@@ -11,7 +11,6 @@ namespace OxidEsales\GraphQL\Account\Basket\DataType;
 
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\FilterList;
-use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class BasketItemFilterList extends FilterList
 {

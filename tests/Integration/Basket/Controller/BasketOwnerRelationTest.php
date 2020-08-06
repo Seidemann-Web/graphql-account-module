@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Basket\Controller;
 
-use OxidEsales\Eshop\Application\Model\User as EshopUser;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class BasketOwnerRelationTest extends TokenTestCase
@@ -60,6 +59,6 @@ final class BasketOwnerRelationTest extends TokenTestCase
     private function deleteUser(string $userId): void
     {
         $db = self::getDb();
-        $db->execute("delete from oxuser where oxid = :oxid", ['oxid' => $userId]);
+        $db->execute('delete from oxuser where oxid = :oxid', ['oxid' => $userId]);
     }
 }
