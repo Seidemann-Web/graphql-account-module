@@ -9,12 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\Service;
 
-use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice;
 use OxidEsales\GraphQL\Account\WishedPrice\Exception\WishedPriceOutOfBounds;
+use OxidEsales\GraphQL\Account\WishedPrice\Infrastructure\WishedPriceFactory;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
-use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product as ProductDataType;
 use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
@@ -29,17 +28,17 @@ final class WishedPriceInput
     /** @var Repository */
     private $repository;
 
-    /** @var CurrencyRepository */
-    private $currencyRepository;
+    /** @var WishedPriceFactory */
+    private $wishedPriceFactory;
 
     public function __construct(
         Authentication $authentication,
         Repository $repository,
-        CurrencyRepository $currencyRepository
+        WishedPriceFactory $wishedPriceFactory
     ) {
         $this->authentication     = $authentication;
         $this->repository         = $repository;
-        $this->currencyRepository = $currencyRepository;
+        $this->wishedPriceFactory = $wishedPriceFactory;
     }
 
     /**
@@ -50,21 +49,13 @@ final class WishedPriceInput
         $this->assertProductWishedPriceIsPossible($productId);
         $this->assertPriceValue($price);
 
-        $currency = $this->currencyRepository->getByName($currencyName);
-
-        /** @var PriceAlarm $model */
-        $model = oxNew(PriceAlarm::class);
-        $model->assign(
-            [
-                'OXUSERID'   => $this->authentication->getUserId(),
-                'OXEMAIL'    => $this->authentication->getUserName(),
-                'OXARTID'    => (string) $productId->val(),
-                'OXPRICE'    => round($price, $currency->getPrecision()),
-                'OXCURRENCY' => $currency->getName(),
-            ]
+        return $this->wishedPriceFactory->createWishedPrice(
+            $this->authentication->getUserId(),
+            $this->authentication->getUserName(),
+            $productId,
+            $currencyName,
+            $price
         );
-
-        return new WishedPrice($model);
     }
 
     /**

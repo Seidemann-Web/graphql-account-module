@@ -10,36 +10,34 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use DateTimeInterface;
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerExists;
+use OxidEsales\GraphQL\Account\Account\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Account\Account\Exception\Password;
+use OxidEsales\GraphQL\Account\Account\Infrastructure\CustomerRegisterFactory;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\InvalidEmail;
-use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Base\Service\Legacy;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class CustomerRegisterInput
 {
-    /** @var Authentication */
-    private $authentication;
-
     /** @var Repository */
     private $repository;
 
     /** @var Legacy */
     private $legacyService;
 
+    /** @var CustomerRegisterFactory */
+    private $customerRegisterFactory;
+
     public function __construct(
-        Authentication $authentication,
         Repository $repository,
-        Legacy $legacyService
+        Legacy $legacyService,
+        CustomerRegisterFactory $customerRegisterFactory
     ) {
-        $this->authentication = $authentication;
-        $this->repository     = $repository;
-        $this->legacyService  = $legacyService;
+        $this->repository              = $repository;
+        $this->legacyService           = $legacyService;
+        $this->customerRegisterFactory = $customerRegisterFactory;
     }
 
     /**
@@ -48,11 +46,11 @@ final class CustomerRegisterInput
     public function fromUserInput(string $email, string $password, ?DateTimeInterface $birthdate): Customer
     {
         if (!strlen($email)) {
-            throw new EmailEmpty();
+            throw InvalidEmail::byEmptyString();
         }
 
         if (!$this->legacyService->isValidEmail($email)) {
-            throw new InvalidEmail();
+            throw InvalidEmail::byString($email);
         }
 
         if (strlen($password) == 0 ||
@@ -65,20 +63,6 @@ final class CustomerRegisterInput
             throw CustomerExists::byEmail($email);
         }
 
-        /** @var User $customerModel */
-        $customerModel = oxNew(User::class);
-        $customerModel->assign([
-            'OXUSERNAME' => $email,
-        ]);
-
-        if ($birthdate) {
-            $customerModel->assign([
-                'OXBIRTHDATE' => $birthdate->format('Y-m-d 00:00:00'),
-            ]);
-        }
-
-        $customerModel->setPassword($password);
-
-        return new Customer($customerModel);
+        return $this->customerRegisterFactory->createCustomer($email, $password, $birthdate);
     }
 }
