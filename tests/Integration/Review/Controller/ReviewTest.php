@@ -170,6 +170,10 @@ final class ReviewTest extends TokenTestCase
         );
     }
 
+    /**
+     *  NOTE: When querying a customer for reviews, all reviews disregarding of current
+     *        langauge are shown. TODO: add Language DataType and relate to customer reviews
+     */
     public function testUserReviews(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
@@ -178,6 +182,35 @@ final class ReviewTest extends TokenTestCase
 
         $this->assertResponseStatus(200, $result);
         $this->assertEquals(3, count($result['body']['data']['customer']['reviews']));
+    }
+
+    public function providerProductMultiLanguageReview()
+    {
+        return [
+            'english' => [
+                'lang'     => 1,
+                'expected' => 1,
+            ],
+            'german' => [
+                'lang'     => 0,
+                'expected' => 0,
+            ],
+        ];
+    }
+
+    /**
+     * NOTE: When querying a product for reviews, only reviews in the
+     *       requested language are shown.
+     *
+     * @dataProvider providerProductMultiLanguageReview
+     */
+    public function testProductReviewsByLanguage(string $lang, int $expected): void
+    {
+        $this->setGETRequestParameter('lang', $lang);
+        $result = $this->queryProduct(self::PRODUCT_WITH_EXISTING_REVIEW_ID);
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertEquals($expected, count($result['body']['data']['product']['reviews']));
     }
 
     public function testProductAverageRating(): void
