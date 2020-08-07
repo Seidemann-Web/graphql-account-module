@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Service;
 
-use OxidEsales\Eshop\Application\Model\Review as ReviewEshopModel;
 use OxidEsales\GraphQL\Account\Review\Exception\RatingOutOfBounds;
 use OxidEsales\GraphQL\Account\Review\Exception\ReviewInputInvalid;
+use OxidEsales\GraphQL\Account\Review\Infrastructure\ReviewFactory;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
@@ -28,12 +28,17 @@ final class ReviewInput
     /** @var Repository */
     private $repository;
 
+    /** @var ReviewFactory */
+    private $reviewFactory;
+
     public function __construct(
         Authentication $authentication,
-        Repository $repository
+        Repository $repository,
+        ReviewFactory $reviewFactory
     ) {
         $this->authentication = $authentication;
         $this->repository     = $repository;
+        $this->reviewFactory  = $reviewFactory;
     }
 
     /**
@@ -48,17 +53,12 @@ final class ReviewInput
             throw ReviewInputInvalid::byWrongValue();
         }
 
-        /** @var ReviewEshopModel */
-        $model = oxNew(ReviewEshopModel::class);
-        $model->assign([
-            'OXTYPE'     => 'oxarticle',
-            'OXOBJECTID' => $productId,
-            'OXRATING'   => (string) $rating,
-            'OXUSERID'   => $this->authentication->getUserId(),
-            'OXTEXT'     => (string) $text,
-        ]);
-
-        return new Review($model);
+        return $this->reviewFactory->createProductReview(
+            $this->authentication->getUserId(),
+            $productId,
+            (string) $text,
+            (string) $rating
+        );
     }
 
     /**

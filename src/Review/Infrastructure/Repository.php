@@ -11,10 +11,8 @@ namespace OxidEsales\GraphQL\Account\Review\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\Article as EshopArticleModel;
 use OxidEsales\Eshop\Application\Model\Rating as EshopRatingModel;
-use OxidEsales\Eshop\Application\Model\Rating as RatingEshopModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
-use OxidEsales\GraphQL\Catalogue\Product\Service\Product as ProductService;
 use OxidEsales\GraphQL\Catalogue\Review\DataType\Review as ReviewDataType;
 use PDO;
 use function getViewName;
@@ -24,23 +22,10 @@ final class Repository
     /** @var QueryBuilderFactoryInterface */
     private $queryBuilderFactory;
 
-    /** @var RatingEshopModel */
-    private $eshopRatingModel;
-
-    /** @var EshopArticleModel */
-    private $eshopArticleModel;
-
-    /** @var ProductService */
-    private $productService;
-
     public function __construct(
-        QueryBuilderFactoryInterface $queryBuilderFactory,
-        EshopRatingModel $eshopRatingModel,
-        ProductService $productService
+        QueryBuilderFactoryInterface $queryBuilderFactory
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
-        $this->eshopRatingModel    = $eshopRatingModel;
-        $this->productService      = $productService;
     }
 
     /**
@@ -60,7 +45,10 @@ final class Repository
 
     public function saveRating(ReviewDataType $review): bool
     {
-        $this->eshopRatingModel->assign(
+        /** @var EshopRatingModel */
+        $eshopRatingModel = oxNew(EshopRatingModel::class);
+
+        $eshopRatingModel->assign(
             [
                 'oxuserid'   => $review->getReviewerId(),
                 'oxobjectid' => $review->getObjectId(),
@@ -68,12 +56,12 @@ final class Repository
                 'oxtype'     => 'oxarticle',
             ]
         );
-        $this->eshopRatingModel->save();
+        $eshopRatingModel->save();
 
-        $product = $this->productService->product(
-            (string) $review->getObjectId()
-        );
-        $product->getEshopModel()->addToRatingAverage($review->getRating());
+        /** @var EshopArticleModel */
+        $eshopArticleModel = oxNew(EshopArticleModel::class);
+        $eshopArticleModel->load($review->getObjectId());
+        $eshopArticleModel->addToRatingAverage($review->getRating());
 
         return true;
     }
@@ -82,7 +70,7 @@ final class Repository
      * Sadly there is no relation between oxratings and oxreviews table but the
      * oxuserid, oxobject and oxrating values beeing identical ...
      */
-    private function ratingForReview(ReviewDataType $review): RatingEshopModel
+    private function ratingForReview(ReviewDataType $review): EshopRatingModel
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder->select('ratings.*')
@@ -105,8 +93,8 @@ final class Repository
             throw new NotFound();
         }
 
-        /** @var RatingEshopModel */
-        $model = oxNew(RatingEshopModel::class);
+        /** @var EshopRatingModel */
+        $model = oxNew(EshopRatingModel::class);
         $model->assign(
             $result->fetch(
                 PDO::FETCH_ASSOC
