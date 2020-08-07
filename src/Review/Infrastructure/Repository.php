@@ -66,6 +66,23 @@ final class Repository
         return true;
     }
 
+    public function doesReviewExist(string $userId, ReviewDataType $review): bool
+    {
+        $reviewAndRatingList = $review
+            ->getEshopModel()
+            ->getReviewAndRatingListByUserId(
+                $userId
+            );
+
+        foreach ($reviewAndRatingList as $reviewAndRating) {
+            if ($reviewAndRating->getObjectId() == $review->getObjectId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Sadly there is no relation between oxratings and oxreviews table but the
      * oxuserid, oxobject and oxrating values beeing identical ...

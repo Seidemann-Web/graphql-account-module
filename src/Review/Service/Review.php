@@ -88,16 +88,8 @@ final class Review
      */
     public function save(ReviewDataType $review): bool
     {
-        $reviewAndRatingList = $review
-            ->getEshopModel()
-            ->getReviewAndRatingListByUserId(
-                $this->authenticationService->getUserId()
-            );
-
-        foreach ($reviewAndRatingList as $reviewAndRating) {
-            if ($reviewAndRating->getObjectId() == $review->getObjectId()) {
-                throw ReviewAlreadyExists::byObjectId($review->getObjectId());
-            }
+        if ($this->reviewRepository->doesReviewExist($this->authenticationService->getUserId(), $review)) {
+            throw ReviewAlreadyExists::byObjectId($review->getObjectId());
         }
         $this->reviewRepository->saveRating($review);
 
