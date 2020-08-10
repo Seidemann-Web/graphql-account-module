@@ -91,7 +91,10 @@ final class Review
         if ($this->reviewRepository->doesReviewExist($this->authenticationService->getUserId(), $review)) {
             throw ReviewAlreadyExists::byObjectId($review->getObjectId());
         }
-        $this->reviewRepository->saveRating($review);
+
+        if ($review->getRating()) {
+            $this->reviewRepository->saveRating($review);
+        }
 
         return $this->repository->saveModel(
             $review->getEshopModel()

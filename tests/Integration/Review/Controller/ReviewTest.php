@@ -28,8 +28,6 @@ final class ReviewTest extends TokenTestCase
 
     private const TEST_DATA_REVIEW = '94415306f824dc1aa2fce0dc4f12783d';
 
-    private const USERID = 'e7af1c3b786fd02906ccd75698f4e6b9';
-
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
 
     private const OTHER_PASSWORD = 'useruser';
@@ -261,6 +259,41 @@ final class ReviewTest extends TokenTestCase
         $this->assertSame(3, $productRating['count']);
     }
 
+    public function testProductAverageRatingSettingReviewWithoutRating(): void
+    {
+        //Add review with user X
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        //Add review without rating
+        $result = $this->reviewSet(self::TEST_PRODUCT_ID, self::TEXT, null);
+        $this->assertResponseStatus(200, $result);
+        $review = $result['body']['data']['reviewSet'];
+        $this->assertSame(0, $review['rating']);
+
+        //Make sure the product is without rating
+        $result = $this->queryProduct(self::TEST_PRODUCT_ID);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['product']['rating'];
+        $this->assertSame(0, $productRating['count']);
+        $this->assertEquals(0, $productRating['rating']);
+
+        //Add review with user Y
+        $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
+
+        //Add review with rating
+        $result = $this->reviewSet(self::TEST_PRODUCT_ID, self::TEXT, '5');
+        $this->assertResponseStatus(200, $result);
+        $review = $result['body']['data']['reviewSet'];
+        $this->assertSame(5, $review['rating']);
+
+        //Check product's average rating
+        $result = $this->queryProduct(self::TEST_PRODUCT_ID);
+        $this->assertResponseStatus(200, $result);
+        $productRating = $result['body']['data']['product']['rating'];
+        $this->assertSame(1, $productRating['count']);
+        $this->assertEquals(5, $productRating['rating']);
+    }
+
     public function testDeleteReviewWithoutToken(): void
     {
         $result = $this->query('mutation {
@@ -316,6 +349,19 @@ final class ReviewTest extends TokenTestCase
             401,
             $result
         );
+    }
+
+    public function testDeleteReviewWithoutRating(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        //Add review without rating
+        $result = $this->reviewSet(self::TEST_PRODUCT_ID, self::TEXT, null);
+        $this->assertResponseStatus(200, $result);
+        $review = $result['body']['data']['reviewSet'];
+        $this->assertSame(0, $review['rating']);
+
+        $this->reviewDelete($review['id']);
     }
 
     private function reviewSet(string $productId, ?string $text, ?string $rating): array
