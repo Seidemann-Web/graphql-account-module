@@ -107,6 +107,8 @@ final class Repository
                      ->from(getViewName('oxuserbaskets'), 'userbaskets')
                      ->innerJoin('userbaskets', getViewName('oxuser'), 'users', 'users.oxid = userbaskets.oxuserid')
                      ->where('userbaskets.oxpublic = 1')
+                     ->andWhere("userbaskets.OXTITLE != 'savedbasket'")
+                     ->andWhere("userbaskets.OXTITLE != 'noticelist'")
                      ->andWhere('(users.oxusername = :search OR users.oxlname = :search)')
                      ->setParameters([
                          ':search' => $search,

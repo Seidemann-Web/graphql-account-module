@@ -41,12 +41,14 @@ final class CustomerTest extends TokenTestCase
 
     public function testCustomerForNotLoggedInUser(): void
     {
-        $result = $this->query('query {
+        $result = $this->query(
+            'query {
             customer {
                id
                firstName
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(400, $result);
     }
@@ -55,7 +57,8 @@ final class CustomerTest extends TokenTestCase
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query('query {
+        $result = $this->query(
+            'query {
             customer {
                id
                firstName
@@ -68,7 +71,8 @@ final class CustomerTest extends TokenTestCase
                created
                updated
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(200, $result);
 
@@ -90,7 +94,8 @@ final class CustomerTest extends TokenTestCase
     {
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
-        $result = $this->query('query {
+        $result = $this->query(
+            'query {
             customer {
                 id
                 firstName
@@ -98,7 +103,8 @@ final class CustomerTest extends TokenTestCase
                     status
                 }
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(200, $result);
         $this->assertSame('Marc', $result['body']['data']['customer']['firstName']);
@@ -119,7 +125,8 @@ final class CustomerTest extends TokenTestCase
 
         $this->prepareToken(self::OTHER_USERNAME, self::OTHER_PASSWORD);
 
-        $result = $this->query('query {
+        $result = $this->query(
+            'query {
             customer {
                 id
                 firstName
@@ -127,7 +134,8 @@ final class CustomerTest extends TokenTestCase
                     status
                 }
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(200, $result);
         $this->assertSame('UNSUBSCRIBED', $result['body']['data']['customer']['newsletterStatus']['status']);
@@ -137,7 +145,8 @@ final class CustomerTest extends TokenTestCase
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query('query {
+        $result = $this->query(
+            'query {
             customer {
                 id
                 firstName
@@ -153,7 +162,8 @@ final class CustomerTest extends TokenTestCase
                     updated
                 }
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(200, $result);
 
@@ -182,7 +192,8 @@ final class CustomerTest extends TokenTestCase
      */
     public function testSuccessfulCustomerRegister(string $email, string $password, ?string $birthdate = null): void
     {
-        $result = $this->query('mutation {
+        $result = $this->query(
+            'mutation {
             customerRegister(customer: {
                 email: "' . $email . '",
                 password: "' . $password . '",
@@ -192,7 +203,8 @@ final class CustomerTest extends TokenTestCase
                 email
                 birthdate
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(200, $result);
 
@@ -237,7 +249,8 @@ final class CustomerTest extends TokenTestCase
      */
     public function testFailedCustomerRegistration(string $email, string $password, string $message): void
     {
-        $result = $this->query('mutation {
+        $result = $this->query(
+            'mutation {
             customerRegister(customer: {
                 email: "' . $email . '",
                 password: "' . $password . '"
@@ -246,7 +259,8 @@ final class CustomerTest extends TokenTestCase
                 email
                 birthdate
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(400, $result);
         $this->assertSame($message, $result['body']['errors'][0]['message']);
@@ -285,12 +299,14 @@ final class CustomerTest extends TokenTestCase
     {
         $this->prepareToken('differentuser@oxid-esales.com', 'useruser');
 
-        $result = $this->query('mutation {
+        $result = $this->query(
+            'mutation {
             customerEmailUpdate(email: "' . $email . '") {
                 id
                 email
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus($expectedStatus, $result);
 
@@ -331,12 +347,14 @@ final class CustomerTest extends TokenTestCase
 
     public function testCustomerBirthdateUpdateWithoutToken(): void
     {
-        $result = $this->query('
+        $result = $this->query(
+            '
             customerBirthdateUpdate(birthdate: "1986-12-25") {
                 email
                 birthdate
             }
-        ');
+        '
+        );
 
         $this->assertResponseStatus(400, $result);
     }
@@ -345,12 +363,14 @@ final class CustomerTest extends TokenTestCase
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query('mutation {
+        $result = $this->query(
+            'mutation {
             customerBirthdateUpdate(birthdate: "1986-12-25") {
                 email
                 birthdate
             }
-        }');
+        }'
+        );
 
         $this->assertResponseStatus(200, $result);
 
@@ -360,6 +380,81 @@ final class CustomerTest extends TokenTestCase
                 'birthdate' => '1986-12-25T00:00:00+01:00',
             ],
             $result['body']['data']['customerBirthdateUpdate']
+        );
+    }
+
+    public function testBaskets(): void
+    {
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'query {
+                customer {
+                    baskets {
+                        id
+                        public
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $baskets = $result['body']['data']['customer']['baskets'];
+        $this->assertEquals(5, count($baskets));
+
+        $resultBasketCreate = $this->query(
+            'mutation {
+                basketCreate(basket: {title: "noticelist", public: false}) {
+                    id
+                }
+            }'
+        );
+
+        $noticeListId = $resultBasketCreate['body']['basketCreate']['id'];
+
+        $result = $this->query(
+            'query {
+                customer {
+                    baskets {
+                        id
+                        public
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $baskets = $result['body']['data']['customer']['baskets'];
+        $this->assertEquals(6, count($baskets));
+
+        $this->query(
+            'mutation {
+                basketMakePublic(id: "' . $noticeListId . '")
+            }'
+        );
+
+        $result = $this->query(
+            'query {
+                customer {
+                    baskets {
+                        id
+                        public
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $baskets = $result['body']['data']['customer']['baskets'];
+        $this->assertEquals(6, count($baskets));
+
+        $this->query(
+            'mutation {
+                basketRemove(id: "' . $noticeListId . '")
+            }'
         );
     }
 }

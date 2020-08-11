@@ -53,7 +53,9 @@ REPLACE INTO `oxuserbaskets` (`OXID`, `OXUSERID`, `OXTITLE`, `OXPUBLIC`) VALUES
 ('test_make_wishlist_private',	'e7af1c3b786fd02906ccd75698f4e6b9',	'wishlist',	true),
 ('_test_basket_public', 'e7af1c3b786fd02906ccd75698f4e6b9', 'buy_these', true),
 ('_test_wish_list_private', '245ad3b5380202966df6ff128e9eecaq', 'wishlist', false),
-('_test_basket_private', '245ad3b5380202966df6ff128e9eecaq', 'buy_these_later', false);
+('_test_basket_private', '245ad3b5380202966df6ff128e9eecaq', 'buy_these_later', false),
+('_test_savedbasket_pubic', 'e7af1c3b786fd02906ccd75698f4e6b9', 'savedbasket', true),
+('_test_savedbasket_private', 'e7af1c3b786fd02906ccd75698f4e6b9', 'savedbasket', false);
 
 REPLACE INTO `oxuserbasketitems` (`OXID`, `OXBASKETID`, `OXARTID`, `OXAMOUNT`, `OXSELLIST`, `OXPERSPARAM`) VALUES
 ('_test_wish_list_item_1', '_test_wish_list_public', '_test_product_for_wish_list', 1, 'N;', ''),
