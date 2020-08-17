@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
+use OxidEsales\GraphQL\Account\Account\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatusUnsubscribe as NewsletterStatusUnsubscribeType;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
@@ -38,7 +38,7 @@ final class NewsletterUnsubscribeInput
     private function assertEmailNotEmpty(string $email): bool
     {
         if (!strlen($email)) {
-            throw new EmailEmpty();
+            throw InvalidEmail::byEmptyString();
         }
 
         return true;

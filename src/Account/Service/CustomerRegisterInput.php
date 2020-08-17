@@ -13,7 +13,7 @@ use DateTimeInterface;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerExists;
 use OxidEsales\GraphQL\Account\Account\Exception\InvalidEmail;
-use OxidEsales\GraphQL\Account\Account\Exception\Password;
+use OxidEsales\GraphQL\Account\Account\Exception\PasswordMismatch;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\CustomerRegisterFactory;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository;
 use OxidEsales\GraphQL\Base\Service\Legacy;
@@ -56,7 +56,7 @@ final class CustomerRegisterInput
         if (strlen($password) == 0 ||
             (strlen($password) < $this->legacyService->getConfigParam('iPasswordLength'))
         ) {
-            throw new Password();
+            throw PasswordMismatch::byLength();
         }
 
         if ($this->repository->checkEmailExists($email)) {

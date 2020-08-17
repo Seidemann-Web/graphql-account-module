@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\Exception;
 
-use OutOfBoundsException;
+use OxidEsales\GraphQL\Base\Exception\OutOfBounds;
 use function sprintf;
 
-final class WishedPriceOutOfBounds extends OutOfBoundsException
+final class WishedPriceOutOfBounds extends OutOfBounds
 {
     public static function byValue(float $value): self
     {

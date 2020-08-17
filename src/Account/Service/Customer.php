@@ -13,9 +13,8 @@ use DateTimeInterface;
 use OxidEsales\GraphQL\Account\Account\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerExists;
 use OxidEsales\GraphQL\Account\Account\Exception\CustomerNotFound;
+use OxidEsales\GraphQL\Account\Account\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Repository as CustomerRepository;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Base\Service\Authentication;
@@ -73,7 +72,7 @@ final class Customer
         }
 
         if (!strlen($email)) {
-            throw new EmailEmpty();
+            throw InvalidEmail::byEmptyString();
         }
 
         if (!$this->legacyService->isValidEmail($email)) {
