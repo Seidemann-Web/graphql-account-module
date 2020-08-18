@@ -24,8 +24,15 @@ final class CountryTest extends TokenTestCase
         $result = $this->query('query {
             country (id: "' . self::ACTIVE_COUNTRY . '") {
                 id
+                position
                 active
                 title
+                isoAlpha2
+                isoAlpha3
+                isoNumeric
+                shortDescription
+                description
+                creationDate
                 states {
                     id
                 }
@@ -37,14 +44,25 @@ final class CountryTest extends TokenTestCase
             $result
         );
 
+        $countryData = $result['body']['data']['country'];
+
+        $this->assertSame('T', substr($countryData['creationDate'], 10, 1));
+        unset($countryData['creationDate']);
+
         $this->assertEquals(
             [
                 'id'     => self::ACTIVE_COUNTRY,
                 'active' => true,
                 'title'  => 'Deutschland',
                 'states' => [],
+                'position' => 1,
+                'isoAlpha2' => 'DE',
+                'isoAlpha3' => 'DEU',
+                'isoNumeric' => '276',
+                'shortDescription' => 'EU1',
+                'description' => ''
             ],
-            $result['body']['data']['country']
+            $countryData
         );
     }
 
