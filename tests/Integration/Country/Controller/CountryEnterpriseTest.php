@@ -96,4 +96,32 @@ final class CountryEnterpriseTest extends MultishopTestCase
             $result['body']['data']['countries']
         );
     }
+
+    public function testGetCountryListWithReversePositionSorting(): void
+    {
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+
+        $result = $this->query('query {
+            countries(sorting: {position: "DESC"}) {
+                id
+            }
+        }');
+
+        $this->assertEquals(
+            200,
+            $result['status']
+        );
+
+        $this->assertEquals(
+            [
+                ['id' => 'a7c40f632a0804ab5.18804076'],
+                ['id' => 'a7c40f6320aeb2ec2.72885259'],
+                ['id' => 'a7c40f6321c6f6109.43859248'],
+                ['id' => '8f241f11096877ac0.98748826'],
+                ['id' => 'a7c40f631fc920687.20179984'],
+            ],
+            $result['body']['data']['countries']
+        );
+    }
 }
