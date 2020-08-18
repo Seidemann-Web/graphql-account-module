@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Country\Controller;
 
 use OxidEsales\GraphQL\Account\Country\DataType\Country as CountryDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\CountryFilterList;
+use OxidEsales\GraphQL\Account\Country\DataType\Sorting as CountrySorting;
 use OxidEsales\GraphQL\Account\Country\Service\Country as CountryService;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 
@@ -38,10 +39,13 @@ final class Country
      *
      * @return CountryDataType[]
      */
-    public function countries(?CountryFilterList $filter = null): array
-    {
+    public function countries(
+        ?CountryFilterList $filter = null,
+        ?CountrySorting $sorting = null
+    ): array {
         return $this->countryService->countries(
-            $filter ?? new CountryFilterList()
+            $filter ?? new CountryFilterList(),
+            $sorting ?? new CountrySorting([])
         );
     }
 }
