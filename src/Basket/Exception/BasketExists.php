@@ -9,28 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\Exception;
 
-use Exception;
-use GraphQL\Error\ClientAware;
-use OxidEsales\GraphQL\Base\Exception\ErrorCategories;
-use OxidEsales\GraphQL\Base\Exception\HttpErrorInterface;
+use OxidEsales\GraphQL\Base\Exception\Exists;
 
-final class BasketExists extends Exception implements ClientAware, HttpErrorInterface
+final class BasketExists extends Exists
 {
-    public function getHttpStatus(): int
-    {
-        return 400;
-    }
-
-    public function isClientSafe(): bool
-    {
-        return true;
-    }
-
-    public function getCategory(): string
-    {
-        return ErrorCategories::REQUESTERROR;
-    }
-
     public static function byTitle(string $title): self
     {
         return new self(sprintf("Basket '%s' already exists!", $title));

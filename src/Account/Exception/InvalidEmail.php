@@ -40,4 +40,9 @@ final class InvalidEmail extends Exception implements ClientAware, HttpErrorInte
     {
         return new self(sprintf("This e-mail address '%s' is invalid!", $email));
     }
+
+    public static function byConfirmationCode(string $code): self
+    {
+        return new self(sprintf("Wrong e-mail confirmation code '%s'!", $code));
+    }
 }

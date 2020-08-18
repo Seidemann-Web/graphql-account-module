@@ -210,7 +210,7 @@ final class CustomerMultiShopTest extends MultishopTestCase
                 'email'          => '',
                 'userId'         => '309db395b6c85c3881fcb9b437a73dd6',
                 'expectedStatus' => 400,
-                'expectedError'  => 'Email empty',
+                'expectedError'  => 'The e-mail address must not be empty!',
             ],
             [
                 'shopId'         => '2',

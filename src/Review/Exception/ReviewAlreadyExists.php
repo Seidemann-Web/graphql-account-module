@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Exception;
 
-use OxidEsales\GraphQL\Base\Exception\NotFound;
-
+use OxidEsales\GraphQL\Base\Exception\Exists;
 use function sprintf;
 
-final class ReviewAlreadyExists extends NotFound
+final class ReviewAlreadyExists extends Exists
 {
     public static function byObjectId(string $id): self
     {

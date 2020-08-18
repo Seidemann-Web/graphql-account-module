@@ -35,4 +35,9 @@ final class PasswordMismatch extends Exception implements ClientAware, HttpError
     {
         return new self('Old password does not match our records');
     }
+
+    public static function byLength(): self
+    {
+        return new self('Password does not match length requirements');
+    }
 }

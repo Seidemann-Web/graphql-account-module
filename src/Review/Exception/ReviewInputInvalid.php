@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Exception;
 
-use OutOfBoundsException;
+use OxidEsales\GraphQL\Base\Exception\OutOfBounds;
 
-final class ReviewInputInvalid extends OutOfBoundsException
+final class ReviewInputInvalid extends OutOfBounds
 {
     public static function byWrongValue(): self
     {

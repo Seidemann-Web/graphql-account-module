@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Review\Exception;
 
-use OutOfBoundsException;
+use OxidEsales\GraphQL\Base\Exception\OutOfBounds;
 use function sprintf;
 
-final class RatingOutOfBounds extends OutOfBoundsException
+final class RatingOutOfBounds extends OutOfBounds
 {
     public static function byWrongValue(int $rating): self
     {

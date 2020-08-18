@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\Service;
 
+use OxidEsales\GraphQL\Account\Account\Exception\InvalidEmail;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\NewsletterStatus as NewsletterStatusType;
 use OxidEsales\GraphQL\Account\NewsletterStatus\DataType\Subscriber as SubscriberType;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailConfirmationCode;
-use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\EmailEmpty;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\NewsletterStatusNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Exception\SubscriberNotFound;
 use OxidEsales\GraphQL\Account\NewsletterStatus\Infrastructure\Repository as NewsletterStatusRepository;
@@ -58,19 +57,19 @@ final class NewsletterOptInInput
     private function assertEmailNotEmpty(string $email): bool
     {
         if (!strlen($email)) {
-            throw new EmailEmpty();
+            throw InvalidEmail::byEmptyString();
         }
 
         return true;
     }
 
     /**
-     * @throws EmailConfirmationCode
+     * @throws InvalidEmail
      */
     private function verifyConfirmCode(SubscriberType $subcriber, string $confirmCode): void
     {
         if ($subcriber->getConfirmationCode() !== $confirmCode) {
-            throw new EmailConfirmationCode();
+            throw InvalidEmail::byConfirmationCode($confirmCode);
         }
     }
 }
