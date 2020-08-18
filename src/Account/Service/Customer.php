@@ -76,7 +76,7 @@ final class Customer
         }
 
         if (!$this->legacyService->isValidEmail($email)) {
-            throw new InvalidEmail();
+            throw InvalidEmail::byString($email);
         }
 
         $customer = $this->fetchCustomer($id);

@@ -235,7 +235,7 @@ final class CustomerTest extends TokenTestCase
     /**
      * @dataProvider dataProviderFailedCustomerRegistration
      */
-    public function testFailedCustomerRegistration(string $email, string $password, string $message): void
+    public function testFailedCustomerRegistration(string $email, string $password, int $status, string $message): void
     {
         $result = $this->query('mutation {
             customerRegister(customer: {
@@ -248,7 +248,7 @@ final class CustomerTest extends TokenTestCase
             }
         }');
 
-        $this->assertResponseStatus(400, $result);
+        $this->assertResponseStatus($status, $result);
         $this->assertSame($message, $result['body']['errors'][0]['message']);
     }
 
@@ -258,21 +258,25 @@ final class CustomerTest extends TokenTestCase
             [
                 'testUser1',
                 'useruser',
+                400,
                 "This e-mail address 'testUser1' is invalid!",
             ],
             [
                 'user@oxid-esales.com',
                 'useruser',
+                400,
                 "This e-mail address 'user@oxid-esales.com' already exists!",
             ],
             [
                 'testUser3@oxid-esales.com',
                 '',
+                403,
                 'Password does not match length requirements',
             ],
             [
                 '',
                 'useruser',
+                400,
                 'The e-mail address must not be empty!',
             ],
         ];
@@ -315,12 +319,12 @@ final class CustomerTest extends TokenTestCase
             [
                 'email'          => '',
                 'expectedStatus' => 400,
-                'expectedError'  => 'Email empty',
+                'expectedError'  => 'The e-mail address must not be empty!',
             ],
             [
                 'email'          => 'someuser',
                 'expectedStatus' => 400,
-                'expectedError'  => 'Email is not valid',
+                'expectedError'  => "This e-mail address 'someuser' is invalid!",
             ],
             [
                 'email'          => 'newUser@oxid-esales.com',

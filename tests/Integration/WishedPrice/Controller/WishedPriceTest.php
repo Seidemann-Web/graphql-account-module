@@ -406,7 +406,7 @@ final class WishedPriceTest extends TokenTestCase
                 -123,
                 'Wished price must be positive, was: -123',
                 400,
-                'debugMessage',
+                'message',
             ],
         ];
     }

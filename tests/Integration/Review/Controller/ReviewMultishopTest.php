@@ -46,21 +46,25 @@ final class ReviewMultiShopTest extends MultishopTestCase
                 1,
                 self::PRODUCT_ID_SHOP_1,
                 200,
+                400,
             ],
             'shop2' => [
                 2,
                 self::PRODUCT_ID_SHOP_2,
                 200,
+                400,
             ],
             'shop1_with_shop2product' => [
                 1,
                 self::PRODUCT_ID_SHOP_2,
+                404,
                 404,
             ],
             'shop2_with_inheritedproduct' => [
                 2,
                 self::PRODUCT_ID_BOTH_SHOPS,
                 200,
+                400,
             ],
         ];
     }
@@ -68,7 +72,7 @@ final class ReviewMultiShopTest extends MultishopTestCase
     /**
      * @dataProvider dataProviderReviewPerShop
      */
-    public function testReviewPerShop(string $shopId, string $productId, int $expected): void
+    public function testReviewPerShop(string $shopId, string $productId, int $expected, int $retryStatus): void
     {
         $this->ensureShop((int) $shopId);
         EshopRegistry::getConfig()->setConfigParam('blAllowUsersToManageTheirReviews', true);
@@ -82,7 +86,7 @@ final class ReviewMultiShopTest extends MultishopTestCase
         $this->assertResponseStatus($expected, $result);
 
         $retry = $this->reviewSet($productId);
-        $this->assertResponseStatus(404, $retry);
+        $this->assertResponseStatus($retryStatus, $retry);
 
         if (isset($result['body']['data']['reviewSet']['id'])) {
             $this->createdReviews[] = $result['body']['data']['reviewSet']['id'];
@@ -115,7 +119,7 @@ final class ReviewMultiShopTest extends MultishopTestCase
 
         //user already did give a review in subshop 1 so he cannot add a another one for same product
         $result = $this->reviewSet(self::PRODUCT_ID_BOTH_SHOPS);
-        $this->assertResponseStatus(404, $result);
+        $this->assertResponseStatus(400, $result);
 
         //review another product
         $result = $this->reviewSet(self::PRODUCT_ID_SHOP_2);

@@ -128,7 +128,7 @@ final class ReviewTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
         $this->assertSame(
             'Review input cannot have both empty text and rating value.',
-            $result['body']['errors'][0]['debugMessage']
+            $result['body']['errors'][0]['message']
         );
     }
 
@@ -139,7 +139,7 @@ final class ReviewTest extends TokenTestCase
         $result = $this->reviewSet(self::TEST_PRODUCT_ID, self::TEXT, '6');
 
         $this->assertResponseStatus(400, $result);
-        $this->assertSame('Rating must be between 1 and 5, was 6', $result['body']['errors'][0]['debugMessage']);
+        $this->assertSame('Rating must be between 1 and 5, was 6', $result['body']['errors'][0]['message']);
     }
 
     public function testSetReviewWrongProduct(): void
@@ -161,7 +161,7 @@ final class ReviewTest extends TokenTestCase
 
         $result = $this->reviewSet(self::PRODUCT_WITH_EXISTING_REVIEW_ID, self::TEXT, '4');
 
-        $this->assertResponseStatus(404, $result);
+        $this->assertResponseStatus(400, $result);
         $this->assertSame(
             'Review for product with id: ' . self::PRODUCT_WITH_EXISTING_REVIEW_ID . ' already exists',
             $result['body']['errors'][0]['message']

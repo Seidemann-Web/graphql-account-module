@@ -71,7 +71,7 @@ final class NewsletterStatusTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(400, $result);
-        $this->assertEquals('Wrong email confirmation code', $result['body']['errors'][0]['debugMessage']);
+        $this->assertEquals("Wrong e-mail confirmation code 'incorrect'!", $result['body']['errors'][0]['message']);
     }
 
     public function testNewsletterOptInEmptyEmail(): void
@@ -89,7 +89,7 @@ final class NewsletterStatusTest extends TokenTestCase
         }');
 
         $this->assertResponseStatus(400, $result);
-        $this->assertEquals('Email empty', $result['body']['errors'][0]['message']);
+        $this->assertEquals('The e-mail address must not be empty!', $result['body']['errors'][0]['message']);
     }
 
     public function testNewsletterOptInWorks(): void

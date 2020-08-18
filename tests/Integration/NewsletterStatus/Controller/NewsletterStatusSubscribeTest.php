@@ -217,6 +217,8 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
 
     public function dataProviderNewsletterSubscribeNotExistingUserIncompleteInput()
     {
+        $strangeEmail = str_pad('x', 1000) . '@oxid-esales.com';
+
         return [
             'empty_email' => [
                 'data' => [
@@ -225,7 +227,7 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
                     'lastName'   => 'InTown',
                     'email'      => '',
                 ],
-                'expected' => 'Email is not valid',
+                'expected' => "This e-mail address '' is invalid!",
             ],
             'invalid_email' => [
                 'data' => [
@@ -234,16 +236,16 @@ final class NewsletterStatusSubscribeTest extends TokenTestCase
                     'lastName'   => 'InTown',
                     'email'      => 'admin',
                 ],
-                'expected' => 'Email is not valid',
+                'expected' => "This e-mail address 'admin' is invalid!",
             ],
             'crazy_input' => [
                 'data' => [
                     'salutation' => 'mrs',
                     'firstName'  => 'NewGirl',
                     'lastName'   => 'InTown',
-                    'email'      => str_pad('x', 1000) . '@oxid-esales.com',
+                    'email'      => $strangeEmail,
                 ],
-                'expected' => 'Email is not valid',
+                'expected' => "This e-mail address '{$strangeEmail}' is invalid!",
             ],
         ];
     }
