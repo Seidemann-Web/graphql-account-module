@@ -80,20 +80,32 @@ final class CountryEnterpriseTest extends MultishopTestCase
     {
         EshopRegistry::getConfig()->setShopId(2);
         $this->setGETRequestParameter('shp', '2');
+        $this->setGETRequestParameter('lang', '1');
 
         $result = $this->query(
             'query{
                 countries {
-                    id
+                    title
+                    position
                 }
             }'
         );
 
         $this->assertResponseStatus(200, $result);
 
-        $this->assertCount(
-            5,
-            $result['body']['data']['countries']
+        $countries = $result['body']['data']['countries'];
+        $this->assertCount(5, $countries);
+
+        // Test default sorting for countries
+        $this->assertEquals(
+            [
+                ['title' => 'Germany',        'position' => 1],
+                ['title' => 'United States',  'position' => 2],
+                ['title' => 'Switzerland',    'position' => 3],
+                ['title' => 'Austria',        'position' => 4],
+                ['title' => 'United Kingdom', 'position' => 5],
+            ],
+            $countries
         );
     }
 
@@ -103,15 +115,12 @@ final class CountryEnterpriseTest extends MultishopTestCase
         $this->setGETRequestParameter('shp', '2');
 
         $result = $this->query('query {
-            countries(sorting: {position: "DESC"}) {
+            countries(sort: {position: "DESC"}) {
                 id
             }
         }');
 
-        $this->assertEquals(
-            200,
-            $result['status']
-        );
+        $this->assertResponseStatus(200, $result);
 
         $this->assertEquals(
             [
@@ -120,6 +129,33 @@ final class CountryEnterpriseTest extends MultishopTestCase
                 ['id' => 'a7c40f6321c6f6109.43859248'],
                 ['id' => '8f241f11096877ac0.98748826'],
                 ['id' => 'a7c40f631fc920687.20179984'],
+            ],
+            $result['body']['data']['countries']
+        );
+    }
+
+    public function testGetCountryListWithTitleSorting(): void
+    {
+        EshopRegistry::getConfig()->setShopId(2);
+        $this->setGETRequestParameter('shp', '2');
+        $this->setGETRequestParameter('lang', '1');
+
+        $result = $this->query('query {
+            countries(sort: {title: "ASC"}) {
+                title
+                position
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $this->assertEquals(
+            [
+                ['title' => 'Austria',        'position' => 4],
+                ['title' => 'Germany',        'position' => 1],
+                ['title' => 'Switzerland',    'position' => 3],
+                ['title' => 'United Kingdom', 'position' => 5],
+                ['title' => 'United States',  'position' => 2],
             ],
             $result['body']['data']['countries']
         );

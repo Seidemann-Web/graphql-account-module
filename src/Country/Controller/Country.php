@@ -41,11 +41,11 @@ final class Country
      */
     public function countries(
         ?CountryFilterList $filter = null,
-        ?CountrySorting $sorting = null
+        ?CountrySorting $sort = null
     ): array {
         return $this->countryService->countries(
             $filter ?? new CountryFilterList(),
-            $sorting ?? new CountrySorting([])
+            $sort ?? new CountrySorting([])
         );
     }
 }
