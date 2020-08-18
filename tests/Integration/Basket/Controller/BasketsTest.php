@@ -41,6 +41,7 @@ final class BasketsTest extends TokenTestCase
         $this->prepareToken(self::USERNAME, self::PASSWORD);
         $this->basketMakePrivateMutation(self::BASKET_ID);
 
+        $this->setAuthToken('');
         $response = $this->basketsQuery(self::USERNAME);
         $this->assertResponseStatus(200, $response);
 
@@ -48,6 +49,7 @@ final class BasketsTest extends TokenTestCase
         $this->assertCount(2, $baskets);
 
         // restore database
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
         $this->basketMakePublicMutation(self::BASKET_ID);
     }
 
@@ -64,6 +66,7 @@ final class BasketsTest extends TokenTestCase
         $this->assertCount(1, $baskets);
 
         // restore database
+        $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
         $this->basketMakePrivateMutation(self::BASKET_ID_2);
     }
 
@@ -73,6 +76,7 @@ final class BasketsTest extends TokenTestCase
         $this->basketMakePublicMutation(self::BASKET_ID_2);
         $this->basketMakePublicMutation(self::BASKET_ID_3);
 
+        $this->setAuthToken('');
         $response = $this->basketsQuery(self::LAST_NAME);
         $this->assertResponseStatus(200, $response);
 
@@ -104,19 +108,27 @@ final class BasketsTest extends TokenTestCase
 
     private function basketMakePrivateMutation(string $basketId): array
     {
-        return $this->query('mutation {
+        $result =  $this->query('mutation {
             basketMakePrivate(id: "' . $basketId . '") {
                 public
             }
         }');
+
+        $this->assertResponseStatus(200, $result);
+
+        return $result;
     }
 
     private function basketMakePublicMutation(string $basketId): array
     {
-        return $this->query('mutation {
+        $result =  $this->query('mutation {
             basketMakePublic(id: "' . $basketId . '") {
                 public
             }
         }');
+
+        $this->assertResponseStatus(200, $result);
+
+        return $result;
     }
 }
