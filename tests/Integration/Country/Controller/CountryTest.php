@@ -24,8 +24,15 @@ final class CountryTest extends TokenTestCase
         $result = $this->query('query {
             country (id: "' . self::ACTIVE_COUNTRY . '") {
                 id
+                position
                 active
                 title
+                isoAlpha2
+                isoAlpha3
+                isoNumeric
+                shortDescription
+                description
+                creationDate
                 states {
                     id
                 }
@@ -37,14 +44,25 @@ final class CountryTest extends TokenTestCase
             $result
         );
 
+        $countryData = $result['body']['data']['country'];
+
+        $this->assertSame('T', substr($countryData['creationDate'], 10, 1));
+        unset($countryData['creationDate']);
+
         $this->assertEquals(
             [
-                'id'     => self::ACTIVE_COUNTRY,
-                'active' => true,
-                'title'  => 'Deutschland',
-                'states' => [],
+                'id'               => self::ACTIVE_COUNTRY,
+                'active'           => true,
+                'title'            => 'Deutschland',
+                'states'           => [],
+                'position'         => 1,
+                'isoAlpha2'        => 'DE',
+                'isoAlpha3'        => 'DEU',
+                'isoNumeric'       => '276',
+                'shortDescription' => 'EU1',
+                'description'      => '',
             ],
-            $result['body']['data']['country']
+            $countryData
         );
     }
 
@@ -97,26 +115,37 @@ final class CountryTest extends TokenTestCase
 
     public function testGetCountryListWithoutFilter(): void
     {
+        $this->setGETRequestParameter('lang', '1');
+
         $result = $this->query('query {
             countries {
-                id
-                active
                 title
+                position
             }
         }');
 
+        $this->assertResponseStatus(200, $result);
+
+        $countries = $result['body']['data']['countries'];
+        $this->assertCount(5, $countries);
+
+        // Test default sorting for countries
         $this->assertEquals(
-            200,
-            $result['status']
-        );
-        $this->assertCount(
-            5,
-            $result['body']['data']['countries']
+            [
+                ['title' => 'Germany',        'position' => 1],
+                ['title' => 'United States',  'position' => 2],
+                ['title' => 'Switzerland',    'position' => 3],
+                ['title' => 'Austria',        'position' => 4],
+                ['title' => 'United Kingdom', 'position' => 5],
+            ],
+            $countries
         );
     }
 
     public function testGetCountryListWithPartialFilter(): void
     {
+        $this->setGETRequestParameter('lang', '0');
+
         $result = $this->query('query {
             countries(filter: {
                 title: {
@@ -124,17 +153,17 @@ final class CountryTest extends TokenTestCase
                 }
             }) {
                 id
+                title
+                position
             }
         }');
 
-        $this->assertEquals(
-            200,
-            $result['status']
-        );
+        $this->assertResponseStatus(200, $result);
+
         $this->assertEquals(
             [
-                ['id' => 'a7c40f631fc920687.20179984'],
-                ['id' => 'a7c40f6321c6f6109.43859248'],
+                ['id' => 'a7c40f631fc920687.20179984', 'title' => 'Deutschland', 'position' => 1],
+                ['id' => 'a7c40f6321c6f6109.43859248', 'title' => 'Schweiz',     'position' => 3],
             ],
             $result['body']['data']['countries']
         );
@@ -186,6 +215,56 @@ final class CountryTest extends TokenTestCase
         );
         $this->assertCount(
             0,
+            $result['body']['data']['countries']
+        );
+    }
+
+    public function testGetCountryListWithReversePositionSorting(): void
+    {
+        $result = $this->query('query {
+            countries(sort: {position: "DESC"}) {
+                id
+            }
+        }');
+
+        $this->assertEquals(
+            200,
+            $result['status']
+        );
+
+        $this->assertEquals(
+            [
+                ['id' => 'a7c40f632a0804ab5.18804076'],
+                ['id' => 'a7c40f6320aeb2ec2.72885259'],
+                ['id' => 'a7c40f6321c6f6109.43859248'],
+                ['id' => '8f241f11096877ac0.98748826'],
+                ['id' => 'a7c40f631fc920687.20179984'],
+            ],
+            $result['body']['data']['countries']
+        );
+    }
+
+    public function testGetCountryListWithTitleSorting(): void
+    {
+        $result = $this->query('query {
+            countries(sort: {title: "ASC"}) {
+                id
+            }
+        }');
+
+        $this->assertEquals(
+            200,
+            $result['status']
+        );
+
+        $this->assertEquals(
+            [
+                ['id' => 'a7c40f631fc920687.20179984'],
+                ['id' => 'a7c40f6320aeb2ec2.72885259'],
+                ['id' => 'a7c40f6321c6f6109.43859248'],
+                ['id' => '8f241f11096877ac0.98748826'],
+                ['id' => 'a7c40f632a0804ab5.18804076'],
+            ],
             $result['body']['data']['countries']
         );
     }
@@ -253,7 +332,7 @@ final class CountryTest extends TokenTestCase
 
     public function testCountryStatesMultilanguage(): void
     {
-        $this->setGETRequestParameter('lang', '2');
+        $this->setGETRequestParameter('lang', '0');
 
         $result = $this->query('query {
             country (id: "' . self::COUNTRY_WITH_STATES . '") {
@@ -290,7 +369,7 @@ final class CountryTest extends TokenTestCase
 
     public function testGetCountriesStatesMultilanguage(): void
     {
-        $this->setGETRequestParameter('lang', '2');
+        $this->setGETRequestParameter('lang', '0');
 
         $result = $this->query('query {
             countries {
@@ -316,7 +395,7 @@ final class CountryTest extends TokenTestCase
                 'id'    => 'MP',
                 'title' => 'Nördlichen Marianen',
             ],
-            $result['body']['data']['countries'][0]['states']
+            $result['body']['data']['countries'][1]['states']
         );
     }
 }

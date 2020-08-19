@@ -29,11 +29,6 @@ final class Country implements DataType
         $this->country = $country;
     }
 
-    public function getEshopModel(): EshopCountryModel
-    {
-        return $this->country;
-    }
-
     /**
      * @Field()
      */
