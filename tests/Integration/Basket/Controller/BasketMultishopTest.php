@@ -40,7 +40,7 @@ final class BasketMultishopTest extends MultishopTestCase
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->queryBasket(self::PRIVATE_BASKET);
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(401, $result);
     }
 
     public function testGetPublicBasketFromDifferentShopNoToken(): void
@@ -91,7 +91,7 @@ final class BasketMultishopTest extends MultishopTestCase
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
         $result = $this->queryBasket($basketId);
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(401, $result);
 
         EshopRegistry::getConfig()->setShopId('1');
         $this->setGETRequestParameter('shp', '1');

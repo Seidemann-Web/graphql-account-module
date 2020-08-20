@@ -83,7 +83,7 @@ final class BasketMakePrivateTest extends TokenTestCase
             }'
         );
 
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(401, $result);
     }
 
     public function testMakePrivateBasketWithToken(): void
