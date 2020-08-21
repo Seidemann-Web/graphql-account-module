@@ -272,7 +272,7 @@ final class WishedPriceTest extends TokenTestCase
             }'
         );
 
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(401, $result);
     }
 
     public function providerWishedPrices()

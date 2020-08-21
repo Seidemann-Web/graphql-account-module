@@ -99,7 +99,7 @@ final class BasketMakePublicTest extends TokenTestCase
             }'
         );
 
-        $this->assertResponseStatus(403, $result);
+        $this->assertResponseStatus(401, $result);
     }
 
     public function testMakePublicBasketWithToken(): void
