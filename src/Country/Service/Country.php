@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Country\Service;
 
 use OxidEsales\GraphQL\Account\Country\DataType\Country as CountryDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\CountryFilterList;
-use OxidEsales\GraphQL\Account\Country\DataType\Sorting;
+use OxidEsales\GraphQL\Account\Country\DataType\CountrySorting;
 use OxidEsales\GraphQL\Account\Country\Exception\CountryNotFound;
 use OxidEsales\GraphQL\Base\DataType\PaginationFilter;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
@@ -68,7 +68,7 @@ final class Country
      */
     public function countries(
         CountryFilterList $filter,
-        Sorting $sorting
+        CountrySorting $sorting
     ): array {
         if ($this->authorizationService->isAllowed('VIEW_INACTIVE_COUNTRY')) {
             $filter = $filter->withActiveFilter(null);

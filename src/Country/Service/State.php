@@ -11,7 +11,9 @@ namespace OxidEsales\GraphQL\Account\Country\Service;
 
 use OxidEsales\GraphQL\Account\Country\DataType\State as StateDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\StateFilterList;
+use OxidEsales\GraphQL\Account\Country\DataType\StateSorting;
 use OxidEsales\GraphQL\Account\Country\Exception\StateNotFound;
+use OxidEsales\GraphQL\Base\DataType\PaginationFilter;
 use OxidEsales\GraphQL\Base\Exception\NotFound;
 use OxidEsales\GraphQL\Catalogue\Shared\Infrastructure\Repository;
 
@@ -29,11 +31,15 @@ final class State
     /**
      * @return StateDataType[]
      */
-    public function states(StateFilterList $filter): array
-    {
-        return $this->repository->getByFilter(
+    public function states(
+        StateFilterList $filter,
+        StateSorting $sorting
+    ): array {
+        return $this->repository->getList(
+            StateDataType::class,
             $filter,
-            StateDataType::class
+            new PaginationFilter(),
+            $sorting
         );
     }
 

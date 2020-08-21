@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\Country\Controller;
 
 use OxidEsales\GraphQL\Account\Country\DataType\Country as CountryDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\CountryFilterList;
-use OxidEsales\GraphQL\Account\Country\DataType\Sorting as CountrySorting;
+use OxidEsales\GraphQL\Account\Country\DataType\CountrySorting;
 use OxidEsales\GraphQL\Account\Country\Service\Country as CountryService;
 use TheCodingMachine\GraphQLite\Annotations\Query;
 

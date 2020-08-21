@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\Country\Service;
 use OxidEsales\GraphQL\Account\Country\DataType\Country as CountryDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\State as StateDataType;
 use OxidEsales\GraphQL\Account\Country\DataType\StateFilterList;
+use OxidEsales\GraphQL\Account\Country\DataType\StateSorting;
 use OxidEsales\GraphQL\Account\Country\Service\State as StateService;
 use OxidEsales\GraphQL\Base\DataType\IDFilter;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
@@ -37,7 +38,8 @@ final class RelationService
      * @return StateDataType[]
      */
     public function states(
-        CountryDataType $country
+        CountryDataType $country,
+        ?StateSorting $sort
     ): array {
         return $this->stateService->states(
             new StateFilterList(
@@ -46,7 +48,8 @@ final class RelationService
                         (string) $country->getId()
                     )
                 )
-            )
+            ),
+            $sort ?? new StateSorting([])
         );
     }
 }

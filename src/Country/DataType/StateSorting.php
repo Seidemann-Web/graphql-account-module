@@ -12,24 +12,15 @@ namespace OxidEsales\GraphQL\Account\Country\DataType;
 use OxidEsales\GraphQL\Base\DataType\Sorting as BaseSorting;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 
-final class Sorting extends BaseSorting
+final class StateSorting extends BaseSorting
 {
-    public function __construct(array $sorting)
-    {
-        $sorting = $sorting ?: ['oxorder' => self::SORTING_ASC];
-
-        parent::__construct($sorting);
-    }
-
     /**
-     * @Factory(name="CountrySorting")
+     * @Factory(name="StateSorting")
      */
     public static function fromUserInput(
-        ?string $position = null,
         ?string $title = null
     ): self {
         return new self([
-            'oxorder' => $position,
             'oxtitle' => $title,
         ]);
     }

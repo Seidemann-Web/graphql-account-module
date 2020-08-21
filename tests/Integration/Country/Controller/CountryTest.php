@@ -304,6 +304,59 @@ final class CountryTest extends TokenTestCase
         );
     }
 
+    public function dataProviderSortedStates()
+    {
+        return [
+            'title_asc'  => [
+                'sortquery' => 'ASC',
+                'method'    => 'asort',
+            ],
+            'title_desc' => [
+                'sortquery' => 'DESC',
+                'method'    => 'arsort',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderSortedStates
+     */
+    public function testGetStatesListWithTitleSorting(string $sort, string $method): void
+    {
+        $this->setGETRequestParameter('lang', '1');
+
+        $result = $this->query('query {
+            country (id: "' . self::COUNTRY_WITH_STATES . '") {
+                states(sort: {
+                    title: "' . $sort . '"
+                }) {
+                    id
+                    title
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(
+            200,
+            $result
+        );
+
+        $sortedStates = [];
+
+        foreach ($result['body']['data']['country']['states'] as $state) {
+            $sortedStates[$state['id']] = $state['title'];
+        }
+
+        $expected = $sortedStates;
+
+        $method($expected, SORT_FLAG_CASE | SORT_STRING);
+
+        $this->assertSame(
+            $expected,
+            $sortedStates
+        );
+    }
+
     public function testGetCountriesStates(): void
     {
         $result = $this->query('query {
