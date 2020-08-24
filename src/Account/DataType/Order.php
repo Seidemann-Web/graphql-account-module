@@ -62,9 +62,9 @@ final class Order implements DataType
     /**
      * @Field()
      */
-    public function getInvoiceNumber(): bool
+    public function getInvoiceNumber(): int
     {
-        return (bool) ($this->order->getInvoiceNum());
+        return (int) ($this->order->getInvoiceNum());
     }
 
     /**
@@ -72,9 +72,13 @@ final class Order implements DataType
      */
     public function getPaid(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
-            (string) $this->order->getFieldData('oxpaid')
-        );
+        $paid = (string) $this->order->getFieldData('oxpaid');
+
+        if ('0000-00-00 00:00:00' == $paid) {
+            return null;
+        }
+
+        return new DateTimeImmutable($paid);
     }
 
     /**

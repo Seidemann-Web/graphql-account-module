@@ -18,7 +18,7 @@ use TheCodingMachine\GraphQLite\Types\ID;
 /**
  * @Type()
  */
-final class OrderInvoiceAddress implements DataType
+final class OrderDeliveryAddress implements DataType
 {
     /** @var EshopOrderModel */
     private $order;
@@ -38,15 +38,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function salutation(): string
     {
-        return (string) $this->order->getFieldData('oxbillsal');
-    }
-
-    /**
-     * @Field()
-     */
-    public function email(): string
-    {
-        return (string) $this->order->getFieldData('oxbillemail');
+        return (string) $this->order->getFieldData('oxdelsal');
     }
 
     /**
@@ -54,7 +46,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function firstName(): string
     {
-        return (string) $this->order->getFieldData('oxbillfname');
+        return (string) $this->order->getFieldData('oxdelfname');
     }
 
     /**
@@ -62,7 +54,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function lastName(): string
     {
-        return (string) $this->order->getFieldData('oxbilllname');
+        return (string) $this->order->getFieldData('oxdellname');
     }
 
     /**
@@ -70,7 +62,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function company(): string
     {
-        return (string) $this->order->getFieldData('oxbillcompany');
+        return (string) $this->order->getFieldData('oxdelcompany');
     }
 
     /**
@@ -78,7 +70,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function additionalInfo(): string
     {
-        return (string) $this->order->getFieldData('oxbilladdinfo');
+        return (string) $this->order->getFieldData('oxdeladdinfo');
     }
 
     /**
@@ -86,7 +78,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function street(): string
     {
-        return (string) $this->order->getFieldData('oxbillstreet');
+        return (string) $this->order->getFieldData('oxdelstreet');
     }
 
     /**
@@ -94,7 +86,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function streetNumber(): string
     {
-        return (string) $this->order->getFieldData('oxbillstreetnr');
+        return (string) $this->order->getFieldData('oxdelstreetnr');
     }
 
     /**
@@ -102,7 +94,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function zipCode(): string
     {
-        return (string) $this->order->getFieldData('oxbillzip');
+        return (string) $this->order->getFieldData('oxdelzip');
     }
 
     /**
@@ -110,15 +102,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function city(): string
     {
-        return (string) $this->order->getFieldData('oxbillcity');
-    }
-
-    /**
-     * @Field()
-     */
-    public function vatID(): string
-    {
-        return (string) $this->order->getFieldData('oxbillustid');
+        return (string) $this->order->getFieldData('oxdelcity');
     }
 
     /**
@@ -126,7 +110,7 @@ final class OrderInvoiceAddress implements DataType
      */
     public function phone(): string
     {
-        return (string) $this->order->getFieldData('oxbillfon');
+        return (string) $this->order->getFieldData('oxdelfon');
     }
 
     /**
@@ -134,20 +118,20 @@ final class OrderInvoiceAddress implements DataType
      */
     public function fax(): string
     {
-        return (string) $this->order->getFieldData('oxbillfax');
+        return (string) $this->order->getFieldData('oxdelfax');
     }
 
     public function countryId(): ID
     {
         return new ID(
-            $this->order->getFieldData('oxbillcountryid')
+            $this->order->getFieldData('oxdelcountryid')
         );
     }
 
     public function stateId(): ID
     {
         return new ID(
-            $this->order->getFieldData('oxbillstateid')
+            $this->order->getFieldData('oxdelstateid')
         );
     }
 

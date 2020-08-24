@@ -285,6 +285,48 @@ final class CustomerMultiShopTest extends MultishopTestCase
         );
     }
 
+    public function providerMallUserOrders()
+    {
+        return [
+            'shop_1' => [
+                'shopid'   => '1',
+                'expected' => 4,
+            ],
+            'shop_2' => [
+                'shopid'   => '2',
+                'expected' => 1,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerMallUserOrders
+     */
+    public function testMallUserOrders(string $shopId, int $expected): void
+    {
+        $this->ensureShop((int) $shopId);
+        EshopRegistry::getConfig()->setConfigParam('blMallUsers', true);
+
+        EshopRegistry::getConfig()->setShopId($shopId);
+        $this->setGETRequestParameter('shp', $shopId);
+
+        $this->prepareToken(self::USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            '
+            query {
+                customer{
+                    orders {
+                        id
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertSame($expected, count($result['body']['data']['customer']['orders']));
+    }
+
     private function prepareTestdata(int $shopid, int $status): void
     {
         $subscription = oxNew(EshopNewsSubscribed::class);
