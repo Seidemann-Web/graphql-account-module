@@ -11,7 +11,7 @@ namespace OxidEsales\GraphQL\Account\WishedPrice\Infrastructure;
 
 use OxidEsales\Eshop\Core\Price as EshopPriceModel;
 use OxidEsales\GraphQL\Account\WishedPrice\DataType\WishedPrice;
-use OxidEsales\GraphQL\Catalogue\Product\DataType\Price;
+use OxidEsales\GraphQL\Catalogue\Shared\DataType\Price;
 
 final class PriceFactory
 {

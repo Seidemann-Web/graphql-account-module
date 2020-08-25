@@ -15,7 +15,7 @@ use OxidEsales\GraphQL\Account\WishedPrice\Exception\InquirerNotFound;
 use OxidEsales\GraphQL\Account\WishedPrice\Infrastructure\PriceFactory;
 use OxidEsales\GraphQL\Account\WishedPrice\Service\Inquirer as InquirerService;
 use OxidEsales\GraphQL\Catalogue\Currency\DataType\Currency;
-use OxidEsales\GraphQL\Catalogue\Product\DataType\Price;
+use OxidEsales\GraphQL\Catalogue\Shared\DataType\Price;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
 use OxidEsales\GraphQL\Catalogue\Product\Service\Product as CatalogueProductService;
 use stdClass;
