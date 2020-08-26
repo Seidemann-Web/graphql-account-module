@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
-use OxidEsales\GraphQL\Catalogue\Product\Infrastructure\OrderProduct as OrderProductInfrastructure;
+use OxidEsales\GraphQL\Account\Account\Infrastructure\OrderProduct as OrderProductInfrastructure;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Catalogue\Product\Infrastructure;
+namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
 use OxidEsales\Eshop\Application\Model\OrderArticle as EshopOrderProductModel;
