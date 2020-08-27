@@ -49,6 +49,8 @@ final class OrderProductBruttoSum implements DataType
 
     /**
      * @Field()
+     *
+     * @return OrderProductVats[]
      */
     public function getVats(): array
     {
