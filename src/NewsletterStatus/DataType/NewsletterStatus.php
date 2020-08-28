@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\NewsletterStatus\DataType;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\NewsSubscribed as EshopNewsletterSubscriptionStatusModel;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -108,9 +108,9 @@ final class NewsletterStatus implements DataType
     /**
      * @Field()
      */
-    public function subscribed(): DateTimeInterface
+    public function subscribed(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->newsletterSubscriptionStatus->getFieldData('oxsubscribed')
         );
     }
@@ -122,11 +122,7 @@ final class NewsletterStatus implements DataType
     {
         $dateTime = (string) $this->newsletterSubscriptionStatus->getFieldData('oxunsubscribed');
 
-        if ($dateTime === '0000-00-00 00:00:00') {
-            return null;
-        }
-
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             $dateTime
         );
     }
@@ -134,9 +130,9 @@ final class NewsletterStatus implements DataType
     /**
      * @Field()
      */
-    public function updated(): DateTimeInterface
+    public function updated(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->newsletterSubscriptionStatus->getFieldData('oxtimestamp')
         );
     }

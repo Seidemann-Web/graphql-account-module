@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\WishedPrice\DataType;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\PriceAlarm as WishedPriceModel;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -78,19 +78,15 @@ final class WishedPrice implements DataType
     {
         $notificationDate = (string) $this->wishedPrice->getFieldData('oxsended');
 
-        if ($notificationDate === '0000-00-00 00:00:00') {
-            return null;
-        }
-
-        return new DateTimeImmutable($notificationDate);
+        return DateTimeImmutableFactory::fromString($notificationDate);
     }
 
     /**
      * @Field()
      */
-    public function getCreationDate(): DateTimeInterface
+    public function getCreationDate(): ?DateTimeInterface
     {
-        return new DateTimeImmutable((string) $this->wishedPrice->getFieldData('oxinsert'));
+        return DateTimeImmutableFactory::fromString((string) $this->wishedPrice->getFieldData('oxinsert'));
     }
 
     /**

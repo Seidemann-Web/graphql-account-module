@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -144,7 +144,7 @@ final class InvoiceAddress implements DataType
      */
     public function created(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->customer->getFieldData('oxcreate')
         );
     }
@@ -154,7 +154,7 @@ final class InvoiceAddress implements DataType
      */
     public function updated(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->customer->getFieldData('oxtimestamp')
         );
     }
