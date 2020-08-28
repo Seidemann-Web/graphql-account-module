@@ -11,6 +11,7 @@ namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\Order as OrderDataType;
+use OxidEsales\GraphQL\Account\Account\DataType\OrderCost;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Order as OrderInfrastructure;
@@ -62,5 +63,13 @@ final class OrderRelations
     public function deliveryAddress(OrderDataType $order): ?OrderDeliveryAddress
     {
         return $this->orderInfrastructure->deliveryAddress($order);
+    }
+
+    /**
+     * @Field()
+     */
+    public function cost(OrderDataType $order): OrderCost
+    {
+        return new OrderCost($order->getEshopModel());
     }
 }

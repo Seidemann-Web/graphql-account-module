@@ -15,75 +15,19 @@ final class CustomerOrderHistoryTest extends TokenTestCase
 {
     private const DIFFERENT_USERNAME = 'differentuser@oxid-esales.com';
 
+    private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
+
     private const USERNAME = 'user@oxid-esales.com';
 
     private const PASSWORD = 'useruser';
 
     private const ORDER_WITH_ALL_DATA = '8c726d3f42ff1a6ea2828d5f309de881';
 
-    public function testCustomerOrderWithAllDataById(): void
+    public function testCustomerOrderWithAllData(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query(
-            'query {
-                customer {
-                    id
-                    orders(
-                        pagination: {limit: 1, offset: 0}
-                    ){
-                        id
-                        orderNumber
-                        invoiceAddress {
-                            salutation
-                            email
-                            firstName
-                            lastName
-                            company
-                            additionalInfo
-                            street
-                            streetNumber
-                            zipCode
-                            city
-                            vatID
-                            phone
-                            fax
-                        }
-                        deliveryAddress {
-                            salutation
-                            firstName
-                            lastName
-                            company
-                            additionalInfo
-                            street
-                            streetNumber
-                            zipCode
-                            city
-                            phone
-                            fax
-                            country {
-                                id
-                                title
-                            }
-                            state {
-                                id
-                                title
-                            }
-                        }
-                        invoiceNumber
-                        invoiced
-                        remark
-                        currency {
-                            name
-                        }
-                        cancelled
-                        ordered
-                        paid
-                        updated
-                    }
-                }
-            }'
-        );
+        $result = $this->query(sprintf($this->getQueryTemplate(), $this->getAddressQuery(), ''));
 
         $this->assertResponseStatus(200, $result);
         $this->assertEquals(1, count($result['body']['data']['customer']['orders']));
@@ -224,6 +168,18 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         }
     }
 
+    public function testOrderCost(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
+
+        $result = $this->query(sprintf($this->getQueryTemplate(), '', $this->getCostQuery()));
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertEquals(1, count($result['body']['data']['customer']['orders']));
+
+        $this->assertCost($result['body']['data']['customer']['orders'][0]['cost']);
+    }
+
     private function assertInvoiceAddress(array $address): void
     {
         $expected = [
@@ -270,5 +226,158 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         foreach ($expected as $key => $value) {
             $this->assertSame($value, $address[$key], $key);
         }
+    }
+
+    private function assertCost(array $costs): void
+    {
+        $expected = [
+            'total'        => '220.78',
+            'productNet'   => [
+                'price' => '178.3',
+                'vat'   => '0.0',
+            ],
+            'productGross' => [
+                'sum'  => '209.38',
+                'vats' => [
+                    [
+                        'vatRate'  => '19.0',
+                        'vatPrice' => '27.38',
+                    ],
+                    [
+                        'vatRate'  => '14',
+                        'vatPrice' => '0.98',
+                    ],
+                    [
+                        'vatRate'  => '10',
+                        'vatPrice' => '2.72',
+                    ],
+                ],
+            ],
+            'delivery'     => [
+                'price'    => '3.9',
+                'vat'      => '19.0',
+                'currency' => [
+                    'name' => 'EUR',
+                ],
+            ],
+            'payment'      => [
+                'price'    => '7.5',
+                'vat'      => '19.0',
+                'currency' => [
+                    'name' => 'EUR',
+                ],
+            ],
+            'currency'     => [
+                'name' => 'EUR',
+            ],
+        ];
+
+        $this->assertEquals($expected, $costs);
+    }
+
+    private function getCostQuery(): string
+    {
+        return 'cost {
+            total
+            productNet {
+                price
+                vat
+            }
+            productGross {
+                sum
+                vats {
+                    vatRate
+                    vatPrice
+                }
+            }
+            delivery {
+                price
+                vat
+                currency {
+                    name
+                }
+            }
+            payment {
+                price
+                vat
+                currency {
+                    name
+               }
+            }
+            currency {
+                name
+            }
+        }';
+    }
+
+    private function getAddressQuery(): string
+    {
+        return '
+            invoiceAddress {
+                salutation
+                email
+                firstName
+                lastName
+                company
+                additionalInfo
+                street
+                streetNumber
+                zipCode
+                city
+                vatID
+                phone
+                fax
+            }
+            deliveryAddress {
+                salutation
+                firstName
+                lastName
+                company
+                additionalInfo
+                street
+                streetNumber
+                zipCode
+                city
+                phone
+                fax
+                country {
+                    id
+                    title
+                }
+                state {
+                    id
+                    title
+                }
+            }
+        ';
+    }
+
+    private function getQueryTemplate(): string
+    {
+        return '
+            query {
+                customer {
+                    id
+                    orders(
+                        pagination: {limit: 1, offset: 0}
+                    ){
+                        id
+                        orderNumber
+                        %s
+                        invoiceNumber
+                        invoiced
+                        remark
+                        currency {
+                            name
+                        }
+                        cancelled
+                        ordered
+                        paid
+                        updated
+                        %s
+                    }
+                }
+            }
+        ';
     }
 }

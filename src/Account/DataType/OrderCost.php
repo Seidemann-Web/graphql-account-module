@@ -17,15 +17,14 @@ use TheCodingMachine\GraphQLite\Annotations\Type;
 /**
  * @Type()
  */
-final class OrderProductBruttoSum implements DataType
+final class OrderCost implements DataType
 {
     /** @var EshopOrderModel */
     private $order;
 
-    public function __construct(
-        EshopOrderModel $order
-    ) {
-        $this->order                      = $order;
+    public function __construct(EshopOrderModel $order)
+    {
+        $this->order = $order;
     }
 
     public function getEshopModel(): EshopOrderModel
@@ -36,9 +35,9 @@ final class OrderProductBruttoSum implements DataType
     /**
      * @Field()
      */
-    public function getSum(): float
+    public function getTotal(): float
     {
-        return (float) ($this->order->getFieldData('oxtotalbrutsum'));
+        return (float) $this->order->getFieldData('oxtotalordersum');
     }
 
     public static function getModelClass(): string

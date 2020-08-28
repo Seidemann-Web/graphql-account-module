@@ -12,6 +12,7 @@ namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
 use OxidEsales\Eshop\Application\Model\OrderArticle as EshopOrderProductModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\GraphQL\Account\Account\DataType\OrderProductBruttoSum;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderProductVats;
 
 use function count;
@@ -22,8 +23,11 @@ final class OrderProduct
     /**
      * @return OrderProductVats[]
      */
-    public function getVats(EshopOrderModel $order): array
+    public function getVats(OrderProductBruttoSum $orderProductGross): array
     {
+        /** @var EshopOrderModel $order */
+        $order = $orderProductGross->getEshopModel();
+
         /** @var ListModel $orderProducts */
         $orderProducts = $order->getOrderArticles();
 
