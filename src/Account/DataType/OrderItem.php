@@ -112,14 +112,6 @@ final class OrderItem implements DataType
     }
 
     /**
-     * @Field
-     */
-    public function getImageGallery(): ProductImageGallery
-    {
-        return new ProductImageGallery($this->orderArticle->getArticle());
-    }
-
-    /**
      * @Field()
      */
     public function getInsert(): DateTimeInterface
