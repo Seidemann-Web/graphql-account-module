@@ -130,7 +130,7 @@ final class Order implements DataType
      */
     public function getItems(): array
     {
-        $items = [];
+        $items         = [];
         $orderArticles = $this->order->getOrderArticles();
 
         foreach ($orderArticles as $oneArticle) {

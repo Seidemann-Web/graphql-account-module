@@ -13,7 +13,6 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\OrderArticle as EshopOrderArticleModel;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\ProductDimensions;
-use OxidEsales\GraphQL\Catalogue\Product\DataType\ProductImageGallery;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\Price;
 use TheCodingMachine\GraphQLite\Annotations\Field;
@@ -38,11 +37,6 @@ final class OrderItem implements DataType
         return $this->orderArticle;
     }
 
-    public static function getModelClass(): string
-    {
-        return EshopOrderArticleModel::class;
-    }
-
     /**
      * @Field
      */
@@ -56,7 +50,7 @@ final class OrderItem implements DataType
      */
     public function amount(): float
     {
-        return (float)$this->orderArticle->getFieldData('OXAMOUNT');
+        return (float) $this->orderArticle->getFieldData('OXAMOUNT');
     }
 
     /**
@@ -64,7 +58,7 @@ final class OrderItem implements DataType
      */
     public function sku(): string
     {
-        return (string)$this->orderArticle->getFieldData('OXARTNUM');
+        return (string) $this->orderArticle->getFieldData('OXARTNUM');
     }
 
     /**
@@ -72,7 +66,7 @@ final class OrderItem implements DataType
      */
     public function title(): string
     {
-        return (string)$this->orderArticle->getFieldData('OXTITLE');
+        return (string) $this->orderArticle->getFieldData('OXTITLE');
     }
 
     /**
@@ -80,7 +74,7 @@ final class OrderItem implements DataType
      */
     public function shortDescription(): string
     {
-        return (string)$this->orderArticle->getFieldData('OXSHORTDESC');
+        return (string) $this->orderArticle->getFieldData('OXSHORTDESC');
     }
 
     /**
@@ -90,6 +84,7 @@ final class OrderItem implements DataType
     {
         /** @var \OxidEsales\Eshop\Core\Price $totalPrice */
         $totalPrice = $this->orderArticle->getPrice();
+
         return new Price($totalPrice);
     }
 
@@ -100,6 +95,7 @@ final class OrderItem implements DataType
     {
         /** @var \OxidEsales\Eshop\Core\Price $itemPrice */
         $itemPrice = $this->orderArticle->getBasePrice();
+
         return new Price($itemPrice);
     }
 
@@ -117,7 +113,7 @@ final class OrderItem implements DataType
     public function getInsert(): DateTimeInterface
     {
         return new DateTimeImmutable(
-            (string)$this->orderArticle->getFieldData('OXINSERT')
+            (string) $this->orderArticle->getFieldData('OXINSERT')
         );
     }
 
@@ -127,7 +123,7 @@ final class OrderItem implements DataType
     public function getTimestamp(): DateTimeInterface
     {
         return new DateTimeImmutable(
-            (string)$this->orderArticle->getFieldData('OXTIMESTAMP')
+            (string) $this->orderArticle->getFieldData('OXTIMESTAMP')
         );
     }
 
@@ -136,7 +132,7 @@ final class OrderItem implements DataType
      */
     public function isCancelled(): bool
     {
-        return (bool)$this->orderArticle->getFieldData('OXSTORNO');
+        return (bool) $this->orderArticle->getFieldData('OXSTORNO');
     }
 
     /**
@@ -144,12 +140,16 @@ final class OrderItem implements DataType
      */
     public function isBundle(): bool
     {
-        return (bool)$this->orderArticle->getFieldData('OXISBUNDLE');
+        return (bool) $this->orderArticle->getFieldData('OXISBUNDLE');
     }
-
 
     public function productId(): string
     {
-        return (string)$this->orderArticle->getFieldData('OXARTID');
+        return (string) $this->orderArticle->getFieldData('OXARTID');
+    }
+
+    public static function getModelClass(): string
+    {
+        return EshopOrderArticleModel::class;
     }
 }
