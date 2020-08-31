@@ -127,6 +127,23 @@ final class Order implements DataType
         );
     }
 
+    /**
+     * @Field
+     *
+     * @return OrderItem[]
+     */
+    public function getItems(): array
+    {
+        $items = [];
+        $orderArticles = $this->order->getOrderArticles();
+
+        foreach ($orderArticles as $oneArticle) {
+            $items[] = new OrderItem($oneArticle);
+        }
+
+        return $items;
+    }
+
     public static function getModelClass(): string
     {
         return EshopOrderModel::class;
