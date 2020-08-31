@@ -16,17 +16,7 @@ final class PermissionProvider implements PermissionProviderInterface
     public function getPermissions(): array
     {
         return [
-            'admin' => [
-                'VIEW_WISHED_PRICES',
-                'DELETE_WISHED_PRICE',
-                'VIEW_RATINGS',
-                'DELETE_RATING',
-                'DELETE_REVIEW',
-                'VIEW_INACTIVE_COUNTRY',
-                'DELETE_DELIVERY_ADDRESS',
-                'DELETE_BASKET',
-            ],
-            'malladmin' => [
+            'oxidadmin' => [
                 'VIEW_WISHED_PRICES',
                 'DELETE_WISHED_PRICE',
                 'VIEW_RATINGS',
