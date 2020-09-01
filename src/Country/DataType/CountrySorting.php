@@ -14,18 +14,26 @@ use TheCodingMachine\GraphQLite\Annotations\Factory;
 
 final class CountrySorting extends BaseSorting
 {
-    public function __construct(array $sorting)
-    {
-        $sorting = $sorting ?: ['oxorder' => self::SORTING_ASC];
-
-        parent::__construct($sorting);
-    }
-
     /**
      * @Factory(name="CountrySorting")
+     *
+     * By default the countries will be sorted by their position ('oxorder' column).
+     * In case you want to sort them by other field, like title for example,
+     * you should set the position as an empty string.
+     *
+     * query {
+     *      countries(
+     *          sort: {
+     *              position: "",
+     *              title: "ASC"
+     *          }
+     *      ) {
+     *          title
+     *      }
+     * }
      */
     public static function fromUserInput(
-        ?string $position = null,
+        ?string $position = self::SORTING_ASC,
         ?string $title = null
     ): self {
         return new self([

@@ -45,7 +45,7 @@ final class Country
     ): array {
         return $this->countryService->countries(
             $filter ?? new CountryFilterList(),
-            $sort ?? new CountrySorting([])
+            $sort ?? CountrySorting::fromUserInput()
         );
     }
 }
