@@ -11,7 +11,9 @@ namespace OxidEsales\GraphQL\Account\Account\DataType;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use Iterator;
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
+use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -130,8 +132,9 @@ final class Order implements DataType
      */
     public function getItems(): array
     {
-        $items         = [];
+        /** @var Iterator<OrderArticle> $orderArticles */
         $orderArticles = $this->order->getOrderArticles();
+        $items         = [];
 
         foreach ($orderArticles as $oneArticle) {
             $items[] = new OrderItem($oneArticle);
