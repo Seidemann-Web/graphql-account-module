@@ -25,6 +25,7 @@ final class StateTest extends TestCase
         $data  = [
             'oxtitle'     => 'state title',
             'oxisoalpha2' => 'state isoalpha2',
+            'oxtimestamp' => '2020-10-10',
         ];
         $model->assign($data);
         $dataType = new State($model);

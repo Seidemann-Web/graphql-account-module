@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -80,7 +80,7 @@ final class Customer implements DataType
      */
     public function getBirthdate(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->customer->getFieldData('oxbirthdate')
         );
     }
@@ -98,7 +98,7 @@ final class Customer implements DataType
      */
     public function getRegistered(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->customer->getFieldData('oxregister')
         );
     }
@@ -108,7 +108,7 @@ final class Customer implements DataType
      */
     public function getCreated(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->customer->getFieldData('oxcreate')
         );
     }
@@ -118,7 +118,7 @@ final class Customer implements DataType
      */
     public function getUpdated(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->customer->getFieldData('oxtimestamp')
         );
     }

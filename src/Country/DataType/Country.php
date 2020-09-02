@@ -9,8 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Country\DataType;
 
-use DateTimeImmutable;
+use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\Country as EshopCountryModel;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -104,9 +105,9 @@ final class Country implements DataType
     /**
      * @Field()
      */
-    public function getCreationDate(): DateTimeImmutable
+    public function getCreationDate(): ?DateTimeInterface
     {
-        return new DateTimeImmutable((string) $this->country->getFieldData('oxtimestamp'));
+        return DateTimeImmutableFactory::fromString((string) $this->country->getFieldData('oxtimestamp'));
     }
 
     public static function getModelClass(): string

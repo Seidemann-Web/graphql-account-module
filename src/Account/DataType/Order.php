@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use Iterator;
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
 use OxidEsales\Eshop\Application\Model\OrderArticle;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -76,11 +76,7 @@ final class Order implements DataType
     {
         $paid = (string) $this->order->getFieldData('oxpaid');
 
-        if ('0000-00-00 00:00:00' == $paid) {
-            return null;
-        }
-
-        return new DateTimeImmutable($paid);
+        return DateTimeImmutableFactory::fromString($paid);
     }
 
     /**
@@ -104,9 +100,9 @@ final class Order implements DataType
      */
     public function getInvoiced(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
-            (string) $this->order->getFieldData('oxbilldate')
-        );
+        $invoiceDate = (string) $this->order->getFieldData('oxbilldate');
+
+        return DateTimeImmutableFactory::fromString($invoiceDate);
     }
 
     /**
@@ -114,7 +110,7 @@ final class Order implements DataType
      */
     public function getOrdered(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->order->getFieldData('oxorderdate')
         );
     }
@@ -124,7 +120,7 @@ final class Order implements DataType
      */
     public function getUpdated(): ?DateTimeInterface
     {
-        return new DateTimeImmutable(
+        return DateTimeImmutableFactory::fromString(
             (string) $this->order->getFieldData('oxtimestamp')
         );
     }

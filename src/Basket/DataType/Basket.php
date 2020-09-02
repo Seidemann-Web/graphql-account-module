@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Basket\DataType;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use OxidEsales\Eshop\Application\Model\UserBasket as BasketModel;
+use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -69,9 +69,9 @@ final class Basket implements DataType
     /**
      * @Field()
      */
-    public function creationDate(): DateTimeInterface
+    public function creationDate(): ?DateTimeInterface
     {
-        return new DateTimeImmutable((string) $this->basket->getFieldData('oxtimestamp'));
+        return DateTimeImmutableFactory::fromString((string) $this->basket->getFieldData('oxtimestamp'));
     }
 
     /**
@@ -82,7 +82,7 @@ final class Basket implements DataType
         $timeStamp = (int) $this->basket->getFieldData('oxupdate');
 
         if ($timeStamp > 0) {
-            return (new DateTimeImmutable())->setTimestamp($timeStamp);
+            return DateTimeImmutableFactory::fromTimeStamp($timeStamp);
         }
 
         return null;
