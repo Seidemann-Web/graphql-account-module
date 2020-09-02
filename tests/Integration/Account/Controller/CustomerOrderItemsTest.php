@@ -9,13 +9,21 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class CustomerOrderItemsTest extends TokenTestCase
 {
     private const USERNAME = 'user@oxid-esales.com';
 
+    private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
+
     private const PASSWORD = 'useruser';
+
+    private const ORDER_WITH_NON_EXISTING_PRODUCT = '_order_with_non_existing_product';
+
+    private const ORDER_WITH_DELETED_PRODUCT = '_order_with_deleted_product';
 
     public function testCustomerOrderItems(): void
     {
@@ -66,7 +74,7 @@ final class CustomerOrderItemsTest extends TokenTestCase
 
         $this->assertCount(6, $items);
 
-        $orderItems = [
+        $expectedItems = [
             [
                 'id'               => '7d0e255c591fb5062669fd039bcf9f29',
                 'amount'           => 1.0,
@@ -91,6 +99,8 @@ final class CustomerOrderItemsTest extends TokenTestCase
                     'weight' => 0.0,
                 ],
                 'insert'           => '2006-12-20T00:00:00+01:00',
+                'cancelled'        => false,
+                'bundle'           => false,
             ], [
                 'id'               => '7d010996ab5656e369a63cdccb5f56e7',
                 'amount'           => 1.0,
@@ -115,21 +125,106 @@ final class CustomerOrderItemsTest extends TokenTestCase
                     'weight' => 0.0,
                 ],
                 'insert'           => '2015-12-20T00:00:00+01:00',
+                'cancelled'        => false,
+                'bundle'           => false,
             ],
         ];
 
-        foreach ($items as $key => $item) {
-            if (!$orderItems[$key]) {
+        foreach ($items as $item) {
+            foreach ($expectedItems as $expectedItem) {
+                if ($expectedItem['id'] != $item['id']) {
+                    continue;
+                }
+
+                $this->assertSame($item, $expectedItem);
+            }
+        }
+    }
+
+    public function testCustomerOrderItemsWithNonExistingProduct(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'query {
+                customer {
+                    id
+                    orders {
+                        id
+                        items {
+                            id
+                            product {
+                                id
+                            }
+                        }
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $orders = $result['body']['data']['customer']['orders'];
+
+        foreach ($orders as $order) {
+            if ($order['id'] != self::ORDER_WITH_NON_EXISTING_PRODUCT) {
                 continue;
             }
 
-            $orderItem = $orderItems[$key];
-
-            $this->assertFalse($item['cancelled']);
-            $this->assertFalse($item['bundle']);
-
-            unset($item['cancelled'], $item['bundle']);
-            $this->assertSame($orderItem, $item);
+            $this->assertNull($order['items'][0]['product']);
         }
+    }
+
+    public function testCustomerOrderItemsWithInactiveProduct(): void
+    {
+        $this->updateProductActiveStatus('_test_product_for_basket', false);
+
+        $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
+
+        $result = $this->query(
+            'query {
+                customer {
+                    id
+                    orders {
+                        id
+                        items {
+                            id
+                            product {
+                                id
+                            }
+                        }
+                    }
+                }
+            }'
+        );
+
+        $this->assertResponseStatus(200, $result);
+
+        $orders = $result['body']['data']['customer']['orders'];
+
+        foreach ($orders as $order) {
+            if ($order['id'] != self::ORDER_WITH_DELETED_PRODUCT) {
+                continue;
+            }
+
+            $this->assertNull($order['items'][0]['product']);
+        }
+
+        $this->updateProductActiveStatus('_test_product_for_basket', true);
+    }
+
+    private function updateProductActiveStatus(string $productId, bool $active): void
+    {
+        $queryBuilderFactory = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $queryBuilder
+            ->update('oxarticles')
+            ->set('oxactive', (int) $active)
+            ->where('OXID = :OXID')
+            ->setParameter(':OXID', $productId)
+            ->execute();
     }
 }

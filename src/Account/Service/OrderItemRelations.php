@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
 use OxidEsales\GraphQL\Account\Account\DataType\OrderItem;
+use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Catalogue\Product\DataType\Product;
+use OxidEsales\GraphQL\Catalogue\Product\Exception\ProductNotFound;
 use OxidEsales\GraphQL\Catalogue\Product\Service\Product as ProductService;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
@@ -32,10 +34,14 @@ final class OrderItemRelations
     /**
      * @Field()
      */
-    public function getProduct(OrderItem $orderItem): Product
+    public function getProduct(OrderItem $orderItem): ?Product
     {
-        return $this->productService->product(
-            $orderItem->productId()
-        );
+        try {
+            return $this->productService->product(
+                $orderItem->productId()
+            );
+        } catch (ProductNotFound | InvalidLogin $e) {
+            return null;
+        }
     }
 }
