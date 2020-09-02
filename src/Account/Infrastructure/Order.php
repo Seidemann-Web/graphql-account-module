@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
+use OxidEsales\Eshop\Application\Model\UserPayment as EshopUserPaymentModel;
 use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
 use OxidEsales\Eshop\Application\Model\VoucherList as EshopVoucherListModel;
 use OxidEsales\GraphQL\Account\Account\DataType\Order as OrderDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDelivery as OrderDeliveryDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\OrderPayment;
 use OxidEsales\GraphQL\Account\Account\DataType\Voucher;
 
 final class Order
@@ -63,5 +65,13 @@ final class Order
         }
 
         return $usedVouchers;
+    }
+
+    public function getOrderPayment(OrderDataType $order): ?OrderPayment
+    {
+        /** @var EshopUserPaymentModel|false $payment */
+        $payment = $order->getEshopModel()->getPaymentType();
+
+        return $payment ? new OrderPayment($payment) : null;
     }
 }

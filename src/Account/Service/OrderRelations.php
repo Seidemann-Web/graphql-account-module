@@ -9,15 +9,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Service;
 
-use OxidEsales\GraphQL\Account\Account\DataType\DeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\Order as OrderDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderCost;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDelivery;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\OrderPayment;
 use OxidEsales\GraphQL\Account\Account\DataType\Voucher;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Order as OrderInfrastructure;
-use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 
@@ -29,15 +28,10 @@ final class OrderRelations
     /** @var OrderInfrastructure */
     private $orderInfrastructure;
 
-    /** @var CurrencyRepository */
-    private $currencyRepository;
-
     public function __construct(
-        OrderInfrastructure $orderInfrastructure,
-        CurrencyRepository $currencyRepository
+        OrderInfrastructure $orderInfrastructure
     ) {
         $this->orderInfrastructure = $orderInfrastructure;
-        $this->currencyRepository  = $currencyRepository;
     }
 
     /**
@@ -80,5 +74,13 @@ final class OrderRelations
     public function vouchers(OrderDataType $order): array
     {
         return $this->orderInfrastructure->getOrderVouchers($order);
+    }
+
+    /**
+     * @Field()
+     */
+    public function getPayment(OrderDataType $order): ?OrderPayment
+    {
+        return $this->orderInfrastructure->getOrderPayment($order);
     }
 }

@@ -45,6 +45,7 @@ final class NamespaceMapper implements NamespaceMapperInterface
             '\\OxidEsales\\GraphQL\\Account\\Country\\Service'                  => __DIR__ . '/../../Country/Service/',
             '\\OxidEsales\\GraphQL\\Account\\Basket\\DataType'                  => __DIR__ . '/../../Basket/DataType/',
             '\\OxidEsales\\GraphQL\\Account\\Basket\\Service'                   => __DIR__ . '/../../Basket/Service/',
+            '\\OxidEsales\\GraphQL\\Account\\Payment\\DataType'                 => __DIR__ . '/../../Payment/DataType/',
         ];
     }
 }

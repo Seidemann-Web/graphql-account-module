@@ -12,7 +12,6 @@ namespace OxidEsales\GraphQL\Account\Account\Service;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderCost;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderProductBruttoSum;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\OrderCost as OrderCostInfrastructure;
-use OxidEsales\GraphQL\Account\Account\Infrastructure\OrderProduct as OrderProductInfrastructure;
 use OxidEsales\GraphQL\Catalogue\Currency\DataType\Currency;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\Price;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
@@ -25,9 +24,6 @@ final class OrderCostRelations
 {
     /** @var OrderCostInfrastructure */
     private $orderCostInfrastructure;
-
-    /** @var OrderProductInfrastructure */
-    private $orderProductInfrastructure;
 
     public function __construct(OrderCostInfrastructure $orderCostInfrastructure)
     {
