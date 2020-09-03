@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
+use OxidEsales\Eshop\Application\Model\VoucherList;
 use OxidEsales\GraphQL\Account\Account\DataType\Order as OrderDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\Voucher;
 
 final class Order
 {
@@ -35,5 +37,27 @@ final class Order
     public function getOrderCurrencyName(OrderDataType $order): string
     {
         return (string) $order->getEshopModel()->getFieldData('oxcurrency');
+    }
+
+    /**
+     * @param OrderDataType $order
+     *
+     * @return Voucher[]
+     */
+    public function getOrderVouchers(OrderDataType $order): array
+    {
+        $list = oxNew(VoucherList::class);
+        $list->selectString(
+            'select * from oxvouchers where oxorderid = :orderId',
+            ['orderId' => $order->getId()]
+        );
+        $voucherModels = $list->getArray();
+
+        $usedVouchers = [];
+        foreach ($voucherModels as $oneVoucher) {
+            $usedVouchers[] = new Voucher($oneVoucher);
+        }
+
+        return $usedVouchers;
     }
 }
