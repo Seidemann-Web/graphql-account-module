@@ -9,10 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
+use OxidEsales\Eshop\Core\Registry as EshopRegistry;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class CustomerOrderHistoryTest extends TokenTestCase
 {
+    private const EXAMPLE_USERNAME = 'exampleuser@oxid-esales.com';
+
     private const DIFFERENT_USERNAME = 'differentuser@oxid-esales.com';
 
     private const OTHER_USERNAME = 'otheruser@oxid-esales.com';
@@ -23,11 +26,30 @@ final class CustomerOrderHistoryTest extends TokenTestCase
 
     private const ORDER_WITH_ALL_DATA = '8c726d3f42ff1a6ea2828d5f309de881';
 
+    private const PARCEL_SERVICE_LINK = 'http://myshinyparcel.com?ID=';
+
+    private $originalParcelService = '';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->originalParcel = EshopRegistry::getConfig()->getConfigParam('sParcelService');
+        EshopRegistry::getConfig()->setConfigParam('sParcelService', self::PARCEL_SERVICE_LINK);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->originalParcel = EshopRegistry::getConfig()->setConfigParam('sParcelService', $this->originalParcelService);
+
+        parent::tearDown();
+    }
+
     public function testCustomerOrderWithAllData(): void
     {
         $this->prepareToken(self::USERNAME, self::PASSWORD);
 
-        $result = $this->query(sprintf($this->getQueryTemplate(), $this->getAddressQuery(), ''));
+        $result = $this->query(sprintf($this->getQueryTemplate(), $this->getAddressQuery(), '', ''));
 
         $this->assertResponseStatus(200, $result);
         $this->assertEquals(1, count($result['body']['data']['customer']['orders']));
@@ -172,12 +194,43 @@ final class CustomerOrderHistoryTest extends TokenTestCase
     {
         $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
 
-        $result = $this->query(sprintf($this->getQueryTemplate(), '', $this->getCostQuery()));
+        $result = $this->query(sprintf($this->getQueryTemplate(), '', $this->getCostQuery(), ''));
 
         $this->assertResponseStatus(200, $result);
         $this->assertEquals(1, count($result['body']['data']['customer']['orders']));
 
         $this->assertCost($result['body']['data']['customer']['orders'][0]['cost']);
+    }
+
+    public function testShippedOrderDelivery(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
+
+        $result = $this->query(sprintf($this->getQueryTemplate(), '', '', $this->getDeliveryQuery()));
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertEquals(1, count($result['body']['data']['customer']['orders']));
+
+        $this->assertDelivery($result['body']['data']['customer']['orders'][0]['delivery']);
+    }
+
+    public function testOrderWithNotExistingDelivery(): void
+    {
+        $this->prepareToken(self::EXAMPLE_USERNAME, self::PASSWORD);
+
+        $result = $this->query(sprintf($this->getQueryTemplate(), '', '', $this->getDeliveryQuery()));
+
+        $this->assertResponseStatus(200, $result);
+        $this->assertEquals(1, count($result['body']['data']['customer']['orders']));
+
+        $delivery = $result['body']['data']['customer']['orders'][0]['delivery'];
+
+        $this->assertNull($delivery['dispatched']);
+        $this->assertEquals(false, $delivery['provider']['active']);
+        $this->assertEmpty($delivery['provider']['id']);
+        $this->assertEmpty($delivery['provider']['title']);
+        $this->assertEmpty($delivery['trackingNumber']);
+        $this->assertEmpty($delivery['trackingURL']);
     }
 
     private function assertInvoiceAddress(array $address): void
@@ -375,9 +428,42 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                         paid
                         updated
                         %s
+                        %s
                     }
                 }
             }
         ';
+    }
+
+    private function getDeliveryQuery(): string
+    {
+        return '
+            delivery {
+                trackingNumber
+                trackingURL
+                dispatched
+                provider {
+                    id
+                    active
+                    title
+                }
+            }
+        ';
+    }
+
+    private function assertDelivery(array $delivery): void
+    {
+        $expected = [
+            'trackingNumber' => 'tracking_code',
+            'trackingURL'    => self::PARCEL_SERVICE_LINK,
+            'dispatched'     => '2020-09-02T12:12:12+02:00',
+            'provider'       => [
+                'id'     => 'oxidstandard',
+                'active' => true,
+                'title'  => 'Standard',
+            ],
+        ];
+
+        $this->assertEquals($expected, $delivery);
     }
 }

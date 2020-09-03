@@ -38,7 +38,7 @@ final class DeliveryProvider implements DataType
      */
     public function getId(): ID
     {
-        return new ID($this->order->getId());
+        return new ID((string) $this->order->getId());
     }
 
     /**
