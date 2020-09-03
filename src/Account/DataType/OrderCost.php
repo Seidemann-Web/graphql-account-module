@@ -40,6 +40,22 @@ final class OrderCost implements DataType
         return (float) $this->order->getFieldData('oxtotalordersum');
     }
 
+    /**
+     * @Field()
+     */
+    public function getVoucher(): float
+    {
+        return (float) $this->order->getFieldData('oxvoucherdiscount');
+    }
+
+    /**
+     * @Field()
+     */
+    public function getDiscount(): float
+    {
+        return (float) $this->order->getFieldData('oxdiscount');
+    }
+
     public static function getModelClass(): string
     {
         return EshopOrderModel::class;
