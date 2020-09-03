@@ -247,7 +247,12 @@ final class CountryTest extends TokenTestCase
     public function testGetCountryListWithTitleSorting(): void
     {
         $result = $this->query('query {
-            countries(sort: {title: "ASC"}) {
+            countries(
+                sort: {
+                    position: ""
+                    title: "ASC"
+                }
+            ) {
                 id
             }
         }');
