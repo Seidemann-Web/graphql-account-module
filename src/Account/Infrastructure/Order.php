@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
-use OxidEsales\Eshop\Application\Model\VoucherList;
+use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
+use OxidEsales\Eshop\Application\Model\VoucherList as EshopVoucherListModel;
 use OxidEsales\GraphQL\Account\Account\DataType\Order as OrderDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
@@ -44,11 +45,14 @@ final class Order
      */
     public function getOrderVouchers(OrderDataType $order): array
     {
-        $list = oxNew(VoucherList::class);
+        /** @var EshopVoucherListModel $list */
+        $list = oxNew(EshopVoucherListModel::class);
         $list->selectString(
             'select * from oxvouchers where oxorderid = :orderId',
             ['orderId' => $order->getId()]
         );
+
+        /** @var EshopVoucherModel[] $voucherModels */
         $voucherModels = $list->getArray();
 
         $usedVouchers = [];
