@@ -141,7 +141,7 @@ final class CountryEnterpriseTest extends MultishopTestCase
         $this->setGETRequestParameter('lang', '1');
 
         $result = $this->query('query {
-            countries(sort: {title: "ASC"}) {
+            countries(sort: {position: "", title: "ASC"}) {
                 title
                 position
             }
