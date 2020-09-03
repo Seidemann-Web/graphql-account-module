@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
 use DateTimeInterface;
-use OxidEsales\Eshop\Application\Model\DeliverySet as EshopDeliveryProviderModel;
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
 use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
@@ -59,17 +58,6 @@ final class OrderDelivery implements DataType
         return DateTimeImmutableFactory::fromString(
             (string) $this->order->getFieldData('oxsenddate')
         );
-    }
-
-    /**
-     * @Field()
-     */
-    public function getProvider(): DeliveryProvider
-    {
-        /** @var EshopDeliveryProviderModel $deliverySet */
-        $deliverySet = $this->order->getDelSet();
-
-        return new DeliveryProvider($deliverySet);
     }
 
     public static function getModelClass(): string
