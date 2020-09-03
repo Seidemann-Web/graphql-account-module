@@ -40,8 +40,6 @@ final class Order
     }
 
     /**
-     * @param OrderDataType $order
-     *
      * @return Voucher[]
      */
     public function getOrderVouchers(OrderDataType $order): array
@@ -54,6 +52,7 @@ final class Order
         $voucherModels = $list->getArray();
 
         $usedVouchers = [];
+
         foreach ($voucherModels as $oneVoucher) {
             $usedVouchers[] = new Voucher($oneVoucher);
         }
