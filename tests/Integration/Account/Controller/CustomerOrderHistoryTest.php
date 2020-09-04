@@ -60,7 +60,6 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         $this->assertSame(665, $order['invoiceNumber']);
         $this->assertSame('2020-08-24T00:00:00+02:00', $order['invoiced']);
         $this->assertSame('please deliver as fast as you can', $order['remark']);
-        $this->assertSame('EUR', $order['currency']['name']);
         $this->assertFalse($order['cancelled']);
         $this->assertSame('2020-05-23T14:08:55+02:00', $order['ordered']);
         $this->assertNull($order['paid']);
@@ -420,9 +419,6 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                         invoiceNumber
                         invoiced
                         remark
-                        currency {
-                            name
-                        }
                         cancelled
                         ordered
                         paid

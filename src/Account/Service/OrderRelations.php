@@ -17,7 +17,6 @@ use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\Voucher;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Order as OrderInfrastructure;
-use OxidEsales\GraphQL\Catalogue\Currency\DataType\Currency;
 use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
 use TheCodingMachine\GraphQLite\Annotations\ExtendType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
@@ -39,16 +38,6 @@ final class OrderRelations
     ) {
         $this->orderInfrastructure = $orderInfrastructure;
         $this->currencyRepository  = $currencyRepository;
-    }
-
-    /**
-     * @Field()
-     */
-    public function currency(OrderDataType $order): Currency
-    {
-        return $this->currencyRepository->getByName(
-            $this->orderInfrastructure->getOrderCurrencyName($order)
-        );
     }
 
     /**

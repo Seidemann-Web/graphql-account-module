@@ -36,11 +36,6 @@ final class Order
         return new OrderInvoiceAddress($order->getEshopModel());
     }
 
-    public function getOrderCurrencyName(OrderDataType $order): string
-    {
-        return (string) $order->getEshopModel()->getFieldData('oxcurrency');
-    }
-
     public function delivery(OrderDataType $order): OrderDeliveryDataType
     {
         return new OrderDeliveryDataType($order->getEshopModel());
