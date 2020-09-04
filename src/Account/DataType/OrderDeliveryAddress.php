@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
-use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 use TheCodingMachine\GraphQLite\Types\ID;
@@ -18,7 +17,7 @@ use TheCodingMachine\GraphQLite\Types\ID;
 /**
  * @Type()
  */
-final class OrderDeliveryAddress implements DataType
+final class OrderDeliveryAddress
 {
     /** @var EshopOrderModel */
     private $order;
@@ -26,11 +25,6 @@ final class OrderDeliveryAddress implements DataType
     public function __construct(EshopOrderModel $order)
     {
         $this->order = $order;
-    }
-
-    public function getEshopModel(): EshopOrderModel
-    {
-        return $this->order;
     }
 
     /**
@@ -133,10 +127,5 @@ final class OrderDeliveryAddress implements DataType
         return new ID(
             $this->order->getFieldData('oxdelstateid')
         );
-    }
-
-    public static function getModelClass(): string
-    {
-        return EshopOrderModel::class;
     }
 }

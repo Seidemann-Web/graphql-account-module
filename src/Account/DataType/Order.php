@@ -14,7 +14,6 @@ use Iterator;
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
 use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
-use OxidEsales\GraphQL\Catalogue\Shared\DataType\DataType;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 use TheCodingMachine\GraphQLite\Types\ID;
@@ -22,7 +21,7 @@ use TheCodingMachine\GraphQLite\Types\ID;
 /**
  * @Type()
  */
-final class Order implements DataType
+final class Order
 {
     /** @var EshopOrderModel */
     private $order;
@@ -141,10 +140,5 @@ final class Order implements DataType
         }
 
         return $items;
-    }
-
-    public static function getModelClass(): string
-    {
-        return EshopOrderModel::class;
     }
 }

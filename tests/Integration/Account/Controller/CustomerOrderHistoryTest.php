@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Tests\Integration\Account\Controller;
 
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
+use OxidEsales\Facts\Facts;
 use OxidEsales\GraphQL\Base\Tests\Integration\TokenTestCase;
 
 final class CustomerOrderHistoryTest extends TokenTestCase
@@ -64,6 +65,7 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         $this->assertSame('2020-05-23T14:08:55+02:00', $order['ordered']);
         $this->assertNull($order['paid']);
         $this->assertNotEmpty($order['updated']);
+        $this->assertFalse($order['exported']);
 
         $this->assertInvoiceAddress($order['invoiceAddress']);
         $this->assertDeliveryAddress($order['deliveryAddress']);
@@ -248,9 +250,11 @@ final class CustomerOrderHistoryTest extends TokenTestCase
             'vatID'          => 'bill vat id',
             'phone'          => '1234',
             'fax'            => '4567',
+            'country'        => ['id' => 'a7c40f631fc920687.20179984'],
+            'state'          => null,
         ];
 
-        if ($this->getConfig()->getEdition() !== 'EE') {
+        if (Facts::getEdition() !== 'EE') {
             $expected['vatID'] = '';
         }
 
@@ -273,6 +277,8 @@ final class CustomerOrderHistoryTest extends TokenTestCase
             'city'           => 'Freiburg',
             'phone'          => '04012345678',
             'fax'            => '04012345679',
+            'country'        => ['id' => 'a7c40f631fc920687.20179984'],
+            'state'          => null,
         ];
 
         foreach ($expected as $key => $value) {
@@ -379,6 +385,12 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                 vatID
                 phone
                 fax
+                country {
+                    id
+                }
+                state {
+                    id
+                }
             }
             deliveryAddress {
                 salutation
@@ -394,11 +406,9 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                 fax
                 country {
                     id
-                    title
                 }
                 state {
                     id
-                    title
                 }
             }
         ';
@@ -423,6 +433,7 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                         ordered
                         paid
                         updated
+                        exported
                         %s
                         %s
                     }
