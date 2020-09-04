@@ -43,6 +43,7 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         $this->assertSame('2020-05-23T14:08:55+02:00', $order['ordered']);
         $this->assertNull($order['paid']);
         $this->assertNotEmpty($order['updated']);
+        $this->assertEmpty($order['vouchers']);
 
         $this->assertInvoiceAddress($order['invoiceAddress']);
         $this->assertDeliveryAddress($order['deliveryAddress']);
@@ -168,6 +169,39 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         }
     }
 
+    public function testOrderVouchers(): void
+    {
+        $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
+
+        $result = $this->query('query {
+            customer {
+                id
+                orders(
+                    pagination: {limit: 1, offset: 0}
+                ){
+                    id
+                    vouchers {
+                        id
+                        number
+                        discount
+                        redeemedAt
+                    }
+                }
+            }
+        }');
+
+        $this->assertResponseStatus(200, $result);
+
+        $vouchers = $result['body']['data']['customer']['orders'][0]['vouchers'];
+        $this->assertEquals(1, count($vouchers));
+
+        $voucher = $vouchers[0];
+        $this->assertSame('usedvoucherid', $voucher['id']);
+        $this->assertSame('voucher1', $voucher['number']);
+        $this->assertSame(321.6, $voucher['discount']);
+        $this->assertStringStartsWith('2020-08-28', $voucher['redeemedAt']);
+    }
+
     public function testOrderCost(): void
     {
         $this->prepareToken(self::OTHER_USERNAME, self::PASSWORD);
@@ -232,6 +266,8 @@ final class CustomerOrderHistoryTest extends TokenTestCase
     {
         $expected = [
             'total'        => '220.78',
+            'discount'     => '123.4',
+            'voucher'      => '321.6',
             'productNet'   => [
                 'price' => '178.3',
                 'vat'   => '0.0',
@@ -279,6 +315,8 @@ final class CustomerOrderHistoryTest extends TokenTestCase
     {
         return 'cost {
             total
+            discount
+            voucher
             productNet {
                 price
                 vat
@@ -374,6 +412,9 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                         ordered
                         paid
                         updated
+                        vouchers {
+                            id
+                        }
                         %s
                     }
                 }
