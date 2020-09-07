@@ -51,9 +51,4 @@ final class OrderCost
     {
         return new OrderProductBruttoSum($orderCost->getEshopModel());
     }
-
-    public function getOrderTotal(OrderCostDataType $orderCost): float
-    {
-        return (float) $orderCost->getEshopModel()->getFieldData('oxtotalordersum');
-    }
 }

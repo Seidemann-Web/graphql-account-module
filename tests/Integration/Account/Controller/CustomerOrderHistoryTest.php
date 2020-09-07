@@ -65,7 +65,6 @@ final class CustomerOrderHistoryTest extends TokenTestCase
         $this->assertSame('2020-05-23T14:08:55+02:00', $order['ordered']);
         $this->assertNull($order['paid']);
         $this->assertNotEmpty($order['updated']);
-        $this->assertFalse($order['exported']);
 
         $this->assertInvoiceAddress($order['invoiceAddress']);
         $this->assertDeliveryAddress($order['deliveryAddress']);
@@ -433,7 +432,6 @@ final class CustomerOrderHistoryTest extends TokenTestCase
                         ordered
                         paid
                         updated
-                        exported
                         %s
                         %s
                     }

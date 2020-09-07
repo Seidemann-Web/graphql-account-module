@@ -78,14 +78,6 @@ final class OrderCostRelations
     /**
      * @Field()
      */
-    public function getOrderTotal(OrderCost $orderCost): float
-    {
-        return $this->orderCostInfrastructure->getOrderTotal($orderCost);
-    }
-
-    /**
-     * @Field()
-     */
     public function getCurrency(OrderCost $orderCost): Currency
     {
         return new Currency($this->orderCostInfrastructure->getOrderCurrencyObject($orderCost));

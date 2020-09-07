@@ -55,14 +55,6 @@ final class Order
     /**
      * @Field()
      */
-    public function getExported(): bool
-    {
-        return (bool) ($this->order->getFieldData('oxpixiexport'));
-    }
-
-    /**
-     * @Field()
-     */
     public function getInvoiceNumber(): int
     {
         return (int) ($this->order->getInvoiceNum());
