@@ -40,7 +40,7 @@ final class Voucher implements DataType
      */
     public function id(): ID
     {
-        return new ID($this->voucherModel->getId());
+        return new ID($this->getEshopModel()->getId());
     }
 
     /**
@@ -48,7 +48,7 @@ final class Voucher implements DataType
      */
     public function number(): string
     {
-        return (string) $this->voucherModel->getFieldData('OXVOUCHERNR');
+        return (string) $this->getEshopModel()->getFieldData('OXVOUCHERNR');
     }
 
     /**
@@ -56,7 +56,7 @@ final class Voucher implements DataType
      */
     public function discount(): float
     {
-        return (float) $this->voucherModel->getFieldData('OXDISCOUNT');
+        return (float) $this->getEshopModel()->getFieldData('OXDISCOUNT');
     }
 
     /**
@@ -65,7 +65,7 @@ final class Voucher implements DataType
     public function redeemedAt(): ?DateTimeInterface
     {
         return DateTimeImmutableFactory::fromString(
-            (string) $this->voucherModel->getFieldData('OXDATEUSED')
+            (string) $this->getEshopModel()->getFieldData('OXDATEUSED')
         );
     }
 
