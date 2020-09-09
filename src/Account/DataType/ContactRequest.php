@@ -110,4 +110,19 @@ final class ContactRequest
     {
         return $this->message;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getFields(): array
+    {
+        return [
+            'email' => $this->getEmail(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'salutation' => $this->getSalutation(),
+            'subject' => $this->getSubject(),
+            'message' => $this->getMessage()
+        ];
+    }
 }

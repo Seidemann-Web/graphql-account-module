@@ -42,10 +42,10 @@ final class Contact
      *
      * @return bool
      */
-    public function validateContactFields(array $fields): bool
+    public function validateContactRequest(ContactRequest $contactRequest): bool
     {
         $form = $this->contactFormBridge->getContactForm();
-        $form->handleRequest($fields);
+        $form->handleRequest($contactRequest->getFields());
 
         if (!$form->isValid()) {
             $errors = $form->getErrors();
