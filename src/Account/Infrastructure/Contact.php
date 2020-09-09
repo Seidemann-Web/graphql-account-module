@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
 use Exception;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\Context;
 use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest;
@@ -60,8 +61,14 @@ final class Contact
         return $this->context->getRequiredContactFormFields();
     }
 
-    public function sendRequest(ContactRequest $contactRequest)
+    public function sendRequest(ContactRequest $contactRequest): bool
     {
-        return true;
+        $mailer = oxNew(Email::class);
+
+        $form = $this->contactFormBridge->getContactForm();
+        $form->handleRequest($contactRequest->getFields());
+        $message = $this->contactFormBridge->getContactFormMessage($form);
+
+        return (bool) $mailer->sendContactMail($contactRequest->getEmail(), $contactRequest->getSubject(), $message);
     }
 }
