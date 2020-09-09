@@ -9,12 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
+use Iterator;
+use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
 use OxidEsales\Eshop\Application\Model\VoucherList as EshopVoucherListModel;
 use OxidEsales\GraphQL\Account\Account\DataType\Order as OrderDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDelivery as OrderDeliveryDataType;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\OrderItem;
 use OxidEsales\GraphQL\Account\Account\DataType\Voucher;
 
 final class Order
@@ -63,5 +66,18 @@ final class Order
         }
 
         return $usedVouchers;
+    }
+
+    public function getOrderItems(OrderDataType $order): array
+    {
+        /** @var Iterator<OrderArticle> $orderArticles */
+        $orderArticles = $order->getEshopModel()->getOrderArticles();
+        $items         = [];
+
+        foreach ($orderArticles as $oneArticle) {
+            $items[] = new OrderItem($oneArticle);
+        }
+
+        return $items;
     }
 }

@@ -10,9 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\DataType;
 
 use DateTimeInterface;
-use Iterator;
 use OxidEsales\Eshop\Application\Model\Order as EshopOrderModel;
-use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\GraphQL\Base\DataType\DateTimeImmutableFactory;
 use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
@@ -114,23 +112,5 @@ final class Order
         return DateTimeImmutableFactory::fromString(
             (string) $this->order->getFieldData('oxtimestamp')
         );
-    }
-
-    /**
-     * @Field
-     *
-     * @return OrderItem[]
-     */
-    public function getItems(): array
-    {
-        /** @var Iterator<OrderArticle> $orderArticles */
-        $orderArticles = $this->order->getOrderArticles();
-        $items         = [];
-
-        foreach ($orderArticles as $oneArticle) {
-            $items[] = new OrderItem($oneArticle);
-        }
-
-        return $items;
     }
 }

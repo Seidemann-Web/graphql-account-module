@@ -15,6 +15,7 @@ use OxidEsales\GraphQL\Account\Account\DataType\OrderCost;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDelivery;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderDeliveryAddress;
 use OxidEsales\GraphQL\Account\Account\DataType\OrderInvoiceAddress;
+use OxidEsales\GraphQL\Account\Account\DataType\OrderItem;
 use OxidEsales\GraphQL\Account\Account\DataType\Voucher;
 use OxidEsales\GraphQL\Account\Account\Infrastructure\Order as OrderInfrastructure;
 use OxidEsales\GraphQL\Catalogue\Currency\Infrastructure\Repository as CurrencyRepository;
@@ -80,5 +81,15 @@ final class OrderRelations
     public function vouchers(OrderDataType $order): array
     {
         return $this->orderInfrastructure->getOrderVouchers($order);
+    }
+
+    /**
+     * @Field
+     *
+     * @return OrderItem[]
+     */
+    public function getItems(OrderDataType $order): array
+    {
+        return $this->orderInfrastructure->getOrderItems($order);
     }
 }
