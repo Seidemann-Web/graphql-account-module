@@ -44,16 +44,17 @@ final class ContactRequestInput
         string $message = ''
     ): ContactRequest {
 
-        $requiredFields = $this->contactInfrastructure->getRequiredContactFormFields();
+        $errors = $this->contactInfrastructure->validateContactFields([
+            'email' => $email,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'salutation' => $salutation,
+            'subject' => $subject,
+            'message' => $message
+        ]);
 
-        foreach ($requiredFields as $oneField) {
-            if (!isset($$oneField) || strlen($$oneField) === 0) {
-                throw new Exception("Value for {$oneField} is required");
-            }
-        }
-
-        if (!$this->legacyService->isValidEmail($email)) {
-            throw InvalidEmail::byString($email);
+        if ($errors) {
+            throw new Exception(reset($errors));
         }
 
         return new ContactRequest(
