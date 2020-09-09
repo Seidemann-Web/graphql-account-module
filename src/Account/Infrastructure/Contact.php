@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\Context;
+use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest;
 
 final class Contact
 {
@@ -27,5 +28,10 @@ final class Contact
     public function getRequiredContactFormFields(): array
     {
         return $this->context->getRequiredContactFormFields();
+    }
+
+    public function sendRequest(ContactRequest $contactRequest)
+    {
+        return true;
     }
 }
