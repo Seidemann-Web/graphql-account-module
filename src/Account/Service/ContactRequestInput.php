@@ -43,8 +43,7 @@ final class ContactRequestInput
         string $subject = '',
         string $message = ''
     ): ContactRequest {
-
-        $errors = $this->contactInfrastructure->validateContactFields([
+        $this->contactInfrastructure->validateContactFields([
             'email' => $email,
             'firstName' => $firstName,
             'lastName' => $lastName,
@@ -52,10 +51,6 @@ final class ContactRequestInput
             'subject' => $subject,
             'message' => $message
         ]);
-
-        if ($errors) {
-            throw new Exception(reset($errors));
-        }
 
         return new ContactRequest(
             $email,
