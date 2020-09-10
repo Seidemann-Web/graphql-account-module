@@ -42,6 +42,6 @@ final class ContactTest extends TokenTestCase
         $this->assertResponseStatus(400, $result);
         $error = $result['body']['errors'][0];
 
-        $this->assertStringStartsWith("Contact request validation failed with error:", $error['message']);
+        $this->assertSame('ERROR_MESSAGE_INPUT_NOVALIDEMAIL', $error['message']);
     }
 }

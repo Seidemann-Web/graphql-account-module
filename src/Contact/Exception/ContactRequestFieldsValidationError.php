@@ -33,6 +33,6 @@ final class ContactRequestFieldsValidationError extends Exception implements Cli
 
     public static function byValidationFieldError(string $error): self
     {
-        return new self(sprintf('Contact request validation failed with error: %s', $error));
+        return new self($error);
     }
 }
