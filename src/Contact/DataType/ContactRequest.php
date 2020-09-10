@@ -63,52 +63,14 @@ final class ContactRequest
         $this->message = $message;
     }
 
-    /**
-     * @Field()
-     */
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @Field()
-     */
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * @Field()
-     */
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * @Field()
-     */
-    public function getSalutation(): string
-    {
-        return $this->salutation;
-    }
-
-    /**
-     * @Field()
-     */
     public function getSubject(): string
     {
         return $this->subject;
-    }
-
-    /**
-     * @Field()
-     */
-    public function getMessage(): string
-    {
-        return $this->message;
     }
 
     /**
@@ -117,12 +79,12 @@ final class ContactRequest
     public function getFields(): array
     {
         return [
-            'email' => $this->getEmail(),
-            'firstName' => $this->getFirstName(),
-            'lastName' => $this->getLastName(),
-            'salutation' => $this->getSalutation(),
-            'subject' => $this->getSubject(),
-            'message' => $this->getMessage()
+            'email' => $this->email,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'salutation' => $this->salutation,
+            'subject' => $this->subject,
+            'message' => $this->message
         ];
     }
 }
