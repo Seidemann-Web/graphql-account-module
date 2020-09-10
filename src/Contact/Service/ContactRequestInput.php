@@ -51,7 +51,7 @@ final class ContactRequestInput
             $message
         );
 
-        $this->contactInfrastructure->validateContactRequest($contactRequest);
+        $this->contactInfrastructure->assertValidContactRequest($contactRequest);
 
         return $contactRequest;
     }

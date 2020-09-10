@@ -44,7 +44,7 @@ final class Contact
      *
      * @return bool
      */
-    public function validateContactRequest(ContactRequest $contactRequest): bool
+    public function assertValidContactRequest(ContactRequest $contactRequest): bool
     {
         $form = $this->contactFormBridge->getContactForm();
         $form->handleRequest($contactRequest->getFields());
