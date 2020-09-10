@@ -12,15 +12,15 @@ namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
 use Exception;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\Context;
 use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest;
+use OxidEsales\GraphQL\Base\Service\Legacy;
 
 final class Contact
 {
     /**
-     * @var Context
+     * @var Legacy
      */
-    private $context;
+    private $legacy;
 
     /**
      * @var ContactFormBridgeInterface
@@ -28,10 +28,10 @@ final class Contact
     private $contactFormBridge;
 
     public function __construct(
-        Context $context,
+        Legacy $legacy,
         ContactFormBridgeInterface $contactFormBridge
     ) {
-        $this->context = $context;
+        $this->legacy = $legacy;
         $this->contactFormBridge = $contactFormBridge;
     }
 
@@ -58,7 +58,9 @@ final class Contact
 
     public function getRequiredContactFormFields(): array
     {
-        return $this->context->getRequiredContactFormFields();
+        $contactFormRequiredFields = $this->legacy->getConfigParam('contactFormRequiredFields');
+
+        return $contactFormRequiredFields === null ? [] : $contactFormRequiredFields;
     }
 
     public function sendRequest(ContactRequest $contactRequest): bool
