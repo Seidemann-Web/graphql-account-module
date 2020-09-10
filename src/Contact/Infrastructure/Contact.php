@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Contact\Infrastructure;
 
-use Exception;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use OxidEsales\GraphQL\Account\Contact\DataType\ContactRequest;
@@ -32,17 +31,13 @@ final class Contact
         Legacy $legacy,
         ContactFormBridgeInterface $contactFormBridge
     ) {
-        $this->legacy = $legacy;
+        $this->legacy            = $legacy;
         $this->contactFormBridge = $contactFormBridge;
     }
 
     /**
      * Validate contact request fields
      * throws exceptions on validation errors
-     *
-     * @param string[] $fields
-     *
-     * @return bool
      */
     public function assertValidContactRequest(ContactRequest $contactRequest): bool
     {
@@ -51,6 +46,7 @@ final class Contact
 
         if (!$form->isValid()) {
             $errors = $form->getErrors();
+
             throw ContactRequestFieldsValidationError::byValidationFieldError(reset($errors));
         }
 
@@ -66,6 +62,7 @@ final class Contact
 
     public function sendRequest(ContactRequest $contactRequest): bool
     {
+        /** @var Email $mailer */
         $mailer = oxNew(Email::class);
 
         $form = $this->contactFormBridge->getContactForm();

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Contact\DataType;
 
-use TheCodingMachine\GraphQLite\Annotations\Field;
 use TheCodingMachine\GraphQLite\Annotations\Type;
 
 /**
@@ -55,12 +54,12 @@ final class ContactRequest
         string $subject,
         string $message
     ) {
-        $this->email = $email;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
+        $this->email      = $email;
+        $this->firstName  = $firstName;
+        $this->lastName   = $lastName;
         $this->salutation = $salutation;
-        $this->subject = $subject;
-        $this->message = $message;
+        $this->subject    = $subject;
+        $this->message    = $message;
     }
 
     public function getEmail(): string
@@ -79,12 +78,12 @@ final class ContactRequest
     public function getFields(): array
     {
         return [
-            'email' => $this->email,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
+            'email'      => $this->email,
+            'firstName'  => $this->firstName,
+            'lastName'   => $this->lastName,
             'salutation' => $this->salutation,
-            'subject' => $this->subject,
-            'message' => $this->message
+            'subject'    => $this->subject,
+            'message'    => $this->message,
         ];
     }
 }
