@@ -25,12 +25,6 @@ final class ContactTest extends TestCase
 
         $contactFormBridge = $container->get(ContactFormBridgeInterface::class);
 
-        /** @var Legacy $legacyServiceMock */
-        $legacyServiceMock = $this
-            ->getMockBuilder(Legacy::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         /** @var Email $mailer */
         $mailer = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
@@ -45,10 +39,19 @@ final class ContactTest extends TestCase
             )
             ->willReturn(true);
 
+        /** @var Legacy $legacyServiceMock */
+        $legacyServiceMock = $this
+            ->getMockBuilder(Legacy::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["getEmail"])
+            ->getMock();
+        $legacyServiceMock->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($mailer);
+
         $contactInfrastructure = new Contact(
             $legacyServiceMock,
-            $contactFormBridge,
-            $mailer
+            $contactFormBridge
         );
 
         $contactRequest = new ContactRequest(

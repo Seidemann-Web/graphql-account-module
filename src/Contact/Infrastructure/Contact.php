@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\GraphQL\Account\Contact\Infrastructure;
 
-use OxidEsales\Eshop\Core\Email;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use OxidEsales\GraphQL\Account\Contact\DataType\ContactRequest;
 use OxidEsales\GraphQL\Account\Contact\Exception\ContactRequestFieldsValidationError;
@@ -27,19 +26,12 @@ final class Contact
      */
     private $contactFormBridge;
 
-    /**
-     * @var Email
-     */
-    private $mailer;
-
     public function __construct(
         Legacy $legacy,
-        ContactFormBridgeInterface $contactFormBridge,
-        Email $mailer
+        ContactFormBridgeInterface $contactFormBridge
     ) {
         $this->legacy            = $legacy;
         $this->contactFormBridge = $contactFormBridge;
-        $this->mailer            = $mailer;
     }
 
     /**
@@ -72,7 +64,8 @@ final class Contact
         $form = $this->contactFormBridge->getContactForm();
         $form->handleRequest($contactRequest->getFields());
         $message = $this->contactFormBridge->getContactFormMessage($form);
+        $mailer = $this->legacy->getEmail();
 
-        return $this->mailer->sendContactMail($contactRequest->getEmail(), $contactRequest->getSubject(), $message);
+        return $mailer->sendContactMail($contactRequest->getEmail(), $contactRequest->getSubject(), $message);
     }
 }
