@@ -27,12 +27,19 @@ final class Contact
      */
     private $contactFormBridge;
 
+    /**
+     * @var Email
+     */
+    private $mailer;
+
     public function __construct(
         Legacy $legacy,
-        ContactFormBridgeInterface $contactFormBridge
+        ContactFormBridgeInterface $contactFormBridge,
+        Email $mailer
     ) {
         $this->legacy            = $legacy;
         $this->contactFormBridge = $contactFormBridge;
+        $this->mailer            = $mailer;
     }
 
     /**
@@ -62,13 +69,10 @@ final class Contact
 
     public function sendRequest(ContactRequest $contactRequest): bool
     {
-        /** @var Email $mailer */
-        $mailer = oxNew(Email::class);
-
         $form = $this->contactFormBridge->getContactForm();
         $form->handleRequest($contactRequest->getFields());
         $message = $this->contactFormBridge->getContactFormMessage($form);
 
-        return (bool) $mailer->sendContactMail($contactRequest->getEmail(), $contactRequest->getSubject(), $message);
+        return $this->mailer->sendContactMail($contactRequest->getEmail(), $contactRequest->getSubject(), $message);
     }
 }
