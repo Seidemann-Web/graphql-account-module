@@ -7,12 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Account\Service;
+namespace OxidEsales\GraphQL\Account\Contact\Service;
 
 use Exception;
-use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest;
-use OxidEsales\GraphQL\Account\Account\Exception\InvalidEmail;
-use OxidEsales\GraphQL\Account\Account\Infrastructure\Contact as ContactInfrastructure;
+use OxidEsales\GraphQL\Account\Contact\DataType\ContactRequest;
+use OxidEsales\GraphQL\Account\Contact\Infrastructure\Contact as ContactInfrastructure;
 use OxidEsales\GraphQL\Base\Service\Legacy;
 use TheCodingMachine\GraphQLite\Annotations\Factory;
 

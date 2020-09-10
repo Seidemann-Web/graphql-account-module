@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Account\Infrastructure;
+namespace OxidEsales\GraphQL\Account\Contact\Infrastructure;
 
 use Exception;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
-use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest;
+use OxidEsales\GraphQL\Account\Contact\DataType\ContactRequest;
 use OxidEsales\GraphQL\Base\Service\Legacy;
 
 final class Contact

@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Account\Controller;
+namespace OxidEsales\GraphQL\Account\Contact\Controller;
 
-use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest;
-use OxidEsales\GraphQL\Account\Account\Service\ContactRequest as ContactRequestService;
+use OxidEsales\GraphQL\Account\Contact\DataType\ContactRequest;
+use OxidEsales\GraphQL\Account\Contact\Service\ContactRequest as ContactRequestService;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
 final class Contact

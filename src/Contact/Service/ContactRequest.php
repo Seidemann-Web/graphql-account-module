@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\GraphQL\Account\Account\Service;
+namespace OxidEsales\GraphQL\Account\Contact\Service;
 
-use OxidEsales\GraphQL\Account\Account\DataType\ContactRequest as ContactRequestDataType;
-use OxidEsales\GraphQL\Account\Account\Infrastructure\Contact as ContactInfrastructure;
+use OxidEsales\GraphQL\Account\Contact\DataType\ContactRequest as ContactRequestDataType;
+use OxidEsales\GraphQL\Account\Contact\Infrastructure\Contact as ContactInfrastructure;
 
 final class ContactRequest
 {
